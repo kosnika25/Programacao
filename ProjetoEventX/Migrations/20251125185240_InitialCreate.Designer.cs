@@ -9,11 +9,11 @@ using ProjetoEventX.Data;
 
 #nullable disable
 
-namespace ProjetoEventX.Migrations.EventX
+namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    [Migration("20251108204910_InitialClean")]
-    partial class InitialClean
+    [Migration("20251125185240_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -988,8 +988,9 @@ namespace ProjetoEventX.Migrations.EventX
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Telefone")
-                        .HasColumnType("integer");
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");

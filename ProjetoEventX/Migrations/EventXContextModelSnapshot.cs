@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjetoEventX.Data;
 
 #nullable disable
 
-namespace ProjetoEventX.Migrations.EventX
+namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    [Migration("20251112181638_AtualizacaoModel")]
-    partial class AtualizacaoModel
+    partial class EventXContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

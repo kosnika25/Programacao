@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace ProjetoEventX.Migrations.EventX
+namespace ProjetoEventX.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -25,6 +25,33 @@ namespace ProjetoEventX.Migrations.EventX
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TipoUsuario = table.Column<string>(type: "text", nullable: true),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -53,7 +80,7 @@ namespace ProjetoEventX.Migrations.EventX
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Nome = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Endereco = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Telefone = table.Column<int>(type: "integer", nullable: false),
+                    Telefone = table.Column<string>(type: "text", nullable: false),
                     Cpf = table.Column<string>(type: "character varying(14)", maxLength: 14, nullable: false),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -101,84 +128,6 @@ namespace ProjetoEventX.Migrations.EventX
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AspNetUsers",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false),
-                    Discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
-                    PessoaId = table.Column<int>(type: "integer", nullable: true),
-                    ConfirmaPresenca = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    PessoaId1 = table.Column<int>(type: "integer", nullable: true),
-                    Fornecedor_PessoaId = table.Column<int>(type: "integer", nullable: true),
-                    Cnpj = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: true),
-                    TipoServico = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    AvaliacaoMedia = table.Column<decimal>(type: "numeric", nullable: true),
-                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Fornecedor_CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Fornecedor_UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Fornecedor_PessoaId1 = table.Column<int>(type: "integer", nullable: true),
-                    Organizador_PessoaId = table.Column<int>(type: "integer", nullable: true),
-                    Organizador_DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Organizador_CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Organizador_UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Organizador_PessoaId1 = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_Fornecedor_PessoaId",
-                        column: x => x.Fornecedor_PessoaId,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_Fornecedor_PessoaId1",
-                        column: x => x.Fornecedor_PessoaId1,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_Organizador_PessoaId",
-                        column: x => x.Organizador_PessoaId,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_Organizador_PessoaId1",
-                        column: x => x.Organizador_PessoaId1,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_PessoaId",
-                        column: x => x.PessoaId,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AspNetUsers_Pessoas_PessoaId1",
-                        column: x => x.PessoaId1,
-                        principalTable: "Pessoas",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -267,6 +216,139 @@ namespace ProjetoEventX.Migrations.EventX
                 });
 
             migrationBuilder.CreateTable(
+                name: "Convidados",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PessoaId = table.Column<int>(type: "integer", nullable: false),
+                    ConfirmaPresenca = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Convidados", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Convidados_Pessoas_PessoaId",
+                        column: x => x.PessoaId,
+                        principalTable: "Pessoas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Fornecedores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PessoaId = table.Column<int>(type: "integer", nullable: false),
+                    Cnpj = table.Column<string>(type: "character varying(18)", maxLength: 18, nullable: false),
+                    TipoServico = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    AvaliacaoMedia = table.Column<decimal>(type: "numeric", nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Fornecedores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Fornecedores_Pessoas_PessoaId",
+                        column: x => x.PessoaId,
+                        principalTable: "Pessoas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Organizadores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PessoaId = table.Column<int>(type: "integer", nullable: false),
+                    DataCadastro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserName = table.Column<string>(type: "text", nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "text", nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "text", nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Organizadores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Organizadores_Pessoas_PessoaId",
+                        column: x => x.PessoaId,
+                        principalTable: "Pessoas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Produtos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Nome = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Descricao = table.Column<string>(type: "text", nullable: false),
+                    Preco = table.Column<decimal>(type: "numeric", nullable: false),
+                    Tipo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    FornecedorId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Produtos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Produtos_Fornecedores_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Eventos",
                 columns: table => new
                 {
@@ -291,43 +373,21 @@ namespace ProjetoEventX.Migrations.EventX
                 {
                     table.PrimaryKey("PK_Eventos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Eventos_AspNetUsers_OrganizadorId",
-                        column: x => x.OrganizadorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Eventos_Locais_LocalId",
                         column: x => x.LocalId,
                         principalTable: "Locais",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_Eventos_Organizadores_OrganizadorId",
+                        column: x => x.OrganizadorId,
+                        principalTable: "Organizadores",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_Eventos_TemplatesEventos_IdTemplateEvento",
                         column: x => x.IdTemplateEvento,
                         principalTable: "TemplatesEventos",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Produto",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Nome = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Descricao = table.Column<string>(type: "text", nullable: false),
-                    Preco = table.Column<decimal>(type: "numeric", nullable: false),
-                    Tipo = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    FornecedorId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Produto", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Produto_AspNetUsers_FornecedorId",
-                        column: x => x.FornecedorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -345,16 +405,16 @@ namespace ProjetoEventX.Migrations.EventX
                 {
                     table.PrimaryKey("PK_Administracoes", x => x.IdAdministrar);
                     table.ForeignKey(
-                        name: "FK_Administracoes_AspNetUsers_OrganizadorId",
-                        column: x => x.OrganizadorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Administracoes_Eventos_IdEvento",
                         column: x => x.IdEvento,
                         principalTable: "Eventos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Administracoes_Organizadores_OrganizadorId",
+                        column: x => x.OrganizadorId,
+                        principalTable: "Organizadores",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -382,6 +442,28 @@ namespace ProjetoEventX.Migrations.EventX
                 });
 
             migrationBuilder.CreateTable(
+                name: "Despesas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EventoId = table.Column<int>(type: "integer", nullable: false),
+                    Descricao = table.Column<string>(type: "text", nullable: false),
+                    Valor = table.Column<decimal>(type: "numeric", nullable: false),
+                    DataDespesa = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Despesas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Despesas_Eventos_EventoId",
+                        column: x => x.EventoId,
+                        principalTable: "Eventos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Feedbacks",
                 columns: table => new
                 {
@@ -400,14 +482,14 @@ namespace ProjetoEventX.Migrations.EventX
                 {
                     table.PrimaryKey("PK_Feedbacks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Feedbacks_AspNetUsers_FornecedorId",
-                        column: x => x.FornecedorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Feedbacks_Eventos_EventoId",
                         column: x => x.EventoId,
                         principalTable: "Eventos",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Feedbacks_Fornecedores_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedores",
                         principalColumn: "Id");
                 });
 
@@ -428,9 +510,9 @@ namespace ProjetoEventX.Migrations.EventX
                 {
                     table.PrimaryKey("PK_ListasConvidados", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ListasConvidados_AspNetUsers_ConvidadoId",
+                        name: "FK_ListasConvidados_Convidados_ConvidadoId",
                         column: x => x.ConvidadoId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Convidados",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -442,7 +524,7 @@ namespace ProjetoEventX.Migrations.EventX
                 });
 
             migrationBuilder.CreateTable(
-                name: "MensagemChats",
+                name: "MensagemChat",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -451,27 +533,27 @@ namespace ProjetoEventX.Migrations.EventX
                     DestinatarioId = table.Column<int>(type: "integer", nullable: false),
                     TipoDestinatario = table.Column<string>(type: "text", nullable: false),
                     Conteudo = table.Column<string>(type: "text", nullable: false),
-                    DataEnvio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EventoId = table.Column<int>(type: "integer", nullable: false),
+                    DataEnvio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     EhRespostaAssistente = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MensagemChats", x => x.Id);
+                    table.PrimaryKey("PK_MensagemChat", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_MensagemChats_Eventos_EventoId",
+                        name: "FK_MensagemChat_Eventos_EventoId",
                         column: x => x.EventoId,
                         principalTable: "Eventos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_MensagemChats_Pessoas_DestinatarioId",
+                        name: "FK_MensagemChat_Pessoas_DestinatarioId",
                         column: x => x.DestinatarioId,
                         principalTable: "Pessoas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_MensagemChats_Pessoas_RemetenteId",
+                        name: "FK_MensagemChat_Pessoas_RemetenteId",
                         column: x => x.RemetenteId,
                         principalTable: "Pessoas",
                         principalColumn: "Id",
@@ -511,6 +593,41 @@ namespace ProjetoEventX.Migrations.EventX
                 });
 
             migrationBuilder.CreateTable(
+                name: "Pedidos",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventoId = table.Column<int>(type: "integer", nullable: false),
+                    ProdutoId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantidade = table.Column<int>(type: "integer", nullable: false),
+                    PrecoTotal = table.Column<decimal>(type: "numeric", nullable: false),
+                    StatusPedido = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValue: "Pendente"),
+                    DataPedido = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FornecedorId = table.Column<int>(type: "integer", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pedidos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Pedidos_Eventos_EventoId",
+                        column: x => x.EventoId,
+                        principalTable: "Eventos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Pedidos_Fornecedores_FornecedorId",
+                        column: x => x.FornecedorId,
+                        principalTable: "Fornecedores",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Pedidos_Produtos_ProdutoId",
+                        column: x => x.ProdutoId,
+                        principalTable: "Produtos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TarefasEventos",
                 columns: table => new
                 {
@@ -540,41 +657,6 @@ namespace ProjetoEventX.Migrations.EventX
                         column: x => x.ResponsavelId,
                         principalTable: "Pessoas",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Pedidos",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    EventoId = table.Column<int>(type: "integer", nullable: false),
-                    ProdutoId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantidade = table.Column<int>(type: "integer", nullable: false),
-                    PrecoTotal = table.Column<decimal>(type: "numeric", nullable: false),
-                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValue: "Pendente"),
-                    DataPedido = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FornecedorId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Pedidos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Pedidos_AspNetUsers_FornecedorId",
-                        column: x => x.FornecedorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Pedidos_Eventos_EventoId",
-                        column: x => x.EventoId,
-                        principalTable: "Eventos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Pedidos_Produto_ProdutoId",
-                        column: x => x.ProdutoId,
-                        principalTable: "Produto",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -670,42 +752,6 @@ namespace ProjetoEventX.Migrations.EventX
                 column: "NormalizedEmail");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_Fornecedor_PessoaId",
-                table: "AspNetUsers",
-                column: "Fornecedor_PessoaId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_Fornecedor_PessoaId1",
-                table: "AspNetUsers",
-                column: "Fornecedor_PessoaId1",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_Organizador_PessoaId",
-                table: "AspNetUsers",
-                column: "Organizador_PessoaId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_Organizador_PessoaId1",
-                table: "AspNetUsers",
-                column: "Organizador_PessoaId1",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_PessoaId",
-                table: "AspNetUsers",
-                column: "PessoaId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AspNetUsers_PessoaId1",
-                table: "AspNetUsers",
-                column: "PessoaId1",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
@@ -714,6 +760,17 @@ namespace ProjetoEventX.Migrations.EventX
             migrationBuilder.CreateIndex(
                 name: "IX_AssistentesVirtuais_EventoId",
                 table: "AssistentesVirtuais",
+                column: "EventoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Convidados_PessoaId",
+                table: "Convidados",
+                column: "PessoaId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Despesas_EventoId",
+                table: "Despesas",
                 column: "EventoId");
 
             migrationBuilder.CreateIndex(
@@ -742,6 +799,12 @@ namespace ProjetoEventX.Migrations.EventX
                 column: "FornecedorId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Fornecedores_PessoaId",
+                table: "Fornecedores",
+                column: "PessoaId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ItensPedidos_PedidoId",
                 table: "ItensPedidos",
                 column: "PedidoId");
@@ -757,18 +820,18 @@ namespace ProjetoEventX.Migrations.EventX
                 column: "EventoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MensagemChats_DestinatarioId",
-                table: "MensagemChats",
+                name: "IX_MensagemChat_DestinatarioId",
+                table: "MensagemChat",
                 column: "DestinatarioId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MensagemChats_EventoId",
-                table: "MensagemChats",
+                name: "IX_MensagemChat_EventoId",
+                table: "MensagemChat",
                 column: "EventoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MensagemChats_RemetenteId",
-                table: "MensagemChats",
+                name: "IX_MensagemChat_RemetenteId",
+                table: "MensagemChat",
                 column: "RemetenteId");
 
             migrationBuilder.CreateIndex(
@@ -780,6 +843,12 @@ namespace ProjetoEventX.Migrations.EventX
                 name: "IX_Notificacoes_EventoId",
                 table: "Notificacoes",
                 column: "EventoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Organizadores_PessoaId",
+                table: "Organizadores",
+                column: "PessoaId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pagamentos_PedidoId",
@@ -802,8 +871,8 @@ namespace ProjetoEventX.Migrations.EventX
                 column: "ProdutoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Produto_FornecedorId",
-                table: "Produto",
+                name: "IX_Produtos_FornecedorId",
+                table: "Produtos",
                 column: "FornecedorId");
 
             migrationBuilder.CreateIndex(
@@ -842,6 +911,9 @@ namespace ProjetoEventX.Migrations.EventX
                 name: "AssistentesVirtuais");
 
             migrationBuilder.DropTable(
+                name: "Despesas");
+
+            migrationBuilder.DropTable(
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
@@ -851,7 +923,7 @@ namespace ProjetoEventX.Migrations.EventX
                 name: "ListasConvidados");
 
             migrationBuilder.DropTable(
-                name: "MensagemChats");
+                name: "MensagemChat");
 
             migrationBuilder.DropTable(
                 name: "Notificacoes");
@@ -866,22 +938,31 @@ namespace ProjetoEventX.Migrations.EventX
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "Convidados");
+
+            migrationBuilder.DropTable(
                 name: "Pedidos");
 
             migrationBuilder.DropTable(
                 name: "Eventos");
 
             migrationBuilder.DropTable(
-                name: "Produto");
+                name: "Produtos");
 
             migrationBuilder.DropTable(
                 name: "Locais");
 
             migrationBuilder.DropTable(
+                name: "Organizadores");
+
+            migrationBuilder.DropTable(
                 name: "TemplatesEventos");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Fornecedores");
 
             migrationBuilder.DropTable(
                 name: "Pessoas");
