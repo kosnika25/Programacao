@@ -80,6 +80,9 @@ builder.Services.AddScoped<ProjetoEventX.Services.EmailService>();
 builder.Services.AddScoped<AuditoriaService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<SecurityActionFilter>();
+builder.Services.AddScoped<NotificationService>();
+builder.Services.AddScoped<FornecedorPerformanceService>();
+builder.Services.AddScoped<EventLogService>();
 
 // ================================
 // 🔹 Stripe

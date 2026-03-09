@@ -1,0 +1,360 @@
+@model ProjetoEventX.Models.FornecedorRanking
+@{
+    ViewData["Title"] = $"Perfil - {Model.Fornecedor?.Pessoa?.Nome ?? "Fornecedor"}";
+    var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor> ?? new();
+    var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido> ?? new();
+    var totalAval = (int)(ViewBag.TotalAvaliacoes ?? 0);
+    var notas5 = (int)(ViewBag.Notas5 ?? 0);
+    var notas4 = (int)(ViewBag.Notas4 ?? 0);
+    var notas3 = (int)(ViewBag.Notas3 ?? 0);
+    var notas2 = (int)(ViewBag.Notas2 ?? 0);
+    var notas1 = (int)(ViewBag.Notas1 ?? 0);
+    var totalRanking = (int)(ViewBag.TotalRanking ?? 0);
+}
+
+<div class="container py-4">
+    <!-- Voltar -->
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-outline-dark" style="border-radius: 8px;">
+            <i class="fas fa-arrow-left me-2"></i>Voltar ao Ranking
+        </a>
+    </div>
+
+    <!-- Header do Perfil -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; overflow: hidden;">
+        <div class="py-5 px-4" style="background: linear-gradient(135deg, #8B0000 0%, #B22222 40%, #D4A574 100%);">
+            <div class="row align-items-center">
+                <div class="col-auto">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                         style="width: 100px; height: 100px; background: rgba(255,255,255,0.2); color: white; font-size: 2.5rem; font-weight: 700; border: 4px solid rgba(255,255,255,0.3);">
+                        @(Model.Fornecedor?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "F")
+                    </div>
+                </div>
+                <div class="col text-white">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <h2 class="fw-bold mb-0">@(Model.Fornecedor?.Pessoa?.Nome ?? "Fornecedor")</h2>
+                        @if (Model.IsTopFornecedor)
+                        {
+                            <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 20px; font-size: 0.85em;">
+                                <i class="fas fa-crown me-1"></i>Top Fornecedor
+                            </span>
+                        }
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 opacity-85">
+                        <span><i class="fas fa-tag me-1"></i>@(Model.Fornecedor?.TipoServico ?? "")</span>
+                        <span><i class="fas fa-map-marker-alt me-1"></i>@(Model.Fornecedor?.Cidade ?? ""), @(Model.Fornecedor?.UF ?? "")</span>
+                        <span><i class="fas fa-id-card me-1"></i>CNPJ: @(Model.Fornecedor?.Cnpj ?? "")</span>
+                    </div>
+                    <div class="mt-2">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= (int)Model.MediaAvaliacoes)
+                            {
+                                <i class="fas fa-star" style="color: #ffc107; font-size: 1.2rem;"></i>
+                            }
+                            else if (i - 0.5m <= Model.MediaAvaliacoes)
+                            {
+                                <i class="fas fa-star-half-alt" style="color: #ffc107; font-size: 1.2rem;"></i>
+                            }
+                            else
+                            {
+                                <i class="far fa-star" style="color: rgba(255,255,255,0.4); font-size: 1.2rem;"></i>
+                            }
+                        }
+                        <span class="fw-bold ms-2" style="font-size: 1.1rem;">@Model.MediaAvaliacoes.ToString("0.0")</span>
+                        <small class="opacity-75">(@totalAval avaliações)</small>
+                    </div>
+                </div>
+                <div class="col-auto text-center text-white">
+                    <div class="p-3 rounded" style="background: rgba(255,255,255,0.15); border-radius: 16px !important;">
+                        <div style="font-size: 2.5rem; font-weight: 800; line-height: 1;">#@Model.PosicaoRanking</div>
+                        <small class="opacity-75">de @totalRanking fornecedores</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Coluna Principal -->
+        <div class="col-lg-8">
+            <!-- Métricas de Desempenho -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 p-4 pb-2">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-chart-bar me-2" style="color: #1a237e;"></i>Métricas de Desempenho</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded text-center" style="background: linear-gradient(135deg, #e8eaf6, #c5cae9); border-radius: 14px !important;">
+                                <div style="font-size: 2rem; font-weight: 800; color: #1a237e;">@Model.PontuacaoGeral.ToString("0.0")</div>
+                                <small class="text-muted fw-semibold">Pontuação Geral</small>
+                                <div class="progress mt-2" style="height: 6px; border-radius: 3px;">
+                                    <div class="progress-bar" style="width: @Model.PontuacaoGeral%; background: #1a237e;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded text-center" style="background: #e8f5e9; border-radius: 14px !important;">
+                                <div style="font-size: 2rem; font-weight: 800; color: #2e7d32;">@Model.PedidosConcluidos</div>
+                                <small class="text-muted fw-semibold">Pedidos Concluídos</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded text-center" style="background: #fff3e0; border-radius: 14px !important;">
+                                <div style="font-size: 2rem; font-weight: 800; color: #e65100;">@Model.EventosAtendidos</div>
+                                <small class="text-muted fw-semibold">Eventos Atendidos</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" style="opacity: 0.1;">
+
+                    <!-- Barras de métricas -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Tempo Médio de Resposta</span>
+                            @{
+                                var tempoTexto = Model.TempoMedioRespostaHoras == 0 ? "Sem dados"
+                                    : Model.TempoMedioRespostaHoras < 1 ? "< 1 hora"
+                                    : Model.TempoMedioRespostaHoras < 24 ? $"{Model.TempoMedioRespostaHoras:0.0} horas"
+                                    : $"{(Model.TempoMedioRespostaHoras / 24):0.1} dias";
+                                var tempoCor = Model.TempoMedioRespostaHoras <= 4 ? "#2e7d32"
+                                    : Model.TempoMedioRespostaHoras <= 24 ? "#f9a825"
+                                    : "#c62828";
+                            }
+                            <span class="fw-bold small" style="color: @tempoCor;">@tempoTexto</span>
+                        </div>
+                        @{
+                            var tempoPercent = Model.TempoMedioRespostaHoras == 0 ? 0
+                                : Model.TempoMedioRespostaHoras >= 72 ? 100
+                                : (Model.TempoMedioRespostaHoras / 72) * 100;
+                            tempoPercent = 100 - tempoPercent; // Inverter: menor tempo = barra maior
+                        }
+                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                            <div class="progress-bar" style="width: @tempoPercent%; background: @tempoCor;"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Taxa de Aceitação</span>
+                            <span class="fw-bold small" style="color: @(Model.TaxaAceitacao >= 70 ? "#2e7d32" : Model.TaxaAceitacao >= 40 ? "#f9a825" : "#c62828");">
+                                @Model.TaxaAceitacao.ToString("0.0")%
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                            <div class="progress-bar" style="width: @Model.TaxaAceitacao%; background: @(Model.TaxaAceitacao >= 70 ? "#2e7d32" : Model.TaxaAceitacao >= 40 ? "#f9a825" : "#c62828");"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span class="fw-semibold small">Taxa de Cancelamento</span>
+                            <span class="fw-bold small" style="color: @(Model.TaxaCancelamento <= 10 ? "#2e7d32" : Model.TaxaCancelamento <= 30 ? "#f9a825" : "#c62828");">
+                                @Model.TaxaCancelamento.ToString("0.0")%
+                            </span>
+                        </div>
+                        <div class="progress" style="height: 8px; border-radius: 4px;">
+                            <div class="progress-bar" style="width: @Model.TaxaCancelamento%; background: @(Model.TaxaCancelamento <= 10 ? "#2e7d32" : Model.TaxaCancelamento <= 30 ? "#f9a825" : "#c62828");"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distribuição de Avaliações -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 p-4 pb-2">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-star me-2" style="color: #ffc107;"></i>Distribuição de Avaliações</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    @if (totalAval > 0)
+                    {
+                        @for (int nota = 5; nota >= 1; nota--)
+                        {
+                            var count = nota switch { 5 => notas5, 4 => notas4, 3 => notas3, 2 => notas2, _ => notas1 };
+                            var percent = totalAval > 0 ? ((decimal)count / totalAval) * 100 : 0;
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <span class="fw-semibold" style="width: 20px;">@nota</span>
+                                <i class="fas fa-star" style="color: #ffc107;"></i>
+                                <div class="progress flex-grow-1" style="height: 10px; border-radius: 5px;">
+                                    <div class="progress-bar" style="width: @percent%; background: #ffc107;"></div>
+                                </div>
+                                <span class="text-muted small" style="width: 60px; text-align: right;">@count (@percent.ToString("0")%)</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted py-3">Nenhuma avaliação recebida ainda.</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Avaliações Recentes -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 p-4 pb-2">
+                    <h5 class="fw-bold mb-0"><i class="fas fa-comments me-2" style="color: #1565c0;"></i>Avaliações Recentes</h5>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    @if (avaliacoesRecentes.Any())
+                    {
+                        @foreach (var aval in avaliacoesRecentes)
+                        {
+                            <div class="mb-4 pb-3" style="border-bottom: 1px solid #f0f0f0;">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                             style="width: 36px; height: 36px; background: #e8eaf6; color: #1a237e; font-weight: 700; font-size: 0.85rem;">
+                                            @(aval.Organizador?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "O")
+                                        </div>
+                                        <div>
+                                            <span class="fw-semibold">@(aval.Organizador?.Pessoa?.Nome ?? "Organizador")</span>
+                                            @if (aval.Evento != null)
+                                            {
+                                                <small class="text-muted d-block">@aval.Evento.NomeEvento</small>
+                                            }
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">@aval.DataAvaliacao.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <div class="mb-1">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <i class="@(i <= aval.Nota ? "fas" : "far") fa-star" style="color: #ffc107; font-size: 0.85rem;"></i>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(aval.Comentario))
+                                {
+                                    <p class="mb-0 text-muted small" style="white-space: pre-line;">@aval.Comentario</p>
+                                }
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-center text-muted py-3">Nenhuma avaliação recebida.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna Lateral -->
+        <div class="col-lg-4">
+            <!-- Resumo Rápido -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                <div class="card-header bg-white border-0 p-4 pb-2">
+                    <h6 class="fw-bold mb-0"><i class="fas fa-tachometer-alt me-2"></i>Resumo</h6>
+                </div>
+                <div class="card-body p-4 pt-2">
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Posição no Ranking</span>
+                        <span class="fw-bold">#@Model.PosicaoRanking de @totalRanking</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Nota Média</span>
+                        <span class="fw-bold">@Model.MediaAvaliacoes.ToString("0.0") ⭐</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Avaliações</span>
+                        <span class="fw-bold">@Model.QuantidadeAvaliacoes</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Resposta Média</span>
+                        <span class="fw-bold">@tempoTexto</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Eventos Atendidos</span>
+                        <span class="fw-bold">@Model.EventosAtendidos</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                        <span class="text-muted small">Pedidos Concluídos</span>
+                        <span class="fw-bold">@Model.PedidosConcluidos</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center py-2">
+                        <span class="text-muted small">Taxa de Aceitação</span>
+                        <span class="fw-bold" style="color: @(Model.TaxaAceitacao >= 70 ? "#2e7d32" : "#e65100");">@Model.TaxaAceitacao.ToString("0")%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Produtos do Fornecedor -->
+            @if (Model.Fornecedor?.Produtos?.Any() == true)
+            {
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                    <div class="card-header bg-white border-0 p-4 pb-2">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-box-open me-2"></i>Produtos / Serviços</h6>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        @foreach (var prod in Model.Fornecedor.Produtos.Take(5))
+                        {
+                            <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                                <div>
+                                    <span class="fw-semibold small">@prod.Nome</span>
+                                    <small class="text-muted d-block">@prod.Tipo</small>
+                                </div>
+                                <span class="fw-bold small" style="color: #8B0000;">R$ @prod.Preco.ToString("N2")</span>
+                            </div>
+                        }
+                        @if (Model.Fornecedor.Produtos.Count > 5)
+                        {
+                            <div class="text-center mt-2">
+                                <small class="text-muted">+@(Model.Fornecedor.Produtos.Count - 5) produtos</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Pedidos Recentes -->
+            @if (pedidosRecentes.Any())
+            {
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                    <div class="card-header bg-white border-0 p-4 pb-2">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-shopping-cart me-2"></i>Pedidos Recentes</h6>
+                    </div>
+                    <div class="card-body p-4 pt-2">
+                        @foreach (var ped in pedidosRecentes)
+                        {
+                            var statusCor = ped.StatusPedido switch
+                            {
+                                "Pago" => "success",
+                                "Entregue" => "primary",
+                                "Pendente" => "warning",
+                                "Cancelado" => "danger",
+                                _ => "secondary"
+                            };
+                            <div class="d-flex justify-content-between align-items-center py-2" style="border-bottom: 1px solid #f5f5f5;">
+                                <div>
+                                    <span class="fw-semibold small">@(ped.Evento?.NomeEvento ?? "Evento")</span>
+                                    <small class="text-muted d-block">@ped.DataPedido.ToString("dd/MM/yyyy")</small>
+                                </div>
+                                <span class="badge bg-@statusCor">@ped.StatusPedido</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- Ações -->
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4 text-center">
+                    <a asp-controller="Marketplace" asp-action="DetalhesFornecedor" asp-route-id="@Model.FornecedorId"
+                       class="btn w-100 mb-2" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; border-radius: 10px; font-weight: 600;">
+                        <i class="fas fa-store me-2"></i>Ver no Marketplace
+                    </a>
+                    <a asp-controller="Orcamento" asp-action="Criar" asp-route-fornecedorId="@Model.FornecedorId"
+                       class="btn btn-outline-dark w-100" style="border-radius: 10px; font-weight: 600;">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Solicitar Orçamento
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card { transition: transform 0.2s ease; }
+    </style>
+}

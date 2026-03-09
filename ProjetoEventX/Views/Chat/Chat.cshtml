@@ -15,8 +15,8 @@
                     <div id="chatMessages" class="chat-container">
                         @foreach (var msg in Model)
                         {
-                            <div class="chat-message @(msg.ConvidadoId == ViewBag.CurrentUserId ? "sent" : "received")">
-                                <strong>@(msg.Convidado?.Nome ?? "Convidado desconhecido")</strong>
+                            <div class="chat-message @(msg.RemetenteId == (int)ViewBag.CurrentUserId ? "sent" : "received")">
+                                <strong>@(msg.Remetente?.Nome ?? "Usuário")</strong>
                                 <p>@msg.Conteudo</p>
                                 <small>@msg.DataEnvio.ToString("dd/MM/yyyy HH:mm")</small>
                             </div>
@@ -27,8 +27,9 @@
                     
                     <div class="mt-3">
                         <form id="chatForm" class="d-flex gap-2">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" id="eventoId" value="@eventoId" />
-                            <input type="hidden" id="convidadoId" value="@ViewBag.CurrentUserId" />
+                            <input type="hidden" id="remetenteId" value="@ViewBag.CurrentUserId" />
                             <input type="text" id="mensagemInput" class="form-control" placeholder="Digite sua mensagem..." />
                             <button type="submit" class="btn btn-eventx-primary">Enviar</button>
                         </form>
@@ -68,7 +69,8 @@
             e.preventDefault();
             const mensagem = document.getElementById("mensagemInput").value;
             const eventoId = document.getElementById("eventoId").value;
-            const convidadoId = document.getElementById("convidadoId").value;
+            const remetenteId = document.getElementById("remetenteId").value;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
             if (mensagem.trim()) {
                 await fetch('/Chat/EnviarMensagem', {
@@ -76,7 +78,7 @@
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `eventoId=${eventoId}&convidadoId=${convidadoId}&mensagem=${encodeURIComponent(mensagem)}`
+                    body: `eventoId=${eventoId}&remetenteId=${remetenteId}&destinatarioId=${remetenteId}&conteudo=${encodeURIComponent(mensagem)}&__RequestVerificationToken=${encodeURIComponent(token)}`
                 });
 
                 document.getElementById("mensagemInput").value = '';

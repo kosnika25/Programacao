@@ -70,5 +70,6 @@ namespace ProjetoEventX.Models
         public ICollection<ChecklistEvento> ChecklistEventos { get; set; } = new List<ChecklistEvento>();
         public ICollection<TimelineEvento> TimelineEventos { get; set; } = new List<TimelineEvento>();
         public ICollection<OrcamentoSimulado> OrcamentosSimulados { get; set; } = new List<OrcamentoSimulado>();
+        public ICollection<EventLog> EventLogs { get; set; } = new List<EventLog>();
     }
 }

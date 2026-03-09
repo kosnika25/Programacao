@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjetoEventX.Data;
 using ProjetoEventX.Models;
+using ProjetoEventX.Services;
 
 namespace ProjetoEventX.Controllers
 {
@@ -13,11 +14,15 @@ namespace ProjetoEventX.Controllers
     {
         private readonly EventXContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly NotificationService _notificationService;
+        private readonly EventLogService _eventLogService;
 
-        public PedidoController(EventXContext context, UserManager<ApplicationUser> userManager)
+        public PedidoController(EventXContext context, UserManager<ApplicationUser> userManager, NotificationService notificationService, EventLogService eventLogService)
         {
             _context = context;
             _userManager = userManager;
+            _notificationService = notificationService;
+            _eventLogService = eventLogService;
         }
 
         // GET: Pedido/Index?eventoId=1
@@ -124,7 +129,9 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("Index", "Eventos");
             }
 
-            var produto = await _context.Produtos.FindAsync(produtoId);
+            var produto = await _context.Produtos
+                .Include(p => p.Fornecedor)
+                .FirstOrDefaultAsync(p => p.Id == produtoId);
             if (produto == null)
             {
                 TempData["ErrorMessage"] = "❌ Produto não encontrado.";
@@ -150,7 +157,23 @@ namespace ProjetoEventX.Controllers
             _context.Pedidos.Add(pedido);
             await _context.SaveChangesAsync();
 
+            // Notificar fornecedor sobre novo pedido
+            var supplierUser = await _userManager.FindByEmailAsync(produto.Fornecedor?.Email ?? "");
+            if (supplierUser != null)
+            {
+                await _notificationService.CreateAsync(
+                    supplierUser.Id,
+                    "Novo pedido criado",
+                    $"Um novo pedido de '{produto.Nome}' (x{quantidade}) foi criado.",
+                    "NovoPedido",
+                    $"/Pedido/Details/{pedido.Id}");
+            }
+
             TempData["SuccessMessage"] = $"✅ Pedido de '{produto.Nome}' (x{quantidade}) criado com sucesso! Total: R$ {pedido.PrecoTotal:N2}";
+
+            await _eventLogService.LogAsync(eventoId, user.Id, "PedidoCriado",
+                $"Pedido de '{produto.Nome}' (x{quantidade}) criado. Total: R$ {pedido.PrecoTotal:N2}.");
+
             return RedirectToAction("Index", new { eventoId });
         }
 
@@ -227,6 +250,35 @@ namespace ProjetoEventX.Controllers
                 }
 
                 TempData["SuccessMessage"] = $"✅ Pagamento confirmado. Despesa de R$ {pedido.PrecoTotal:N2} adicionada automaticamente.";
+
+                await _eventLogService.LogAsync(pedido.EventoId, user.Id, "PagamentoConfirmado",
+                    $"Pagamento de R$ {pedido.PrecoTotal:N2} confirmado para '{pedido.Produto?.Nome}'.");
+
+                await _eventLogService.LogAsync(pedido.EventoId, user.Id, "DespesaRegistrada",
+                    $"Despesa de R$ {pedido.PrecoTotal:N2} registrada automaticamente a partir do pedido.");
+
+                // Notificar fornecedor sobre pagamento confirmado
+                var supplierUser = await _userManager.FindByEmailAsync(pedido.Produto?.Fornecedor?.Email ?? "");
+                if (supplierUser != null)
+                {
+                    await _notificationService.CreateAsync(
+                        supplierUser.Id,
+                        "Pagamento confirmado",
+                        $"O pagamento de R$ {pedido.PrecoTotal:N2} do pedido '{pedido.Produto?.Nome}' foi confirmado.",
+                        "PagamentoConfirmado",
+                        $"/Pedido/Details/{pedido.Id}");
+                }
+
+                // Notificar organizador sobre pagamento
+                if (pedido.Evento != null)
+                {
+                    await _notificationService.CreateAsync(
+                        pedido.Evento.OrganizadorId,
+                        "Pagamento confirmado",
+                        $"O pagamento de R$ {pedido.PrecoTotal:N2} para '{pedido.Produto?.Nome}' foi confirmado.",
+                        "PagamentoConfirmado",
+                        $"/Pedido/Details/{pedido.Id}");
+                }
             }
             else
             {

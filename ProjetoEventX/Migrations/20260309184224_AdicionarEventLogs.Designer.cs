@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjetoEventX.Data;
@@ -11,9 +12,11 @@ using ProjetoEventX.Data;
 namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    partial class EventXContextModelSnapshot : ModelSnapshot
+    [Migration("20260309184224_AdicionarEventLogs")]
+    partial class AdicionarEventLogs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1084,7 +1087,7 @@ namespace ProjetoEventX.Migrations
 
                     b.HasIndex("RemetenteId");
 
-                    b.ToTable("MensagemChats");
+                    b.ToTable("MensagemChat");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.NegociacaoHistorico", b =>

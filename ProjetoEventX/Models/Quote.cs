@@ -52,6 +52,21 @@ namespace ProjetoEventX.Models
 
         public DateTime? ResponseDate { get; set; }
 
+        // Contra-proposta do Organizador
+        [Range(0, 10000000)]
+        public decimal? ContraPropostaValor { get; set; }
+
+        [StringLength(2000)]
+        public string? ContraPropostaMensagem { get; set; }
+
+        public DateTime? DataContraProposta { get; set; }
+
+        // Controle de rodadas de negociação
+        public int RodadaAtual { get; set; } = 1;
+
+        // Prazo de validade
+        public DateTime? PrazoValidade { get; set; }
+
         public Guid? PedidoGeradoId { get; set; }
 
         [ForeignKey("PedidoGeradoId")]

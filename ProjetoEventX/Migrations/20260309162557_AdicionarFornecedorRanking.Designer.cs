@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjetoEventX.Data;
@@ -11,9 +12,11 @@ using ProjetoEventX.Data;
 namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    partial class EventXContextModelSnapshot : ModelSnapshot
+    [Migration("20260309162557_AdicionarFornecedorRanking")]
+    partial class AdicionarFornecedorRanking
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -555,42 +558,6 @@ namespace ProjetoEventX.Migrations
                     b.ToTable("Despesas");
                 });
 
-            modelBuilder.Entity("ProjetoEventX.Models.EventLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventLogs");
-                });
-
             modelBuilder.Entity("ProjetoEventX.Models.Evento", b =>
                 {
                     b.Property<int>("Id")
@@ -1084,53 +1051,7 @@ namespace ProjetoEventX.Migrations
 
                     b.HasIndex("RemetenteId");
 
-                    b.ToTable("MensagemChats");
-                });
-
-            modelBuilder.Entity("ProjetoEventX.Models.NegociacaoHistorico", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DataAcao")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Mensagem")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<int>("QuoteId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Rodada")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TipoAcao")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<string>("TipoUsuario")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal?>("Valor")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("QuoteId");
-
-                    b.HasIndex("QuoteId", "Rodada");
-
-                    b.ToTable("NegociacaoHistoricos");
+                    b.ToTable("MensagemChat");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.Notificacao", b =>
@@ -1180,53 +1101,6 @@ namespace ProjetoEventX.Migrations
                     b.HasIndex("EventoId");
 
                     b.ToTable("Notificacoes");
-                });
-
-            modelBuilder.Entity("ProjetoEventX.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsRead")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Link")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("UserId", "IsRead");
-
-                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.OrcamentoSimulado", b =>
@@ -1516,17 +1390,7 @@ namespace ProjetoEventX.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ContraPropostaMensagem")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<decimal?>("ContraPropostaValor")
-                        .HasColumnType("numeric");
-
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("DataContraProposta")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
@@ -1546,9 +1410,6 @@ namespace ProjetoEventX.Migrations
                     b.Property<Guid?>("PedidoGeradoId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime?>("PrazoValidade")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<DateTime?>("ResponseDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -1558,9 +1419,6 @@ namespace ProjetoEventX.Migrations
 
                     b.Property<decimal?>("ResponseValue")
                         .HasColumnType("numeric");
-
-                    b.Property<int>("RodadaAtual")
-                        .HasColumnType("integer");
 
                     b.Property<string>("ServiceName")
                         .IsRequired()
@@ -2087,17 +1945,6 @@ namespace ProjetoEventX.Migrations
                     b.Navigation("Pedido");
                 });
 
-            modelBuilder.Entity("ProjetoEventX.Models.EventLog", b =>
-                {
-                    b.HasOne("ProjetoEventX.Models.Evento", "Evento")
-                        .WithMany("EventLogs")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Evento");
-                });
-
             modelBuilder.Entity("ProjetoEventX.Models.Evento", b =>
                 {
                     b.HasOne("ProjetoEventX.Models.TemplateEvento", "TemplateEvento")
@@ -2213,17 +2060,6 @@ namespace ProjetoEventX.Migrations
                     b.Navigation("Evento");
 
                     b.Navigation("Remetente");
-                });
-
-            modelBuilder.Entity("ProjetoEventX.Models.NegociacaoHistorico", b =>
-                {
-                    b.HasOne("ProjetoEventX.Models.Quote", "Quote")
-                        .WithMany()
-                        .HasForeignKey("QuoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quote");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.Notificacao", b =>
@@ -2442,8 +2278,6 @@ namespace ProjetoEventX.Migrations
                     b.Navigation("ChecklistEventos");
 
                     b.Navigation("Despesas");
-
-                    b.Navigation("EventLogs");
 
                     b.Navigation("Feedbacks");
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjetoEventX.Data;
@@ -11,9 +12,11 @@ using ProjetoEventX.Data;
 namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    partial class EventXContextModelSnapshot : ModelSnapshot
+    [Migration("20260309171049_AdicionarNotifications")]
+    partial class AdicionarNotifications
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -555,42 +558,6 @@ namespace ProjetoEventX.Migrations
                     b.ToTable("Despesas");
                 });
 
-            modelBuilder.Entity("ProjetoEventX.Models.EventLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ActionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("EventLogs");
-                });
-
             modelBuilder.Entity("ProjetoEventX.Models.Evento", b =>
                 {
                     b.Property<int>("Id")
@@ -1084,7 +1051,7 @@ namespace ProjetoEventX.Migrations
 
                     b.HasIndex("RemetenteId");
 
-                    b.ToTable("MensagemChats");
+                    b.ToTable("MensagemChat");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.NegociacaoHistorico", b =>
@@ -2087,17 +2054,6 @@ namespace ProjetoEventX.Migrations
                     b.Navigation("Pedido");
                 });
 
-            modelBuilder.Entity("ProjetoEventX.Models.EventLog", b =>
-                {
-                    b.HasOne("ProjetoEventX.Models.Evento", "Evento")
-                        .WithMany("EventLogs")
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Evento");
-                });
-
             modelBuilder.Entity("ProjetoEventX.Models.Evento", b =>
                 {
                     b.HasOne("ProjetoEventX.Models.TemplateEvento", "TemplateEvento")
@@ -2442,8 +2398,6 @@ namespace ProjetoEventX.Migrations
                     b.Navigation("ChecklistEventos");
 
                     b.Navigation("Despesas");
-
-                    b.Navigation("EventLogs");
 
                     b.Navigation("Feedbacks");
 

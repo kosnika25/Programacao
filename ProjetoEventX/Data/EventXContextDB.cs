@@ -31,7 +31,6 @@ namespace ProjetoEventX.Data
         public DbSet<Notificacao> Notificacoes { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<MensagemChat> MensagemChats { get; set; }
-        public DbSet<MensagemChat> MensagensChat { get; set; }
         public DbSet<LogsAcesso> LogsAcessos { get; set; }
         public DbSet<Auditoria> Auditorias { get; set; }
         public DbSet<ChecklistEvento> ChecklistEventos { get; set; }
@@ -41,6 +40,10 @@ namespace ProjetoEventX.Data
         public DbSet<SolicitacaoOrcamento> SolicitacoesOrcamento { get; set; }
         public DbSet<Quote> Quotes { get; set; }
         public DbSet<QuoteMessage> QuoteMessages { get; set; }
+        public DbSet<FornecedorRanking> FornecedorRankings { get; set; }
+        public DbSet<NegociacaoHistorico> NegociacaoHistoricos { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<EventLog> EventLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -229,6 +232,44 @@ namespace ProjetoEventX.Data
                 .Property(m => m.IsRead)
                 .HasDefaultValue(false);
 
+            // NegociacaoHistorico
+            builder.Entity<NegociacaoHistorico>()
+                .HasOne(n => n.Quote)
+                .WithMany()
+                .HasForeignKey(n => n.QuoteId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<NegociacaoHistorico>()
+                .HasIndex(n => n.QuoteId);
+
+            builder.Entity<NegociacaoHistorico>()
+                .HasIndex(n => new { n.QuoteId, n.Rodada });
+
+            // FornecedorRanking
+            builder.Entity<FornecedorRanking>()
+                .HasOne(r => r.Fornecedor)
+                .WithMany()
+                .HasForeignKey(r => r.FornecedorId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Entity<FornecedorRanking>()
+                .HasIndex(r => r.FornecedorId)
+                .IsUnique();
+
+            builder.Entity<FornecedorRanking>()
+                .HasIndex(r => r.PontuacaoGeral);
+
+            // Notification
+            builder.Entity<Notification>()
+                .HasIndex(n => n.UserId);
+
+            builder.Entity<Notification>()
+                .HasIndex(n => new { n.UserId, n.IsRead });
+
+            builder.Entity<Notification>()
+                .Property(n => n.IsRead)
+                .HasDefaultValue(false);
+
             // Restrições para status
             builder.Entity<Evento>().Property(e => e.StatusEvento).HasDefaultValue("Planejado");
             builder.Entity<Pedido>().Property(p => p.StatusPedido).HasDefaultValue("Pendente");
@@ -239,6 +280,8 @@ namespace ProjetoEventX.Data
             builder.Entity<Evento>().HasIndex(e => e.OrganizadorId);
             builder.Entity<Evento>().HasIndex(e => e.Slug).IsUnique().HasFilter("\"Slug\" IS NOT NULL");
             builder.Entity<Pedido>().HasIndex(p => p.EventoId);
+            builder.Entity<EventLog>().HasIndex(e => e.EventId);
+            builder.Entity<EventLog>().HasIndex(e => e.CreatedAt);
 
             // Conversão automática de DateTime para UTC
             foreach (var entityType in builder.Model.GetEntityTypes())

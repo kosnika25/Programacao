@@ -4,17 +4,21 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ProjetoEventX.Data;
 using ProjetoEventX.Models;
+using ProjetoEventX.Services;
+
 namespace ProjetoEventX.Controllers
 {
     public class FornecedorController : Controller
     {
         private readonly EventXContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly FornecedorPerformanceService _performanceService;
 
-        public FornecedorController(EventXContext context, UserManager<ApplicationUser> userManager)
+        public FornecedorController(EventXContext context, UserManager<ApplicationUser> userManager, FornecedorPerformanceService performanceService)
         {
             _context = context;
             _userManager = userManager;
+            _performanceService = performanceService;
         }
 
         // GET: Fornecedor
@@ -42,6 +46,9 @@ namespace ProjetoEventX.Controllers
                     .ThenInclude(f => f.Pessoa)
                 .OrderBy(p => p.Nome)
                 .ToListAsync();
+
+            var rankings = await _context.FornecedorRankings.ToListAsync();
+            ViewBag.Rankings = rankings.ToDictionary(r => r.FornecedorId);
 
             return View(produtos);
         }
@@ -126,6 +133,81 @@ namespace ProjetoEventX.Controllers
                 .ToListAsync();
 
             return View(fornecedor);
+        }
+
+        // GET: Fornecedor/Performance - Dashboard de Performance do Fornecedor
+        public async Task<IActionResult> Performance()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null || user.TipoUsuario != "Fornecedor")
+                return RedirectToAction("LoginFornecedor", "Auth");
+
+            var fornecedor = await _context.Fornecedores
+                .Include(f => f.Pessoa)
+                .Include(f => f.Produtos)
+                .Include(f => f.Avaliacoes)
+                .FirstOrDefaultAsync(f => f.Email == user.Email);
+
+            if (fornecedor == null)
+                return NotFound();
+
+            // Recalcular métricas
+            var ranking = await _performanceService.RecalcularAsync(fornecedor.Id);
+
+            // Recarregar com includes
+            ranking = await _context.FornecedorRankings
+                .Include(r => r.Fornecedor)
+                    .ThenInclude(f => f!.Pessoa)
+                .FirstOrDefaultAsync(r => r.FornecedorId == fornecedor.Id);
+
+            if (ranking == null)
+                return NotFound();
+
+            // Total de fornecedores para contexto de posição
+            ViewBag.TotalFornecedores = await _context.FornecedorRankings.CountAsync();
+
+            // Avaliações recentes
+            ViewBag.AvaliacoesRecentes = await _context.AvaliacoesFornecedores
+                .Include(a => a.Organizador).ThenInclude(o => o!.Pessoa)
+                .Include(a => a.Evento)
+                .Where(a => a.FornecedorId == fornecedor.Id)
+                .OrderByDescending(a => a.DataAvaliacao)
+                .Take(5)
+                .ToListAsync();
+
+            // Distribuição de notas
+            var todasAvaliacoes = await _context.AvaliacoesFornecedores
+                .Where(a => a.FornecedorId == fornecedor.Id)
+                .ToListAsync();
+
+            ViewBag.Notas5 = todasAvaliacoes.Count(a => a.Nota == 5);
+            ViewBag.Notas4 = todasAvaliacoes.Count(a => a.Nota == 4);
+            ViewBag.Notas3 = todasAvaliacoes.Count(a => a.Nota == 3);
+            ViewBag.Notas2 = todasAvaliacoes.Count(a => a.Nota == 2);
+            ViewBag.Notas1 = todasAvaliacoes.Count(a => a.Nota == 1);
+
+            // Pedidos recentes
+            var produtoIds = fornecedor.Produtos.Select(p => p.Id).ToList();
+            ViewBag.PedidosRecentes = await _context.Pedidos
+                .Include(p => p.Evento)
+                .Include(p => p.Produto)
+                .Where(p => produtoIds.Contains(p.ProdutoId))
+                .OrderByDescending(p => p.DataPedido)
+                .Take(10)
+                .ToListAsync();
+
+            // Receita total
+            ViewBag.ReceitaTotal = await _context.Pedidos
+                .Where(p => produtoIds.Contains(p.ProdutoId)
+                    && (p.StatusPedido == "Pago" || p.StatusPedido == "Entregue"))
+                .SumAsync(p => (decimal?)p.PrecoTotal) ?? 0;
+
+            // Quotes pendentes
+            ViewBag.QuotesPendentes = await _context.Quotes
+                .CountAsync(q => q.SupplierId == fornecedor.Id
+                    && (q.Status == "Pendente" || q.Status == "EmNegociacao"));
+
+            return View(ranking);
         }
 
         // POST: Fornecedor/AddProduct

@@ -1,6 +1,7 @@
 @model IEnumerable<ProjetoEventX.Models.Produto>
 @{
     ViewData["Title"] = "EventX - Catálogo de Produtos";
+    var rankings = ViewBag.Rankings as Dictionary<int, ProjetoEventX.Models.FornecedorRanking> ?? new();
 }
 
 <style>
@@ -139,6 +140,17 @@
     .produto-card:hover .ver-detalhes-btn {
         background: var(--eventx-primary-dark, #654321);
     }
+
+    .badge-top-forn {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: linear-gradient(135deg, #f9a825, #ff8f00);
+        color: #fff; padding: 2px 10px; border-radius: 12px;
+        font-size: 0.7rem; font-weight: 600;
+    }
+    .fornecedor-metrics {
+        display: flex; justify-content: center; gap: 0.7rem;
+        font-size: 0.75rem; color: #888; margin-top: 4px;
+    }
 </style>
 
 <section class="catalogo-section">
@@ -171,6 +183,17 @@
                                     </span>
                                 }
                             </p>
+                            @if (produto.Fornecedor != null && rankings.TryGetValue(produto.Fornecedor.Id, out var rank))
+                            {
+                                @if (rank.IsTopFornecedor)
+                                {
+                                    <span class="badge-top-forn"><i class="fas fa-crown"></i> Top Fornecedor</span>
+                                }
+                                <div class="fornecedor-metrics">
+                                    <span><i class="fas fa-calendar-check"></i> @rank.EventosAtendidos eventos</span>
+                                    <span><i class="fas fa-clock"></i> @(rank.TempoMedioRespostaHoras < 1 ? $"{(int)(rank.TempoMedioRespostaHoras * 60)}min" : rank.TempoMedioRespostaHoras < 24 ? $"{rank.TempoMedioRespostaHoras:N0}h" : $"{(rank.TempoMedioRespostaHoras / 24):N0}d") resp.</span>
+                                </div>
+                            }
                             <span class="ver-detalhes-btn">
                                 <i class="fas fa-eye"></i> Ver Detalhes
                             </span>

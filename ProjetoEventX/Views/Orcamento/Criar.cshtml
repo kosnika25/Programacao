@@ -13,94 +13,227 @@
         </a>
     </div>
 
-    <div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
-        <div class="card-header py-4 px-4" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white;">
-            <h3 class="mb-1 fw-bold">
-                <i class="fas fa-file-invoice-dollar me-2"></i>Solicitar Orçamento
-            </h3>
-            <p class="mb-0 opacity-75">Preencha os detalhes para solicitar um orçamento a um fornecedor</p>
+    <!-- Toggle: envio individual ou em lote -->
+    <div class="d-flex justify-content-center mb-4">
+        <div class="btn-group" role="group" style="border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <button type="button" class="btn px-4 py-2 active" id="btnIndividual" onclick="toggleMode('individual')"
+                    style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; border: none; font-weight: 600;">
+                <i class="fas fa-user me-1"></i>Envio Individual
+            </button>
+            <button type="button" class="btn px-4 py-2" id="btnLote" onclick="toggleMode('lote')"
+                    style="background: #e0e0e0; color: #333; border: none; font-weight: 600;">
+                <i class="fas fa-users me-1"></i>Envio em Lote
+            </button>
         </div>
-        <div class="card-body p-4">
-            <form asp-action="Criar" method="post">
-                @Html.AntiForgeryToken()
+    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="fas fa-calendar-alt me-1" style="color: #8B0000;"></i>Evento *
-                    </label>
-                    <select name="eventoId" class="form-select form-select-lg" style="border-radius: 10px;" required>
-                        <option value="">Selecione o evento</option>
-                        @foreach (var ev in eventos)
-                        {
-                            if (eventoIdSelecionado.HasValue && eventoIdSelecionado.Value == ev.Id)
+    <!-- FORMULÁRIO INDIVIDUAL -->
+    <div id="formIndividual">
+        <div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
+            <div class="card-header py-4 px-4" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white;">
+                <h3 class="mb-1 fw-bold">
+                    <i class="fas fa-file-invoice-dollar me-2"></i>Solicitar Orçamento
+                </h3>
+                <p class="mb-0 opacity-75">Preencha os detalhes para solicitar um orçamento a um fornecedor</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Criar" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-calendar-alt me-1" style="color: #8B0000;"></i>Evento *
+                        </label>
+                        <select name="eventoId" class="form-select form-select-lg" style="border-radius: 10px;" required>
+                            <option value="">Selecione o evento</option>
+                            @foreach (var ev in eventos)
                             {
-                                <option value="@ev.Id" selected>@ev.NomeEvento — @ev.DataEvento.ToString("dd/MM/yyyy")</option>
+                                if (eventoIdSelecionado.HasValue && eventoIdSelecionado.Value == ev.Id)
+                                {
+                                    <option value="@ev.Id" selected>@ev.NomeEvento — @ev.DataEvento.ToString("dd/MM/yyyy")</option>
+                                }
+                                else
+                                {
+                                    <option value="@ev.Id">@ev.NomeEvento — @ev.DataEvento.ToString("dd/MM/yyyy")</option>
+                                }
                             }
-                            else
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-store me-1" style="color: #8B0000;"></i>Fornecedor *
+                        </label>
+                        <select name="supplierId" class="form-select form-select-lg" style="border-radius: 10px;" required>
+                            <option value="">Selecione o fornecedor</option>
+                            @foreach (var f in fornecedores)
+                            {
+                                var nome = f.Pessoa?.Nome ?? "Fornecedor";
+                                var tipo = f.TipoServico ?? "";
+                                if (fornecedorIdSelecionado.HasValue && fornecedorIdSelecionado.Value == f.Id)
+                                {
+                                    <option value="@f.Id" selected>@nome — @tipo (@f.Cidade/@f.UF)</option>
+                                }
+                                else
+                                {
+                                    <option value="@f.Id">@nome — @tipo (@f.Cidade/@f.UF)</option>
+                                }
+                            }
+                        </select>
+                        <small class="text-muted">
+                            Não encontrou? Busque no <a asp-controller="Marketplace" asp-action="Index">Marketplace</a>
+                        </small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-concierge-bell me-1" style="color: #8B0000;"></i>Serviço Solicitado *
+                        </label>
+                        <input type="text" name="serviceName" class="form-control form-control-lg" style="border-radius: 10px;"
+                               placeholder="Ex: Decoração, Buffet, DJ, Fotografia..." required maxlength="200" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-align-left me-1" style="color: #8B0000;"></i>Descrição Detalhada *
+                        </label>
+                        <textarea name="description" class="form-control" rows="5" style="border-radius: 10px;"
+                                  placeholder="Descreva em detalhes o serviço que você precisa, incluindo especificações, quantidade de convidados, preferências..." required maxlength="2000"></textarea>
+                        <small class="text-muted">Seja o mais detalhado possível para receber uma proposta precisa</small>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-money-bill-wave me-1" style="color: #8B0000;"></i>Valor Estimado (R$) *
+                            </label>
+                            <input type="number" name="estimatedValue" step="0.01" min="0" max="10000000" class="form-control form-control-lg"
+                                   style="border-radius: 10px;" placeholder="0,00" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-hourglass-half me-1" style="color: #8B0000;"></i>Prazo de Validade
+                            </label>
+                            <input type="date" name="prazoValidade" class="form-control form-control-lg" style="border-radius: 10px;"
+                                   min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" />
+                            <small class="text-muted">Data limite para o fornecedor responder</small>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; border: none; border-radius: 10px; font-weight: 600; padding: 14px;">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar Solicitação de Orçamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO EM LOTE -->
+    <div id="formLote" style="display: none;">
+        <div class="card border-0 shadow-sm" style="border-radius: 14px; overflow: hidden;">
+            <div class="card-header py-4 px-4" style="background: linear-gradient(135deg, #1a237e, #283593); color: white;">
+                <h3 class="mb-1 fw-bold">
+                    <i class="fas fa-paper-plane me-2"></i>Envio em Lote
+                </h3>
+                <p class="mb-0 opacity-75">Envie a mesma solicitação para múltiplos fornecedores de uma vez</p>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="CriarLote" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-calendar-alt me-1" style="color: #1a237e;"></i>Evento *
+                        </label>
+                        <select name="eventoId" class="form-select form-select-lg" style="border-radius: 10px;" required>
+                            <option value="">Selecione o evento</option>
+                            @foreach (var ev in eventos)
                             {
                                 <option value="@ev.Id">@ev.NomeEvento — @ev.DataEvento.ToString("dd/MM/yyyy")</option>
                             }
-                        }
-                    </select>
-                </div>
+                        </select>
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="fas fa-store me-1" style="color: #8B0000;"></i>Fornecedor *
-                    </label>
-                    <select name="supplierId" class="form-select form-select-lg" style="border-radius: 10px;" required>
-                        <option value="">Selecione o fornecedor</option>
-                        @foreach (var f in fornecedores)
-                        {
-                            var nome = f.Pessoa?.Nome ?? "Fornecedor";
-                            var tipo = f.TipoServico ?? "";
-                            if (fornecedorIdSelecionado.HasValue && fornecedorIdSelecionado.Value == f.Id)
-                            {
-                                <option value="@f.Id" selected>@nome — @tipo (@f.Cidade/@f.UF)</option>
-                            }
-                            else
-                            {
-                                <option value="@f.Id">@nome — @tipo (@f.Cidade/@f.UF)</option>
-                            }
-                        }
-                    </select>
-                    <small class="text-muted">
-                        Não encontrou? Busque no <a asp-controller="Marketplace" asp-action="Index">Marketplace</a>
-                    </small>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-store me-1" style="color: #1a237e;"></i>Fornecedores * <small class="text-muted">(selecione múltiplos)</small>
+                        </label>
+                        <div class="card border" style="border-radius: 10px; max-height: 250px; overflow-y: auto;">
+                            <div class="card-body p-2">
+                                <div class="mb-2 px-2">
+                                    <input type="text" id="buscaFornecedor" class="form-control form-control-sm" placeholder="Buscar fornecedor..."
+                                           style="border-radius: 8px;" onkeyup="filtrarFornecedores()" />
+                                </div>
+                                @foreach (var f in fornecedores)
+                                {
+                                    var nome = f.Pessoa?.Nome ?? "Fornecedor";
+                                    var tipo = f.TipoServico ?? "";
+                                    <div class="form-check px-3 py-2 fornecedor-item" style="border-bottom: 1px solid #f0f0f0;"
+                                         data-nome="@nome.ToLower()" data-tipo="@tipo.ToLower()">
+                                        <input class="form-check-input fornecedor-cb" type="checkbox" name="supplierIds" value="@f.Id" id="forn_@f.Id" />
+                                        <label class="form-check-label w-100" for="forn_@f.Id" style="cursor: pointer;">
+                                            <span class="fw-semibold">@nome</span>
+                                            <small class="text-muted ms-2">@tipo</small>
+                                            @if (!string.IsNullOrEmpty(f.Cidade))
+                                            {
+                                                <small class="text-muted ms-1">(@f.Cidade/@f.UF)</small>
+                                            }
+                                            @if (f.AvaliacaoMedia > 0)
+                                            {
+                                                <small class="ms-1" style="color: #ffc107;">@f.AvaliacaoMedia.ToString("0.0") <i class="fas fa-star" style="font-size: 0.7em;"></i></small>
+                                            }
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <small class="text-muted">
+                            <span id="fornecedoresSelecionados">0</span> fornecedor(es) selecionado(s)
+                        </small>
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="fas fa-concierge-bell me-1" style="color: #8B0000;"></i>Serviço Solicitado *
-                    </label>
-                    <input type="text" name="serviceName" class="form-control form-control-lg" style="border-radius: 10px;"
-                           placeholder="Ex: Decoração, Buffet, DJ, Fotografia..." required maxlength="200" />
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-concierge-bell me-1" style="color: #1a237e;"></i>Serviço Solicitado *
+                        </label>
+                        <input type="text" name="serviceName" class="form-control form-control-lg" style="border-radius: 10px;"
+                               placeholder="Ex: Decoração, Buffet, DJ, Fotografia..." required maxlength="200" />
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="fas fa-align-left me-1" style="color: #8B0000;"></i>Descrição Detalhada *
-                    </label>
-                    <textarea name="description" class="form-control" rows="5" style="border-radius: 10px;"
-                              placeholder="Descreva em detalhes o serviço que você precisa, incluindo especificações, quantidade de convidados, preferências..." required maxlength="2000"></textarea>
-                    <small class="text-muted">Seja o mais detalhado possível para receber uma proposta precisa</small>
-                </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">
+                            <i class="fas fa-align-left me-1" style="color: #1a237e;"></i>Descrição Detalhada *
+                        </label>
+                        <textarea name="description" class="form-control" rows="5" style="border-radius: 10px;"
+                                  placeholder="Descreva em detalhes o serviço que você precisa..." required maxlength="2000"></textarea>
+                    </div>
 
-                <div class="mb-4">
-                    <label class="form-label fw-semibold">
-                        <i class="fas fa-money-bill-wave me-1" style="color: #8B0000;"></i>Valor Estimado (R$) *
-                    </label>
-                    <input type="number" name="estimatedValue" step="0.01" min="0" max="10000000" class="form-control form-control-lg"
-                           style="border-radius: 10px;" placeholder="0,00" required />
-                    <small class="text-muted">Informe o orçamento que você tem disponível para este serviço</small>
-                </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-money-bill-wave me-1" style="color: #1a237e;"></i>Valor Estimado (R$) *
+                            </label>
+                            <input type="number" name="estimatedValue" step="0.01" min="0" max="10000000" class="form-control form-control-lg"
+                                   style="border-radius: 10px;" placeholder="0,00" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">
+                                <i class="fas fa-hourglass-half me-1" style="color: #1a237e;"></i>Prazo de Validade
+                            </label>
+                            <input type="date" name="prazoValidade" class="form-control form-control-lg" style="border-radius: 10px;"
+                                   min="@DateTime.Now.AddDays(1).ToString("yyyy-MM-dd")" />
+                        </div>
+                    </div>
 
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; border: none; border-radius: 10px; font-weight: 600; padding: 14px;">
-                        <i class="fas fa-paper-plane me-2"></i>Enviar Solicitação de Orçamento
-                    </button>
-                </div>
-            </form>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-lg" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; border: none; border-radius: 10px; font-weight: 600; padding: 14px;">
+                            <i class="fas fa-paper-plane me-2"></i>Enviar para Fornecedores Selecionados
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -111,5 +244,57 @@
             border-color: #8B0000;
             box-shadow: 0 0 0 0.2rem rgba(139, 0, 0, 0.15);
         }
+        .form-check-input:checked {
+            background-color: #1a237e;
+            border-color: #1a237e;
+        }
+        .btn-group .btn.active {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
     </style>
+}
+
+@section Scripts {
+    <script>
+        function toggleMode(mode) {
+            const individual = document.getElementById('formIndividual');
+            const lote = document.getElementById('formLote');
+            const btnI = document.getElementById('btnIndividual');
+            const btnL = document.getElementById('btnLote');
+
+            if (mode === 'individual') {
+                individual.style.display = '';
+                lote.style.display = 'none';
+                btnI.style.background = 'linear-gradient(135deg, #8B0000, #a52a2a)';
+                btnI.style.color = 'white';
+                btnL.style.background = '#e0e0e0';
+                btnL.style.color = '#333';
+            } else {
+                individual.style.display = 'none';
+                lote.style.display = '';
+                btnL.style.background = 'linear-gradient(135deg, #1a237e, #283593)';
+                btnL.style.color = 'white';
+                btnI.style.background = '#e0e0e0';
+                btnI.style.color = '#333';
+            }
+        }
+
+        function filtrarFornecedores() {
+            const busca = document.getElementById('buscaFornecedor').value.toLowerCase();
+            document.querySelectorAll('.fornecedor-item').forEach(item => {
+                const nome = item.getAttribute('data-nome') || '';
+                const tipo = item.getAttribute('data-tipo') || '';
+                item.style.display = (nome.includes(busca) || tipo.includes(busca)) ? '' : 'none';
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.fornecedor-cb').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const count = document.querySelectorAll('.fornecedor-cb:checked').length;
+                    document.getElementById('fornecedoresSelecionados').textContent = count;
+                });
+            });
+        });
+    </script>
 }

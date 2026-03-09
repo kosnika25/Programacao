@@ -1,0 +1,381 @@
+@model List<ProjetoEventX.Models.FornecedorRanking>
+@{
+    ViewData["Title"] = "Ranking de Fornecedores";
+    var categorias = ViewBag.Categorias as List<string> ?? new List<string>();
+    var ufs = ViewBag.UFs as List<string> ?? new List<string>();
+    var filtroCategoria = ViewBag.FiltroCategoria as string ?? "";
+    var filtroUF = ViewBag.FiltroUF as string ?? "";
+    var filtroOrdem = ViewBag.FiltroOrdem as string ?? "";
+    var totalFornecedores = (int)(ViewBag.TotalFornecedores ?? 0);
+    var topFornecedores = (int)(ViewBag.TopFornecedores ?? 0);
+    var mediaGeral = (decimal)(ViewBag.MediaGeralAvaliacoes ?? 0m);
+}
+
+<div class="container-fluid px-4 py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="fw-bold mb-1" style="color: #1a1a2e;">
+                <i class="fas fa-trophy me-2" style="color: #f9a825;"></i>Ranking de Fornecedores
+            </h2>
+            <p class="text-muted mb-0">Classificação automática baseada em desempenho, avaliações e confiabilidade</p>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #1a237e, #283593);">
+                <div class="card-body text-center text-white py-4">
+                    <i class="fas fa-store fa-2x mb-2 opacity-75"></i>
+                    <h2 class="fw-bold mb-0">@totalFornecedores</h2>
+                    <small class="opacity-75">Fornecedores Cadastrados</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #e65100, #ff8f00);">
+                <div class="card-body text-center text-white py-4">
+                    <i class="fas fa-award fa-2x mb-2 opacity-75"></i>
+                    <h2 class="fw-bold mb-0">@topFornecedores</h2>
+                    <small class="opacity-75">Top Fornecedores</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #2e7d32, #43a047);">
+                <div class="card-body text-center text-white py-4">
+                    <i class="fas fa-star fa-2x mb-2 opacity-75"></i>
+                    <h2 class="fw-bold mb-0">@mediaGeral.ToString("0.1")</h2>
+                    <small class="opacity-75">Avaliação Média Geral</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold"><i class="fas fa-tag me-1"></i>Categoria</label>
+                    <select name="categoria" class="form-select" style="border-radius: 8px;">
+                        <option value="">Todas as categorias</option>
+                        @foreach (var cat in categorias)
+                        {
+                            <option value="@cat" selected="@(filtroCategoria == cat)">@cat</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold"><i class="fas fa-map-marker-alt me-1"></i>Estado</label>
+                    <select name="uf" class="form-select" style="border-radius: 8px;">
+                        <option value="">Todos os estados</option>
+                        @foreach (var u in ufs)
+                        {
+                            <option value="@u" selected="@(filtroUF == u)">@u</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold"><i class="fas fa-sort-amount-down me-1"></i>Ordenar por</label>
+                    <select name="ordem" class="form-select" style="border-radius: 8px;">
+                        <option value="" selected="@(string.IsNullOrEmpty(filtroOrdem))">Pontuação Geral</option>
+                        <option value="avaliacao" selected="@(filtroOrdem == "avaliacao")">Melhor Avaliação</option>
+                        <option value="pedidos" selected="@(filtroOrdem == "pedidos")">Mais Pedidos</option>
+                        <option value="eventos" selected="@(filtroOrdem == "eventos")">Mais Eventos</option>
+                        <option value="resposta" selected="@(filtroOrdem == "resposta")">Resposta Mais Rápida</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; border-radius: 8px; font-weight: 600;">
+                        <i class="fas fa-search me-1"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pódio (top 3) -->
+    @if (Model.Count >= 3)
+    {
+        <div class="row g-4 mb-5 justify-content-center">
+            @{
+                var podio = Model.Take(3).ToList();
+                var podioOrdem = new[] { 1, 0, 2 }; // 2º, 1º, 3º para layout visual
+            }
+            @foreach (var idx in podioOrdem)
+            {
+                var r = podio[idx];
+                var posicao = idx + 1;
+                var medalha = posicao == 1 ? "🥇" : posicao == 2 ? "🥈" : "🥉";
+                var gradiente = posicao == 1
+                    ? "linear-gradient(135deg, #f9a825, #ff8f00)"
+                    : posicao == 2
+                        ? "linear-gradient(135deg, #bdbdbd, #9e9e9e)"
+                        : "linear-gradient(135deg, #8d6e63, #a1887f)";
+                var tamanho = posicao == 1 ? "col-lg-4" : "col-lg-3";
+                var alturaExtra = posicao == 1 ? "margin-top: -20px;" : "margin-top: 20px;";
+
+                <div class="@tamanho">
+                    <div class="card border-0 shadow text-center position-relative" style="border-radius: 20px; overflow: hidden; @alturaExtra">
+                        <div class="py-4" style="background: @gradiente;">
+                            <div style="font-size: 3rem; line-height: 1;">@medalha</div>
+                            <div class="text-white fw-bold mt-1" style="font-size: 1.2rem;">#@posicao</div>
+                        </div>
+                        <div class="card-body pb-4">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; font-size: 1.8rem; font-weight: 700; margin-top: -35px; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                                @(r.Fornecedor?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "F")
+                            </div>
+                            <h5 class="fw-bold mb-1">@(r.Fornecedor?.Pessoa?.Nome ?? "Fornecedor")</h5>
+                            <span class="badge bg-light text-dark mb-2">@(r.Fornecedor?.TipoServico ?? "")</span>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>@(r.Fornecedor?.Cidade ?? ""), @(r.Fornecedor?.UF ?? "")
+                            </p>
+                            <div class="mb-2">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= (int)r.MediaAvaliacoes)
+                                    {
+                                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                                    }
+                                    else if (i - 0.5m <= r.MediaAvaliacoes)
+                                    {
+                                        <i class="fas fa-star-half-alt" style="color: #ffc107;"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star" style="color: #ddd;"></i>
+                                    }
+                                }
+                                <span class="fw-bold ms-1">@r.MediaAvaliacoes.ToString("0.0")</span>
+                            </div>
+                            <div class="d-flex justify-content-center gap-3 mb-3">
+                                <div class="text-center">
+                                    <div class="fw-bold" style="color: #1a237e;">@r.PontuacaoGeral.ToString("0.0")</div>
+                                    <small class="text-muted">Pontuação</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="fw-bold" style="color: #2e7d32;">@r.PedidosConcluidos</div>
+                                    <small class="text-muted">Pedidos</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="fw-bold" style="color: #e65100;">@r.EventosAtendidos</div>
+                                    <small class="text-muted">Eventos</small>
+                                </div>
+                            </div>
+                            @if (r.IsTopFornecedor)
+                            {
+                                <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 20px;">
+                                    <i class="fas fa-crown me-1"></i>Top Fornecedor
+                                </span>
+                            }
+                            <div class="mt-3">
+                                <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark px-4" style="border-radius: 10px;">
+                                    <i class="fas fa-user me-1"></i>Ver Perfil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Tabela de Ranking Completo -->
+    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+        <div class="card-header bg-white border-0 p-4 pb-2">
+            <h5 class="fw-bold mb-0" style="color: #1a1a2e;">
+                <i class="fas fa-list-ol me-2" style="color: #1a237e;"></i>Ranking Completo
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-chart-line fa-4x text-muted mb-3" style="opacity: 0.3;"></i>
+                    <h5 class="text-muted">Nenhum fornecedor no ranking</h5>
+                    <p class="text-muted">O ranking será preenchido conforme fornecedores receberem avaliações e pedidos.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                            <tr>
+                                <th class="ps-4 py-3 text-center" style="width: 70px; font-weight: 700;">#</th>
+                                <th class="py-3" style="font-weight: 700;">Fornecedor</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Pontuação</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Avaliação</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Pedidos</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Eventos</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Resp. Média</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Aceitação</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Badge</th>
+                                <th class="py-3 text-center" style="font-weight: 700;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model)
+                            {
+                                var rowStyle = r.PosicaoRanking <= 3 ? "background: #fff8e1;" : "";
+                                var posIcon = r.PosicaoRanking switch
+                                {
+                                    1 => "🥇",
+                                    2 => "🥈",
+                                    3 => "🥉",
+                                    _ => r.PosicaoRanking.ToString()
+                                };
+
+                                <tr style="@rowStyle border-bottom: 1px solid #f0f0f0;">
+                                    <td class="ps-4 py-3 text-center">
+                                        <span class="fw-bold" style="font-size: @(r.PosicaoRanking <= 3 ? "1.3rem" : "1rem");">@posIcon</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                 style="width: 42px; height: 42px; background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; font-weight: 700; font-size: 14px; flex-shrink: 0;">
+                                                @(r.Fornecedor?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "F")
+                                            </div>
+                                            <div>
+                                                <div class="fw-semibold">@(r.Fornecedor?.Pessoa?.Nome ?? "Fornecedor")</div>
+                                                <small class="text-muted">@(r.Fornecedor?.TipoServico ?? "") · @(r.Fornecedor?.Cidade ?? ""), @(r.Fornecedor?.UF ?? "")</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <div class="d-inline-flex align-items-center gap-2">
+                                            <div class="progress" style="width: 60px; height: 8px; border-radius: 4px;">
+                                                @{
+                                                    var barColor = r.PontuacaoGeral >= 70 ? "#2e7d32" : r.PontuacaoGeral >= 40 ? "#f9a825" : "#c62828";
+                                                }
+                                                <div class="progress-bar" style="width: @r.PontuacaoGeral%; background: @barColor;"></div>
+                                            </div>
+                                            <span class="fw-bold" style="color: @barColor;">@r.PontuacaoGeral.ToString("0.0")</span>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                                        <span class="fw-semibold">@r.MediaAvaliacoes.ToString("0.0")</span>
+                                        <small class="text-muted">(@r.QuantidadeAvaliacoes)</small>
+                                    </td>
+                                    <td class="py-3 text-center fw-semibold">@r.PedidosConcluidos</td>
+                                    <td class="py-3 text-center fw-semibold">@r.EventosAtendidos</td>
+                                    <td class="py-3 text-center">
+                                        @if (r.TempoMedioRespostaHoras > 0)
+                                        {
+                                            var tempoTexto = r.TempoMedioRespostaHoras < 1 ? "< 1h"
+                                                : r.TempoMedioRespostaHoras < 24 ? $"{r.TempoMedioRespostaHoras:0.0}h"
+                                                : $"{(r.TempoMedioRespostaHoras / 24):0.0}d";
+                                            var tempoCor = r.TempoMedioRespostaHoras <= 4 ? "#2e7d32"
+                                                : r.TempoMedioRespostaHoras <= 24 ? "#f9a825"
+                                                : "#c62828";
+                                            <span class="fw-semibold" style="color: @tempoCor;">@tempoTexto</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        @{
+                                            var aceitacaoCor = r.TaxaAceitacao >= 70 ? "#2e7d32"
+                                                : r.TaxaAceitacao >= 40 ? "#f9a825"
+                                                : "#c62828";
+                                        }
+                                        <span class="fw-semibold" style="color: @aceitacaoCor;">@r.TaxaAceitacao.ToString("0")%</span>
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        @if (r.IsTopFornecedor)
+                                        {
+                                            <span class="badge px-2 py-1" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 12px; font-size: 0.75em;">
+                                                <i class="fas fa-crown me-1"></i>Top
+                                            </span>
+                                        }
+                                    </td>
+                                    <td class="py-3 text-center">
+                                        <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark" style="border-radius: 8px;" title="Ver perfil completo">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Legenda -->
+    <div class="card border-0 shadow-sm mt-4" style="border-radius: 14px;">
+        <div class="card-body">
+            <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Como o ranking é calculado</h6>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-primary me-2" style="min-width: 40px;">30%</span>
+                        <div>
+                            <strong>Avaliação Média</strong>
+                            <br><small class="text-muted">Média das notas recebidas (1-5 estrelas)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-success me-2" style="min-width: 40px;">20%</span>
+                        <div>
+                            <strong>Pedidos Concluídos</strong>
+                            <br><small class="text-muted">Quantidade de pedidos pagos ou entregues</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-info me-2" style="min-width: 40px;">15%</span>
+                        <div>
+                            <strong>Tempo de Resposta</strong>
+                            <br><small class="text-muted">Velocidade média de resposta aos orçamentos</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-warning text-dark me-2" style="min-width: 40px;">15%</span>
+                        <div>
+                            <strong>Taxa de Aceitação</strong>
+                            <br><small class="text-muted">Percentual de orçamentos aceitos pelos organizadores</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-danger me-2" style="min-width: 40px;">10%</span>
+                        <div>
+                            <strong>Taxa Cancelamento</strong>
+                            <br><small class="text-muted">Menor cancelamento = maior pontuação</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start">
+                        <span class="badge bg-secondary me-2" style="min-width: 40px;">10%</span>
+                        <div>
+                            <strong>Eventos Atendidos</strong>
+                            <br><small class="text-muted">Quantidade de eventos distintos atendidos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .table-hover tbody tr:hover { background-color: #f5f5f5 !important; }
+        .card { transition: transform 0.2s ease; }
+    </style>
+}

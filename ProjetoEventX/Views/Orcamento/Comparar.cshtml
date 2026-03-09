@@ -1,6 +1,7 @@
 @model List<ProjetoEventX.Models.Quote>
 @{
     ViewData["Title"] = "Comparar Orçamentos";
+    var rankings = ViewBag.Rankings as Dictionary<int, ProjetoEventX.Models.FornecedorRanking> ?? new();
 
     var bestPrice = Model.Where(q => q.ResponseValue.HasValue || q.EstimatedValue > 0)
         .OrderBy(q => q.ResponseValue ?? q.EstimatedValue).FirstOrDefault();
@@ -9,20 +10,14 @@
     var fastestResponse = Model.Where(q => q.ResponseDate.HasValue)
         .OrderBy(q => (q.ResponseDate!.Value - q.CreatedAt).TotalDays).FirstOrDefault();
 
+    // Melhor ranking
+    var bestRanking = Model.Where(q => rankings.ContainsKey(q.SupplierId))
+        .OrderByDescending(q => rankings[q.SupplierId].PontuacaoGeral).FirstOrDefault();
+
     // Custo-benefício: menor preço relativo à avaliação (preço / avaliação)
     var bestValue = Model.Where(q => (q.ResponseValue ?? q.EstimatedValue) > 0 && q.Supplier?.AvaliacaoMedia > 0)
         .OrderBy(q => (double)(q.ResponseValue ?? q.EstimatedValue) / (double)q.Supplier!.AvaliacaoMedia)
         .FirstOrDefault();
-
-    string BadgeFor(Quote q, string icon, string label)
-    {
-        var badges = new List<string>();
-        if (q.Id == bestPrice?.Id) badges.Add($"<span class='badge bg-success me-1'><i class='fas {icon} me-1'></i>🏆 Menor Preço</span>");
-        if (q.Id == bestRating?.Id) badges.Add($"<span class='badge bg-warning text-dark me-1'><i class='fas {icon} me-1'></i>⭐ Melhor Avaliação</span>");
-        if (q.Id == fastestResponse?.Id) badges.Add($"<span class='badge bg-info text-dark me-1'><i class='fas {icon} me-1'></i>⏱️ Resposta Mais Rápida</span>");
-        if (q.Id == bestValue?.Id) badges.Add($"<span class='badge bg-primary me-1'><i class='fas {icon} me-1'></i>💎 Melhor Custo-Benefício</span>");
-        return string.Join(" ", badges);
-    }
 
     decimal GetValue(Quote q) => q.ResponseValue ?? q.EstimatedValue;
 }
@@ -49,6 +44,7 @@
             <span class="badge bg-warning text-dark">⭐ Melhor Avaliação</span>
             <span class="badge bg-info text-dark">⏱️ Resposta Mais Rápida</span>
             <span class="badge bg-primary">💎 Melhor Custo-Benefício</span>
+            <span class="badge" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white;">👑 Melhor Ranking</span>
         </div>
     </div>
 
@@ -61,8 +57,9 @@
             var isBestRating = q.Id == bestRating?.Id;
             var isBestResponse = q.Id == fastestResponse?.Id;
             var isBestValue = q.Id == bestValue?.Id;
-            var hasBadge = isBestPrice || isBestRating || isBestResponse || isBestValue;
-            var borderColor = isBestValue ? "#1a237e" : isBestPrice ? "#198754" : isBestRating ? "#ffc107" : isBestResponse ? "#0dcaf0" : "#dee2e6";
+            var isBestRanking = q.Id == bestRanking?.Id;
+            var hasBadge = isBestPrice || isBestRating || isBestResponse || isBestValue || isBestRanking;
+            var borderColor = isBestValue ? "#1a237e" : isBestPrice ? "#198754" : isBestRating ? "#ffc107" : isBestResponse ? "#0dcaf0" : isBestRanking ? "#ff8f00" : "#dee2e6";
             var colSize = Model.Count <= 3 ? (12 / Model.Count) : 6;
 
             <div class="col-xl-@colSize col-lg-6 col-md-12">
@@ -74,6 +71,7 @@
                             @if (isBestRating) { <span class="badge bg-warning text-dark">⭐ Melhor Avaliação</span> }
                             @if (isBestResponse) { <span class="badge bg-info text-dark">⏱️ Mais Rápido</span> }
                             @if (isBestValue) { <span class="badge bg-primary">💎 Custo-Benefício</span> }
+                            @if (isBestRanking) { <span class="badge" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white;">👑 Melhor Ranking</span> }
                         </div>
                     }
 
@@ -164,6 +162,47 @@
 
                         <hr class="my-3" style="opacity: 0.1;">
 
+                        <!-- Dados do Ranking -->
+                        @if (rankings.ContainsKey(q.SupplierId))
+                        {
+                            var rank = rankings[q.SupplierId];
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small">Posição no Ranking</span>
+                                <span class="fw-bold small" style="color: #1a237e;">#@rank.PosicaoRanking</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small">Pontuação Geral</span>
+                                <div class="d-flex align-items-center gap-1">
+                                    <div class="progress" style="width: 40px; height: 6px; border-radius: 3px;">
+                                        <div class="progress-bar" style="width: @rank.PontuacaoGeral%; background: @(rank.PontuacaoGeral >= 70 ? "#2e7d32" : "#f9a825");"></div>
+                                    </div>
+                                    <span class="fw-bold small">@rank.PontuacaoGeral.ToString("0.0")</span>
+                                </div>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small">Pedidos Concluídos</span>
+                                <span class="fw-semibold small">@rank.PedidosConcluidos</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small">Eventos Atendidos</span>
+                                <span class="fw-semibold small">@rank.EventosAtendidos</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <span class="text-muted small">Taxa de Aceitação</span>
+                                <span class="fw-semibold small" style="color: @(rank.TaxaAceitacao >= 70 ? "#2e7d32" : "#e65100");">@rank.TaxaAceitacao.ToString("0")%</span>
+                            </div>
+                            @if (rank.IsTopFornecedor)
+                            {
+                                <div class="text-center mt-2">
+                                    <span class="badge px-2 py-1" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 12px;">
+                                        <i class="fas fa-crown me-1"></i>Top Fornecedor
+                                    </span>
+                                </div>
+                            }
+                        }
+
+                        <hr class="my-3" style="opacity: 0.1;">
+
                         <!-- Valores -->
                         <div class="mb-2 d-flex justify-content-between">
                             <span class="text-muted small">Valor Estimado</span>
@@ -207,8 +246,12 @@
 
                     <!-- Footer -->
                     <div class="card-footer bg-transparent border-0 p-4 pt-0">
-                        <a asp-action="Detalhes" asp-route-id="@q.Id" class="btn btn-outline-dark w-100" style="border-radius: 10px;">
+                        <a asp-action="Detalhes" asp-route-id="@q.Id" class="btn btn-outline-dark w-100 mb-2" style="border-radius: 10px;">
                             <i class="fas fa-eye me-1"></i>Ver Detalhes
+                        </a>
+                        <a asp-controller="RankingFornecedor" asp-action="Perfil" asp-route-id="@q.SupplierId"
+                           class="btn btn-sm btn-outline-secondary w-100" style="border-radius: 10px;">
+                            <i class="fas fa-trophy me-1"></i>Perfil no Ranking
                         </a>
                     </div>
                 </div>
@@ -294,6 +337,56 @@
                                     _ => "secondary"
                                 };
                                 <td class="px-4 py-3 text-center"><span class="badge bg-@sc">@q.Status</span></td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">Posição no Ranking</td>
+                            @foreach (var q in Model)
+                            {
+                                var hasRank = rankings.ContainsKey(q.SupplierId);
+                                <td class="px-4 py-3 text-center @(q.Id == bestRanking?.Id ? "table-warning fw-bold" : "")">
+                                    @(hasRank ? "#" + rankings[q.SupplierId].PosicaoRanking.ToString() : "—")
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">Pontuação Geral</td>
+                            @foreach (var q in Model)
+                            {
+                                var hasRank = rankings.ContainsKey(q.SupplierId);
+                                <td class="px-4 py-3 text-center @(q.Id == bestRanking?.Id ? "table-warning fw-bold" : "")">
+                                    @(hasRank ? rankings[q.SupplierId].PontuacaoGeral.ToString("0.0") + "/100" : "—")
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">Pedidos Concluídos</td>
+                            @foreach (var q in Model)
+                            {
+                                var hasRank = rankings.ContainsKey(q.SupplierId);
+                                <td class="px-4 py-3 text-center">
+                                    @(hasRank ? rankings[q.SupplierId].PedidosConcluidos.ToString() : "—")
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">Eventos Atendidos</td>
+                            @foreach (var q in Model)
+                            {
+                                var hasRank = rankings.ContainsKey(q.SupplierId);
+                                <td class="px-4 py-3 text-center">
+                                    @(hasRank ? rankings[q.SupplierId].EventosAtendidos.ToString() : "—")
+                                </td>
+                            }
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 fw-semibold">Taxa de Aceitação</td>
+                            @foreach (var q in Model)
+                            {
+                                var hasRank = rankings.ContainsKey(q.SupplierId);
+                                <td class="px-4 py-3 text-center">
+                                    @(hasRank ? rankings[q.SupplierId].TaxaAceitacao.ToString("0") + "%" : "—")
+                                </td>
                             }
                         </tr>
                     </tbody>

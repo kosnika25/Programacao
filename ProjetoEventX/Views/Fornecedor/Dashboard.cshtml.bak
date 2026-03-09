@@ -1,0 +1,845 @@
+@model ProjetoEventX.Models.Fornecedor
+@{
+    ViewData["Title"] = "Dashboard - Fornecedor";
+}
+
+<style>
+    .dash-wrapper {
+        background: #f5f1ed;
+        min-height: 100vh;
+        padding-bottom: 3rem;
+    }
+
+    /* Header de Boas-vindas */
+    .dash-welcome-fornecedor {
+        background: linear-gradient(135deg, #8B0000 0%, #B22222 40%, #D4A574 100%);
+        color: #fff;
+        padding: 2.5rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .dash-welcome-fornecedor h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+    }
+
+    .dash-welcome-fornecedor p {
+        opacity: 0.85;
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .dash-welcome-fornecedor .user-avatar {
+        width: 60px;
+        height: 60px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-right: 1rem;
+    }
+
+    /* Cards de Estatísticas */
+    .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        color: #fff;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon.produtos { background: linear-gradient(135deg, #8B0000, #B22222); }
+    .stat-icon.pedidos { background: linear-gradient(135deg, #E65100, #FF8F00); }
+    .stat-icon.receita { background: linear-gradient(135deg, #2E7D32, #43A047); }
+    .stat-icon.avaliacao { background: linear-gradient(135deg, #1565C0, #42A5F5); }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    /* Card de Perfil */
+    .perfil-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border-left: 5px solid #8B0000;
+    }
+
+    .perfil-card h5 {
+        color: #8B0000;
+        font-weight: 700;
+        margin-bottom: 1.2rem;
+    }
+
+    .perfil-info-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .perfil-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .perfil-info-item i {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f1ed;
+        color: #8B0000;
+        border-radius: 8px;
+        font-size: 0.85rem;
+    }
+
+    .perfil-info-item .info-label {
+        font-size: 0.75rem;
+        color: #999;
+        display: block;
+        line-height: 1;
+    }
+
+    .perfil-info-item .info-value {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    /* Produtos lista */
+    .produtos-list-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .produtos-list-card h5 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.2rem;
+    }
+
+    .produto-row {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 12px;
+        background: #f8f9fa;
+        margin-bottom: 0.8rem;
+        transition: background 0.2s;
+    }
+
+    .produto-row:hover {
+        background: #f0ebe5;
+    }
+
+    .produto-row .produto-icon-sm {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #8B0000, #D4A574);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.1rem;
+        margin-right: 1rem;
+        flex-shrink: 0;
+    }
+
+    .produto-row .produto-info-sm {
+        flex: 1;
+    }
+
+    .produto-info-sm .produto-nome-sm {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .produto-info-sm .produto-tipo-sm {
+        font-size: 0.8rem;
+        color: #888;
+    }
+
+    .produto-row .produto-preco-sm {
+        font-weight: 700;
+        color: #8B0000;
+        font-size: 1rem;
+    }
+
+    /* Ações Rápidas */
+    .quick-action {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+    .quick-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .quick-action .qa-icon {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #8B0000, #D4A574);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.8rem;
+        color: #fff;
+        font-size: 1.4rem;
+    }
+
+    .quick-action h6 {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.2rem;
+    }
+
+    .quick-action p {
+        font-size: 0.8rem;
+        color: #999;
+        margin: 0;
+    }
+
+    .section-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 1.2rem;
+        font-size: 1.1rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+
+    .btn-eventx {
+        background: #8B0000;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-eventx:hover {
+        background: #650000;
+        color: #fff;
+    }
+
+    /* Botões de ação do produto */
+    .produto-acoes {
+        display: flex;
+        gap: 6px;
+        margin-left: 10px;
+        flex-shrink: 0;
+    }
+
+    .btn-acao-produto {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-acao-editar {
+        background: #E3F2FD;
+        color: #1565C0;
+    }
+
+    .btn-acao-editar:hover {
+        background: #1565C0;
+        color: #fff;
+    }
+
+    .btn-acao-excluir {
+        background: #FFEBEE;
+        color: #C62828;
+    }
+
+    .btn-acao-excluir:hover {
+        background: #C62828;
+        color: #fff;
+    }
+
+    .alert-sucesso-forn {
+        background: #E8F5E9;
+        border: 1px solid #A5D6A7;
+        color: #2E7D32;
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+</style>
+
+<div class="dash-wrapper">
+    <!-- Header de Boas-vindas -->
+    <section class="dash-welcome-fornecedor">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <div class="user-avatar">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div>
+                    <h1>Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h1>
+                    <p>Gerencie sua loja, produtos e pedidos</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        @if (TempData["Sucesso"] != null)
+        {
+            <div class="alert-sucesso-forn">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Sucesso"]
+            </div>
+        }
+
+        <!-- Cards de Estatísticas -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon produtos">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-number">@ViewBag.TotalProdutos</div>
+                    <div class="stat-label">Produtos Cadastrados</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon pedidos">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="stat-number">@ViewBag.TotalPedidos</div>
+                    <div class="stat-label">Total de Pedidos (@ViewBag.PedidosPendentes pendentes)</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon receita">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="stat-number">R$ @(((decimal)ViewBag.ReceitaTotal).ToString("N0"))</div>
+                    <div class="stat-label">Receita Total</div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="stat-card">
+                    <div class="stat-icon avaliacao">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-number">@(Model.AvaliacaoMedia.ToString("N1"))</div>
+                    <div class="stat-label">Avaliação Média (@ViewBag.TotalAvaliacoes avaliações)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna Esquerda -->
+            <div class="col-lg-8">
+                <!-- Perfil da Loja -->
+                <div class="perfil-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-store me-2"></i>Informações da Loja</h5>
+                        <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#editPerfilModal">
+                            <i class="fas fa-pen me-1"></i> Editar
+                        </button>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-store"></i>
+                        <div>
+                            <span class="info-label">Nome da Loja</span>
+                            <span class="info-value">@(Model.Pessoa?.Nome ?? "Não informado")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-id-card"></i>
+                        <div>
+                            <span class="info-label">CNPJ</span>
+                            <span class="info-value">@(Model.Cnpj ?? "Não informado")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <span class="info-label">Telefone</span>
+                            <span class="info-value">@(Model.PhoneNumber ?? Model.Pessoa?.Telefone ?? "Não informado")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <span class="info-label">Email</span>
+                            <span class="info-value">@(Model.Email ?? "Não informado")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <span class="info-label">Localização</span>
+                            <span class="info-value">@(Model.Cidade ?? "")/@(Model.UF ?? "")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-concierge-bell"></i>
+                        <div>
+                            <span class="info-label">Tipo de Serviço</span>
+                            <span class="info-value">@(Model.TipoServico ?? "Não informado")</span>
+                        </div>
+                    </div>
+                    <div class="perfil-info-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <div>
+                            <span class="info-label">Membro desde</span>
+                            <span class="info-value">@Model.DataCadastro.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Produtos -->
+                <div class="produtos-list-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-box-open me-2"></i>Meus Produtos</h5>
+                        <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="fas fa-plus"></i> Novo Produto
+                        </button>
+                    </div>
+
+                    @if (Model.Produtos != null && Model.Produtos.Any())
+                    {
+                        @foreach (var produto in Model.Produtos)
+                        {
+                            <div class="produto-row">
+                                <div class="produto-icon-sm">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <div class="produto-info-sm">
+                                    <div class="produto-nome-sm">@produto.Nome</div>
+                                    <div class="produto-tipo-sm">@produto.Tipo · @produto.Descricao</div>
+                                </div>
+                                <div class="produto-preco-sm">R$ @produto.Preco.ToString("N2")</div>
+                                <div class="produto-acoes">
+                                    <button class="btn-acao-produto btn-acao-editar" title="Editar" data-bs-toggle="modal" data-bs-target="#editModal-@produto.Id.ToString().Replace("-","")">
+                                        <i class="fas fa-pen"></i>
+                                    </button>
+                                    <button class="btn-acao-produto btn-acao-excluir" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal-@produto.Id.ToString().Replace("-","")">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-box-open d-block"></i>
+                            <p>Nenhum produto cadastrado ainda.</p>
+                            <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                                <i class="fas fa-plus"></i> Cadastrar Primeiro Produto
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Coluna Direita -->
+            <div class="col-lg-4">
+                <!-- Ações Rápidas -->
+                <h6 class="section-title"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <div class="quick-action" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <div class="qa-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <h6>Novo Produto</h6>
+                            <p>Cadastrar produto</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <a asp-controller="Pedido" asp-action="Index" class="quick-action">
+                            <div class="qa-icon">
+                                <i class="fas fa-shopping-bag"></i>
+                            </div>
+                            <h6>Pedidos</h6>
+                            <p>Ver pedidos</p>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-controller="Fornecedor" asp-action="Performance" class="quick-action">
+                            <div class="qa-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h6>Performance</h6>
+                            <p>Métricas e score</p>
+                        </a>
+                    </div>
+                    <div class="col-6">
+                        <a asp-controller="RankingFornecedor" asp-action="Index" class="quick-action">
+                            <div class="qa-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <h6>Ranking</h6>
+                            <p>Ver ranking geral</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Resumo de Pedidos -->
+                <div class="produtos-list-card mb-4">
+                    <h5><i class="fas fa-shopping-bag me-2"></i>Pedidos Recentes</h5>
+                    @{
+                        var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido>;
+                    }
+                    @if (pedidosRecentes != null && pedidosRecentes.Any())
+                    {
+                        @foreach (var pedido in pedidosRecentes)
+                        {
+                            <div class="produto-row">
+                                <div class="produto-icon-sm" style="background: linear-gradient(135deg, #E65100, #FF8F00);">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <div class="produto-info-sm">
+                                    <div class="produto-nome-sm">@(pedido.Produto?.Nome ?? "Produto") — @(pedido.Evento?.NomeEvento ?? "")</div>
+                                    <div class="produto-tipo-sm">@pedido.DataPedido.ToString("dd/MM/yyyy") · <span class="badge @(pedido.StatusPedido == "Pendente" ? "bg-warning text-dark" : pedido.StatusPedido == "Pago" ? "bg-info" : pedido.StatusPedido == "Entregue" ? "bg-success" : "bg-secondary")" style="font-size: 0.7rem;">@pedido.StatusPedido</span></div>
+                                </div>
+                                <div class="produto-preco-sm">R$ @pedido.PrecoTotal.ToString("N2")</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-inbox d-block"></i>
+                            <p class="mb-0" style="font-size: 0.9rem;">Nenhum pedido recebido ainda.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Avaliações de Fornecedores -->
+                <div class="produtos-list-card">
+                    <h5><i class="fas fa-star me-2"></i>Avaliações Recentes</h5>
+                    @{
+                        var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor>;
+                    }
+                    @if (avaliacoesRecentes != null && avaliacoesRecentes.Any())
+                    {
+                        @foreach (var avaliacao in avaliacoesRecentes)
+                        {
+                            <div class="produto-row">
+                                <div class="produto-icon-sm" style="background: linear-gradient(135deg, #1565C0, #42A5F5);">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="produto-info-sm">
+                                    <div class="produto-nome-sm">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fa@(i <= avaliacao.Nota ? "s" : "r") fa-star" style="color:@(i <= avaliacao.Nota ? "#f59e0b" : "#ddd"); font-size: 0.85rem;"></i>
+                                        }
+                                        <span class="ms-2 text-muted" style="font-size:0.8rem;">@avaliacao.Organizador?.Pessoa?.Nome</span>
+                                    </div>
+                                    <div class="produto-tipo-sm">@(avaliacao.Comentario ?? "Sem comentário")</div>
+                                </div>
+                            </div>
+                        }
+                        <div class="text-center mt-2">
+                            <a asp-controller="AvaliacaoFornecedor" asp-action="Avaliacoes" asp-route-fornecedorId="@Model.Id"
+                               class="text-decoration-none" style="color:#8B0000; font-weight:600; font-size:0.9rem;">
+                                Ver todas as avaliações <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="fas fa-star d-block"></i>
+                            <p class="mb-0" style="font-size: 0.9rem;">Nenhuma avaliação recebida ainda.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Perfil da Loja -->
+<div class="modal fade" id="editPerfilModal" tabindex="-1" aria-labelledby="editPerfilModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #8B0000; color: #fff;">
+                <h5 class="modal-title" id="editPerfilModalLabel"><i class="fas fa-store me-2"></i>Editar Informações da Loja</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Fornecedor" asp-action="EditarPerfil" method="post">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-store me-1 text-muted"></i> Nome da Loja</label>
+                                <input type="text" class="form-control" name="NomeLoja" value="@(Model.Pessoa?.Nome)" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-id-card me-1 text-muted"></i> CNPJ</label>
+                                <input type="text" class="form-control" name="Cnpj" value="@Model.Cnpj" required />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-phone me-1 text-muted"></i> Telefone</label>
+                                <input type="text" class="form-control" name="Telefone" value="@(Model.PhoneNumber ?? Model.Pessoa?.Telefone)" />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-concierge-bell me-1 text-muted"></i> Tipo de Serviço</label>
+                                @{
+                                    var tiposServico = new[] { "Buffet", "Decoração", "Fotografia", "Música", "Locação", "Outros" };
+                                }
+                                <select class="form-control" name="TipoServico" required>
+                                    @foreach (var tipo in tiposServico)
+                                    {
+                                        if (Model.TipoServico == tipo)
+                                        {
+                                            <option value="@tipo" selected>@tipo</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@tipo">@tipo</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-map-marker-alt me-1 text-muted"></i> Cidade</label>
+                                <input type="text" class="form-control" name="Cidade" value="@Model.Cidade" required />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label class="form-label">UF</label>
+                                <input type="text" class="form-control" name="UF" value="@Model.UF" maxlength="2" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><i class="fas fa-home me-1 text-muted"></i> Endereço</label>
+                                <input type="text" class="form-control" name="Endereco" value="@(Model.Pessoa?.Endereco)" />
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn" style="background: #e0e0e0; color: #333; font-weight: 600; border-radius: 8px;" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-eventx">
+                            <i class="fas fa-save me-1"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Product Modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #8B0000; color: #fff;">
+                <h5 class="modal-title" id="addProductModalLabel"><i class="fas fa-plus-circle me-2"></i>Adicionar Produto</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Fornecedor" asp-action="AddProduct" method="post">
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">Nome do Produto</label>
+                        <input type="text" class="form-control" id="productName" name="ProductName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productDescription" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="productDescription" name="ProductDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="productPrice" class="form-label">Preço (R$)</label>
+                                <input type="number" class="form-control" id="productPrice" name="ProductPrice" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="mb-3">
+                                <label for="productType" class="form-label">Tipo</label>
+                                <select class="form-control" id="productType" name="ProductType" required>
+                                    <option value="Produto">Produto</option>
+                                    <option value="Local">Local</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-eventx w-100">
+                        <i class="fas fa-plus"></i> Adicionar Produto
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais de Edição e Exclusão para cada produto -->
+@if (Model.Produtos != null && Model.Produtos.Any())
+{
+    @foreach (var produto in Model.Produtos)
+    {
+        var modalEditId = "editModal-" + produto.Id.ToString().Replace("-","");
+        var modalDeleteId = "deleteModal-" + produto.Id.ToString().Replace("-","");
+
+        <!-- Modal Editar Produto -->
+        <div class="modal fade" id="@modalEditId" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: #1565C0; color: #fff;">
+                        <h5 class="modal-title"><i class="fas fa-pen me-2"></i>Editar Produto</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form asp-controller="Fornecedor" asp-action="EditarProduto" method="post">
+                            <input type="hidden" name="produtoId" value="@produto.Id" />
+                            <div class="mb-3">
+                                <label class="form-label">Nome do Produto</label>
+                                <input type="text" class="form-control" name="Nome" value="@produto.Nome" required />
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Descrição</label>
+                                <textarea class="form-control" name="Descricao" rows="3" required>@produto.Descricao</textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Preço (R$)</label>
+                                        <input type="number" class="form-control" name="Preco" step="0.01" value="@produto.Preco.ToString(System.Globalization.CultureInfo.InvariantCulture)" required />
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Tipo</label>
+                                        <select class="form-control" name="Tipo" required>
+                                            @if (produto.Tipo == "Produto")
+                                            {
+                                                <option value="Produto" selected>Produto</option>
+                                                <option value="Local">Local</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="Produto">Produto</option>
+                                                <option value="Local" selected>Local</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn w-100" style="background: #1565C0; color: #fff; font-weight: 600;">
+                                <i class="fas fa-save me-2"></i>Salvar Alterações
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Excluir Produto -->
+        <div class="modal fade" id="@modalDeleteId" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header" style="background: #C62828; color: #fff;">
+                        <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Excluir Produto</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #E65100; margin-bottom: 1rem;"></i>
+                        <p style="font-weight: 600; color: #333;">Tem certeza que deseja excluir</p>
+                        <p style="font-size: 1.1rem; font-weight: 700; color: #8B0000;">@produto.Nome</p>
+                        <p style="font-size: 0.85rem; color: #999;">Esta ação não pode ser desfeita.</p>
+                    </div>
+                    <div class="modal-footer justify-content-center" style="border: none;">
+                        <button type="button" class="btn" style="background: #e0e0e0; color: #333; font-weight: 600; border-radius: 8px;" data-bs-dismiss="modal">Cancelar</button>
+                        <form asp-controller="Fornecedor" asp-action="ExcluirProduto" method="post" class="d-inline">
+                            <input type="hidden" name="produtoId" value="@produto.Id" />
+                            <button type="submit" class="btn" style="background: #C62828; color: #fff; font-weight: 600; border-radius: 8px;">
+                                <i class="fas fa-trash me-2"></i>Excluir
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}

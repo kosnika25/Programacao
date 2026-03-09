@@ -22,13 +22,17 @@ namespace ProjetoEventX.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AuditoriaService _auditoriaService;
         private readonly EmailService _emailService;
+        private readonly NotificationService _notificationService;
+        private readonly EventLogService _eventLogService;
 
-        public ConviteController(EventXContext context, UserManager<ApplicationUser> userManager, AuditoriaService auditoriaService, EmailService emailService)
+        public ConviteController(EventXContext context, UserManager<ApplicationUser> userManager, AuditoriaService auditoriaService, EmailService emailService, NotificationService notificationService, EventLogService eventLogService)
         {
             _context = context;
             _userManager = userManager;
             _auditoriaService = auditoriaService;
             _emailService = emailService;
+            _notificationService = notificationService;
+            _eventLogService = eventLogService;
         }
 
         [HttpGet]
@@ -343,6 +347,10 @@ namespace ProjetoEventX.Controllers
                     new { listaConvidado.Id, Convidado = pessoa.Nome, Evento = evento.NomeEvento });
 
                 TempData["SuccessMessage"] = $"✅ Convidado '{pessoa.Nome}' adicionado com sucesso!";
+
+                await _eventLogService.LogAsync(eventoId, user.Id, "ConviteEnviado",
+                    $"Convidado '{pessoa.Nome}' adicionado à lista do evento.");
+
                 return RedirectToAction("Detalhes", "Eventos", new { id = eventoId });
             }
             catch (Exception ex)
@@ -467,6 +475,10 @@ namespace ProjetoEventX.Controllers
                 {
                     TempData["SuccessMessage"] = $"✅ Convite registrado para {convidado.Pessoa.Nome}! (Email SMTP não configurado - configure SMTP_USER e SMTP_PASS)";
                 }
+
+                await _eventLogService.LogAsync(eventoId, user.Id, "ConviteEnviado",
+                    $"Convite enviado para {convidado.Pessoa.Nome} ({convidado.Pessoa.Email}).");
+
                 return RedirectToAction("Listar", new { eventoId });
             }
             catch (Exception ex)
@@ -555,6 +567,21 @@ namespace ProjetoEventX.Controllers
                     $"RSVP: {listaConvidado.Convidado?.Pessoa?.Nome} respondeu '{novoStatus}' no evento {listaConvidado.Evento?.NomeEvento}",
                     new { listaConvidado.Id, ConfirmaPresenca = statusAnterior },
                     new { listaConvidado.Id, ConfirmaPresenca = novoStatus });
+
+                // Notificar organizador sobre confirmação de presença
+                if (listaConvidado.Evento != null && novoStatus == "Confirmado")
+                {
+                    var nomeConvidado = listaConvidado.Convidado?.Pessoa?.Nome ?? "Um convidado";
+                    await _notificationService.CreateAsync(
+                        listaConvidado.Evento.OrganizadorId,
+                        "Presença confirmada",
+                        $"{nomeConvidado} confirmou presença no evento '{listaConvidado.Evento.NomeEvento}'.",
+                        "ConfirmacaoPresenca",
+                        $"/Convite/Gerenciar?eventoId={listaConvidado.EventoId}");
+
+                    await _eventLogService.LogAsync(listaConvidado.EventoId, null, "ConfirmacaoPresenca",
+                        $"{nomeConvidado} confirmou presença no evento.");
+                }
 
                 ViewBag.NomeConvidado = listaConvidado.Convidado?.Pessoa?.Nome ?? "Convidado";
                 ViewBag.NomeEvento = listaConvidado.Evento?.NomeEvento ?? "Evento";

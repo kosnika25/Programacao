@@ -3,604 +3,259 @@
     ViewData["Title"] = "Dashboard - Fornecedor";
 }
 
-<style>
-    .dash-wrapper {
-        background: #f5f1ed;
-        min-height: 100vh;
-        padding-bottom: 3rem;
-    }
+<!-- Welcome Banner -->
+<div class="welcome-banner animate-in">
+    <div class="d-flex align-items-center">
+        <div class="me-3" style="width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
+            <i class="fas fa-store" style="color: #FDE68A;"></i>
+        </div>
+        <div>
+            <h2>Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h2>
+            <p>Gerencie sua loja, produtos e pedidos</p>
+        </div>
+    </div>
+</div>
 
-    /* Header de Boas-vindas */
-    .dash-welcome-fornecedor {
-        background: linear-gradient(135deg, #8B0000 0%, #B22222 40%, #D4A574 100%);
-        color: #fff;
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-    }
+@if (TempData["Sucesso"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show saas-alert mb-3" role="alert">
+        <i class="fas fa-check-circle me-2"></i>@TempData["Sucesso"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
 
-    .dash-welcome-fornecedor h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.3rem;
-    }
-
-    .dash-welcome-fornecedor p {
-        opacity: 0.85;
-        font-size: 1rem;
-        margin: 0;
-    }
-
-    .dash-welcome-fornecedor .user-avatar {
-        width: 60px;
-        height: 60px;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        margin-right: 1rem;
-    }
-
-    /* Cards de Estatísticas */
-    .stat-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        color: #fff;
-        margin-bottom: 1rem;
-    }
-
-    .stat-icon.produtos { background: linear-gradient(135deg, #8B0000, #B22222); }
-    .stat-icon.pedidos { background: linear-gradient(135deg, #E65100, #FF8F00); }
-    .stat-icon.receita { background: linear-gradient(135deg, #2E7D32, #43A047); }
-    .stat-icon.avaliacao { background: linear-gradient(135deg, #1565C0, #42A5F5); }
-
-    .stat-number {
-        font-size: 2rem;
-        font-weight: 700;
-        color: #333;
-        line-height: 1;
-    }
-
-    .stat-label {
-        font-size: 0.85rem;
-        color: #888;
-        margin-top: 2px;
-    }
-
-    /* Card de Perfil */
-    .perfil-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        border-left: 5px solid #8B0000;
-    }
-
-    .perfil-card h5 {
-        color: #8B0000;
-        font-weight: 700;
-        margin-bottom: 1.2rem;
-    }
-
-    .perfil-info-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 0.6rem 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .perfil-info-item:last-child {
-        border-bottom: none;
-    }
-
-    .perfil-info-item i {
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f5f1ed;
-        color: #8B0000;
-        border-radius: 8px;
-        font-size: 0.85rem;
-    }
-
-    .perfil-info-item .info-label {
-        font-size: 0.75rem;
-        color: #999;
-        display: block;
-        line-height: 1;
-    }
-
-    .perfil-info-item .info-value {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    /* Produtos lista */
-    .produtos-list-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-
-    .produtos-list-card h5 {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 1.2rem;
-    }
-
-    .produto-row {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        border-radius: 12px;
-        background: #f8f9fa;
-        margin-bottom: 0.8rem;
-        transition: background 0.2s;
-    }
-
-    .produto-row:hover {
-        background: #f0ebe5;
-    }
-
-    .produto-row .produto-icon-sm {
-        width: 45px;
-        height: 45px;
-        background: linear-gradient(135deg, #8B0000, #D4A574);
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        font-size: 1.1rem;
-        margin-right: 1rem;
-        flex-shrink: 0;
-    }
-
-    .produto-row .produto-info-sm {
-        flex: 1;
-    }
-
-    .produto-info-sm .produto-nome-sm {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .produto-info-sm .produto-tipo-sm {
-        font-size: 0.8rem;
-        color: #888;
-    }
-
-    .produto-row .produto-preco-sm {
-        font-weight: 700;
-        color: #8B0000;
-        font-size: 1rem;
-    }
-
-    /* Ações Rápidas */
-    .quick-action {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        text-align: center;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        transition: transform 0.2s, box-shadow 0.2s;
-        cursor: pointer;
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        height: 100%;
-    }
-
-    .quick-action:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        color: inherit;
-        text-decoration: none;
-    }
-
-    .quick-action .qa-icon {
-        width: 56px;
-        height: 56px;
-        background: linear-gradient(135deg, #8B0000, #D4A574);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 0.8rem;
-        color: #fff;
-        font-size: 1.4rem;
-    }
-
-    .quick-action h6 {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 0.2rem;
-    }
-
-    .quick-action p {
-        font-size: 0.8rem;
-        color: #999;
-        margin: 0;
-    }
-
-    .section-title {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 1.2rem;
-        font-size: 1.1rem;
-    }
-
-    .empty-state {
-        text-align: center;
-        padding: 2rem;
-        color: #999;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.3;
-    }
-
-    .btn-eventx {
-        background: #8B0000;
-        color: #fff;
-        border: none;
-    }
-
-    .btn-eventx:hover {
-        background: #650000;
-        color: #fff;
-    }
-
-    /* Botões de ação do produto */
-    .produto-acoes {
-        display: flex;
-        gap: 6px;
-        margin-left: 10px;
-        flex-shrink: 0;
-    }
-
-    .btn-acao-produto {
-        width: 32px;
-        height: 32px;
-        border-radius: 8px;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-
-    .btn-acao-editar {
-        background: #E3F2FD;
-        color: #1565C0;
-    }
-
-    .btn-acao-editar:hover {
-        background: #1565C0;
-        color: #fff;
-    }
-
-    .btn-acao-excluir {
-        background: #FFEBEE;
-        color: #C62828;
-    }
-
-    .btn-acao-excluir:hover {
-        background: #C62828;
-        color: #fff;
-    }
-
-    .alert-sucesso-forn {
-        background: #E8F5E9;
-        border: 1px solid #A5D6A7;
-        color: #2E7D32;
-        border-radius: 12px;
-        padding: 1rem 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-    }
-</style>
-
-<div class="dash-wrapper">
-    <!-- Header de Boas-vindas -->
-    <section class="dash-welcome-fornecedor">
-        <div class="container">
-            <div class="d-flex align-items-center">
-                <div class="user-avatar">
-                    <i class="fas fa-store"></i>
-                </div>
-                <div>
-                    <h1>Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h1>
-                    <p>Gerencie sua loja, produtos e pedidos</p>
-                </div>
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+        <div class="stat-card purple">
+            <div class="stat-icon purple"><i class="fas fa-box"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Produtos</div>
+                <div class="stat-value">@ViewBag.TotalProdutos</div>
             </div>
         </div>
-    </section>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="fas fa-shopping-cart"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Pedidos</div>
+                <div class="stat-value">@ViewBag.TotalPedidos</div>
+                <div class="stat-change"><i class="fas fa-clock"></i> @ViewBag.PedidosPendentes pendentes</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Receita</div>
+                <div class="stat-value">R$ @(((decimal)ViewBag.ReceitaTotal).ToString("N0"))</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-xl-3">
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-star"></i></div>
+            <div class="stat-info">
+                <div class="stat-label">Avaliação</div>
+                <div class="stat-value">@(Model.AvaliacaoMedia.ToString("N1"))</div>
+                <div class="stat-change">@ViewBag.TotalAvaliacoes avaliações</div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <div class="container">
-        @if (TempData["Sucesso"] != null)
-        {
-            <div class="alert-sucesso-forn">
-                <i class="fas fa-check-circle me-2"></i>@TempData["Sucesso"]
+<div class="row g-4">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+        <!-- Store Profile -->
+        <div class="saas-card mb-4" style="border-left: 4px solid var(--ex-primary);">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title"><i class="fas fa-store me-2"></i>Informações da Loja</h5>
+                <button class="btn btn-saas-outline btn-sm" data-bs-toggle="modal" data-bs-target="#editPerfilModal">
+                    <i class="fas fa-pen me-1"></i>Editar
+                </button>
             </div>
-        }
-
-        <!-- Cards de Estatísticas -->
-        <div class="row g-3 mb-4">
-            <div class="col-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon produtos">
-                        <i class="fas fa-box"></i>
+            <div class="d-flex flex-column gap-1">
+                @{
+                    var perfilItems = new[] {
+                        ("fa-store", "Nome", Model.Pessoa?.Nome ?? "Não informado"),
+                        ("fa-id-card", "CNPJ", Model.Cnpj ?? "Não informado"),
+                        ("fa-phone", "Telefone", Model.PhoneNumber ?? Model.Pessoa?.Telefone ?? "Não informado"),
+                        ("fa-envelope", "Email", Model.Email ?? "Não informado"),
+                        ("fa-map-marker-alt", "Local", $"{Model.Cidade ?? ""}/{Model.UF ?? ""}"),
+                        ("fa-concierge-bell", "Serviço", Model.TipoServico ?? "Não informado"),
+                        ("fa-calendar-check", "Desde", Model.DataCadastro.ToString("dd/MM/yyyy"))
+                    };
+                }
+                @foreach (var (icon, label, value) in perfilItems)
+                {
+                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--ex-border-light);">
+                        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--ex-primary-bg); color: var(--ex-primary); border-radius: 8px; font-size: 0.8rem; flex-shrink: 0;">
+                            <i class="fas @icon"></i>
+                        </div>
+                        <div>
+                            <div style="font-size: 0.7rem; color: var(--ex-text-muted); line-height: 1;">@label</div>
+                            <div style="font-weight: 600; color: var(--ex-text); font-size: 0.88rem;">@value</div>
+                        </div>
                     </div>
-                    <div class="stat-number">@ViewBag.TotalProdutos</div>
-                    <div class="stat-label">Produtos Cadastrados</div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon pedidos">
-                        <i class="fas fa-shopping-cart"></i>
-                    </div>
-                    <div class="stat-number">@ViewBag.TotalPedidos</div>
-                    <div class="stat-label">Total de Pedidos (@ViewBag.PedidosPendentes pendentes)</div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon receita">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-number">R$ @(((decimal)ViewBag.ReceitaTotal).ToString("N0"))</div>
-                    <div class="stat-label">Receita Total</div>
-                </div>
-            </div>
-            <div class="col-6 col-lg-3">
-                <div class="stat-card">
-                    <div class="stat-icon avaliacao">
-                        <i class="fas fa-star"></i>
-                    </div>
-                    <div class="stat-number">@(Model.AvaliacaoMedia.ToString("N1"))</div>
-                    <div class="stat-label">Avaliação Média (@ViewBag.TotalAvaliacoes avaliações)</div>
-                </div>
+                }
             </div>
         </div>
 
-        <div class="row g-4">
-            <!-- Coluna Esquerda -->
-            <div class="col-lg-8">
-                <!-- Perfil da Loja -->
-                <div class="perfil-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5><i class="fas fa-store me-2"></i>Informações da Loja</h5>
-                        <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#editPerfilModal">
-                            <i class="fas fa-pen me-1"></i> Editar
-                        </button>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-store"></i>
-                        <div>
-                            <span class="info-label">Nome da Loja</span>
-                            <span class="info-value">@(Model.Pessoa?.Nome ?? "Não informado")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-id-card"></i>
-                        <div>
-                            <span class="info-label">CNPJ</span>
-                            <span class="info-value">@(Model.Cnpj ?? "Não informado")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <span class="info-label">Telefone</span>
-                            <span class="info-value">@(Model.PhoneNumber ?? Model.Pessoa?.Telefone ?? "Não informado")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <span class="info-label">Email</span>
-                            <span class="info-value">@(Model.Email ?? "Não informado")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <span class="info-label">Localização</span>
-                            <span class="info-value">@(Model.Cidade ?? "")/@(Model.UF ?? "")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-concierge-bell"></i>
-                        <div>
-                            <span class="info-label">Tipo de Serviço</span>
-                            <span class="info-value">@(Model.TipoServico ?? "Não informado")</span>
-                        </div>
-                    </div>
-                    <div class="perfil-info-item">
-                        <i class="fas fa-calendar-check"></i>
-                        <div>
-                            <span class="info-label">Membro desde</span>
-                            <span class="info-value">@Model.DataCadastro.ToString("dd/MM/yyyy")</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Products List -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title"><i class="fas fa-box-open me-2"></i>Meus Produtos</h5>
+                <button class="btn btn-saas-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                    <i class="fas fa-plus me-1"></i>Novo Produto
+                </button>
+            </div>
 
-                <!-- Lista de Produtos -->
-                <div class="produtos-list-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0"><i class="fas fa-box-open me-2"></i>Meus Produtos</h5>
-                        <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                            <i class="fas fa-plus"></i> Novo Produto
-                        </button>
-                    </div>
-
-                    @if (Model.Produtos != null && Model.Produtos.Any())
-                    {
-                        @foreach (var produto in Model.Produtos)
-                        {
-                            <div class="produto-row">
-                                <div class="produto-icon-sm">
-                                    <i class="fas fa-box"></i>
-                                </div>
-                                <div class="produto-info-sm">
-                                    <div class="produto-nome-sm">@produto.Nome</div>
-                                    <div class="produto-tipo-sm">@produto.Tipo · @produto.Descricao</div>
-                                </div>
-                                <div class="produto-preco-sm">R$ @produto.Preco.ToString("N2")</div>
-                                <div class="produto-acoes">
-                                    <button class="btn-acao-produto btn-acao-editar" title="Editar" data-bs-toggle="modal" data-bs-target="#editModal-@produto.Id.ToString().Replace("-","")">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button class="btn-acao-produto btn-acao-excluir" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal-@produto.Id.ToString().Replace("-","")">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="empty-state">
-                            <i class="fas fa-box-open d-block"></i>
-                            <p>Nenhum produto cadastrado ainda.</p>
-                            <button class="btn btn-sm btn-eventx" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                                <i class="fas fa-plus"></i> Cadastrar Primeiro Produto
+            @if (Model.Produtos != null && Model.Produtos.Any())
+            {
+                @foreach (var produto in Model.Produtos)
+                {
+                    <div style="display: flex; align-items: center; padding: 0.85rem; border-radius: var(--radius-md); background: var(--ex-bg); margin-bottom: 0.6rem; transition: all 0.2s;">
+                        <div style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--ex-primary), var(--ex-primary-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; margin-right: 0.85rem; flex-shrink: 0;">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; font-size: 0.92rem; color: var(--ex-text);">@produto.Nome</div>
+                            <div style="font-size: 0.78rem; color: var(--ex-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@produto.Tipo · @produto.Descricao</div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.95rem; margin: 0 0.75rem; white-space: nowrap;">R$ @produto.Preco.ToString("N2")</div>
+                        <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                            <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-info-bg); color: var(--ex-info); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Editar" data-bs-toggle="modal" data-bs-target="#editModal-@produto.Id.ToString().Replace("-","")">
+                                <i class="fas fa-pen"></i>
+                            </button>
+                            <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-danger-bg); color: var(--ex-danger); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal-@produto.Id.ToString().Replace("-","")">
+                                <i class="fas fa-trash"></i>
                             </button>
                         </div>
-                    }
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-box-open d-block"></i>
+                    <h5>Nenhum produto cadastrado</h5>
+                    <p>Comece adicionando seu primeiro produto.</p>
+                    <button class="btn btn-saas-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-1"></i>Cadastrar Produto
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="saas-card mb-4">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title"><i class="fas fa-bolt me-2" style="color: var(--ex-warning);"></i>Ações Rápidas</h5>
+            </div>
+            <div class="row g-2">
+                <div class="col-6">
+                    <div class="quick-action" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus-circle"></i><span>Novo Produto</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="Pedido" asp-action="Index" class="quick-action">
+                        <i class="fas fa-shopping-bag"></i><span>Pedidos</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="Fornecedor" asp-action="Performance" class="quick-action">
+                        <i class="fas fa-chart-line"></i><span>Performance</span>
+                    </a>
+                </div>
+                <div class="col-6">
+                    <a asp-controller="RankingFornecedor" asp-action="Index" class="quick-action">
+                        <i class="fas fa-trophy"></i><span>Ranking</span>
+                    </a>
                 </div>
             </div>
+        </div>
 
-            <!-- Coluna Direita -->
-            <div class="col-lg-4">
-                <!-- Ações Rápidas -->
-                <h6 class="section-title"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h6>
-                <div class="row g-3 mb-4">
-                    <div class="col-6">
-                        <div class="quick-action" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                            <div class="qa-icon">
-                                <i class="fas fa-plus-circle"></i>
-                            </div>
-                            <h6>Novo Produto</h6>
-                            <p>Cadastrar produto</p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <a asp-controller="Pedido" asp-action="Index" class="quick-action">
-                            <div class="qa-icon">
-                                <i class="fas fa-shopping-bag"></i>
-                            </div>
-                            <h6>Pedidos</h6>
-                            <p>Ver pedidos</p>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Resumo de Pedidos -->
-                <div class="produtos-list-card mb-4">
-                    <h5><i class="fas fa-shopping-bag me-2"></i>Pedidos Recentes</h5>
-                    @{
-                        var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido>;
-                    }
-                    @if (pedidosRecentes != null && pedidosRecentes.Any())
-                    {
-                        @foreach (var pedido in pedidosRecentes)
-                        {
-                            <div class="produto-row">
-                                <div class="produto-icon-sm" style="background: linear-gradient(135deg, #E65100, #FF8F00);">
-                                    <i class="fas fa-receipt"></i>
-                                </div>
-                                <div class="produto-info-sm">
-                                    <div class="produto-nome-sm">@(pedido.Produto?.Nome ?? "Produto") — @(pedido.Evento?.NomeEvento ?? "")</div>
-                                    <div class="produto-tipo-sm">@pedido.DataPedido.ToString("dd/MM/yyyy") · <span class="badge @(pedido.StatusPedido == "Pendente" ? "bg-warning text-dark" : pedido.StatusPedido == "Pago" ? "bg-info" : pedido.StatusPedido == "Entregue" ? "bg-success" : "bg-secondary")" style="font-size: 0.7rem;">@pedido.StatusPedido</span></div>
-                                </div>
-                                <div class="produto-preco-sm">R$ @pedido.PrecoTotal.ToString("N2")</div>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="empty-state">
-                            <i class="fas fa-inbox d-block"></i>
-                            <p class="mb-0" style="font-size: 0.9rem;">Nenhum pedido recebido ainda.</p>
-                        </div>
-                    }
-                </div>
-
-                <!-- Avaliações de Fornecedores -->
-                <div class="produtos-list-card">
-                    <h5><i class="fas fa-star me-2"></i>Avaliações Recentes</h5>
-                    @{
-                        var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor>;
-                    }
-                    @if (avaliacoesRecentes != null && avaliacoesRecentes.Any())
-                    {
-                        @foreach (var avaliacao in avaliacoesRecentes)
-                        {
-                            <div class="produto-row">
-                                <div class="produto-icon-sm" style="background: linear-gradient(135deg, #1565C0, #42A5F5);">
-                                    <i class="fas fa-star"></i>
-                                </div>
-                                <div class="produto-info-sm">
-                                    <div class="produto-nome-sm">
-                                        @for (int i = 1; i <= 5; i++)
-                                        {
-                                            <i class="fa@(i <= avaliacao.Nota ? "s" : "r") fa-star" style="color:@(i <= avaliacao.Nota ? "#f59e0b" : "#ddd"); font-size: 0.85rem;"></i>
-                                        }
-                                        <span class="ms-2 text-muted" style="font-size:0.8rem;">@avaliacao.Organizador?.Pessoa?.Nome</span>
-                                    </div>
-                                    <div class="produto-tipo-sm">@(avaliacao.Comentario ?? "Sem comentário")</div>
-                                </div>
-                            </div>
-                        }
-                        <div class="text-center mt-2">
-                            <a asp-controller="AvaliacaoFornecedor" asp-action="Avaliacoes" asp-route-fornecedorId="@Model.Id"
-                               class="text-decoration-none" style="color:#8B0000; font-weight:600; font-size:0.9rem;">
-                                Ver todas as avaliações <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="empty-state">
-                            <i class="fas fa-star d-block"></i>
-                            <p class="mb-0" style="font-size: 0.9rem;">Nenhuma avaliação recebida ainda.</p>
-                        </div>
-                    }
-                </div>
+        <!-- Recent Orders -->
+        <div class="saas-card mb-4">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title"><i class="fas fa-shopping-bag me-2" style="color: var(--ex-warning);"></i>Pedidos Recentes</h5>
             </div>
+            @{
+                var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido>;
+            }
+            @if (pedidosRecentes != null && pedidosRecentes.Any())
+            {
+                @foreach (var pedido in pedidosRecentes)
+                {
+                    <div style="display: flex; align-items: center; padding: 0.7rem; border-radius: var(--radius-sm); background: var(--ex-bg); margin-bottom: 0.4rem;">
+                        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--ex-warning), #F97316); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; margin-right: 0.75rem; flex-shrink: 0;">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; font-size: 0.82rem; color: var(--ex-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@(pedido.Produto?.Nome ?? "Produto") — @(pedido.Evento?.NomeEvento ?? "")</div>
+                            <div style="font-size: 0.72rem; color: var(--ex-text-muted);">
+                                @pedido.DataPedido.ToString("dd/MM/yyyy") ·
+                                <span class="badge-saas @(pedido.StatusPedido == "Pendente" ? "badge-warning" : pedido.StatusPedido == "Pago" ? "badge-info" : pedido.StatusPedido == "Entregue" ? "badge-success" : "badge-primary")" style="font-size: 0.65rem;">@pedido.StatusPedido</span>
+                            </div>
+                        </div>
+                        <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.85rem; white-space: nowrap; margin-left: 0.5rem;">R$ @pedido.PrecoTotal.ToString("N2")</div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <i class="fas fa-inbox d-block" style="font-size: 2rem;"></i>
+                    <p style="font-size: 0.85rem; margin: 0;">Nenhum pedido recebido ainda.</p>
+                </div>
+            }
+        </div>
+
+        <!-- Recent Reviews -->
+        <div class="saas-card">
+            <div class="saas-card-header">
+                <h5 class="saas-card-title"><i class="fas fa-star me-2" style="color: var(--ex-warning);"></i>Avaliações Recentes</h5>
+            </div>
+            @{
+                var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor>;
+            }
+            @if (avaliacoesRecentes != null && avaliacoesRecentes.Any())
+            {
+                @foreach (var avaliacao in avaliacoesRecentes)
+                {
+                    <div style="padding: 0.7rem; border-radius: var(--radius-sm); background: var(--ex-bg); margin-bottom: 0.4rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <div style="display: flex; gap: 1px;">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fa@(i <= avaliacao.Nota ? "s" : "r") fa-star" style="color: @(i <= avaliacao.Nota ? "#F59E0B" : "#E5E7EB"); font-size: 0.75rem;"></i>
+                                }
+                            </div>
+                            <span style="font-size: 0.72rem; color: var(--ex-text-muted);">@avaliacao.Organizador?.Pessoa?.Nome</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: var(--ex-text-secondary); line-height: 1.35;">@(avaliacao.Comentario ?? "Sem comentário")</div>
+                    </div>
+                }
+                <div class="text-center mt-2">
+                    <a asp-controller="AvaliacaoFornecedor" asp-action="Avaliacoes" asp-route-fornecedorId="@Model.Id" style="color: var(--ex-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none;">
+                        Ver todas <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state" style="padding: 1.5rem;">
+                    <i class="fas fa-star d-block" style="font-size: 2rem;"></i>
+                    <p style="font-size: 0.85rem; margin: 0;">Nenhuma avaliação recebida.</p>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -608,12 +263,12 @@
 <!-- Modal Editar Perfil da Loja -->
 <div class="modal fade" id="editPerfilModal" tabindex="-1" aria-labelledby="editPerfilModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header" style="background: #8B0000; color: #fff;">
+        <div class="modal-content" style="border-radius: var(--radius-lg); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--ex-primary), var(--ex-primary-light)); color: #fff; border: none;">
                 <h5 class="modal-title" id="editPerfilModalLabel"><i class="fas fa-store me-2"></i>Editar Informações da Loja</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form asp-controller="Fornecedor" asp-action="EditarPerfil" method="post">
                     @Html.AntiForgeryToken()
                     <div class="row">
@@ -681,10 +336,8 @@
                     </div>
                     <hr />
                     <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn" style="background: #e0e0e0; color: #333; font-weight: 600; border-radius: 8px;" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-eventx">
-                            <i class="fas fa-save me-1"></i> Salvar Alterações
-                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-saas-primary"><i class="fas fa-save me-1"></i>Salvar Alterações</button>
                     </div>
                 </form>
             </div>
@@ -695,12 +348,12 @@
 <!-- Add Product Modal -->
 <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background: #8B0000; color: #fff;">
+        <div class="modal-content" style="border-radius: var(--radius-lg); overflow: hidden;">
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--ex-primary), var(--ex-primary-light)); color: #fff; border: none;">
                 <h5 class="modal-title" id="addProductModalLabel"><i class="fas fa-plus-circle me-2"></i>Adicionar Produto</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form asp-controller="Fornecedor" asp-action="AddProduct" method="post">
                     <div class="mb-3">
                         <label for="productName" class="form-label">Nome do Produto</label>
@@ -727,9 +380,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-eventx w-100">
-                        <i class="fas fa-plus"></i> Adicionar Produto
-                    </button>
+                    <button type="submit" class="btn btn-saas-primary w-100"><i class="fas fa-plus me-1"></i>Adicionar Produto</button>
                 </form>
             </div>
         </div>
@@ -744,15 +395,14 @@
         var modalEditId = "editModal-" + produto.Id.ToString().Replace("-","");
         var modalDeleteId = "deleteModal-" + produto.Id.ToString().Replace("-","");
 
-        <!-- Modal Editar Produto -->
         <div class="modal fade" id="@modalEditId" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header" style="background: #1565C0; color: #fff;">
+                <div class="modal-content" style="border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, var(--ex-info), #60A5FA); color: #fff; border: none;">
                         <h5 class="modal-title"><i class="fas fa-pen me-2"></i>Editar Produto</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body p-4">
                         <form asp-controller="Fornecedor" asp-action="EditarProduto" method="post">
                             <input type="hidden" name="produtoId" value="@produto.Id" />
                             <div class="mb-3">
@@ -788,36 +438,31 @@
                                     </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn w-100" style="background: #1565C0; color: #fff; font-weight: 600;">
-                                <i class="fas fa-save me-2"></i>Salvar Alterações
-                            </button>
+                            <button type="submit" class="btn btn-saas-primary w-100"><i class="fas fa-save me-1"></i>Salvar Alterações</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal Excluir Produto -->
         <div class="modal fade" id="@modalDeleteId" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header" style="background: #C62828; color: #fff;">
+                <div class="modal-content" style="border-radius: var(--radius-lg); overflow: hidden;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, var(--ex-danger), #F87171); color: #fff; border: none;">
                         <h5 class="modal-title"><i class="fas fa-trash me-2"></i>Excluir Produto</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body text-center">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: #E65100; margin-bottom: 1rem;"></i>
-                        <p style="font-weight: 600; color: #333;">Tem certeza que deseja excluir</p>
-                        <p style="font-size: 1.1rem; font-weight: 700; color: #8B0000;">@produto.Nome</p>
-                        <p style="font-size: 0.85rem; color: #999;">Esta ação não pode ser desfeita.</p>
+                    <div class="modal-body text-center p-4">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem; color: var(--ex-warning); margin-bottom: 1rem;"></i>
+                        <p style="font-weight: 600; color: var(--ex-text);">Tem certeza que deseja excluir</p>
+                        <p style="font-size: 1.1rem; font-weight: 700; color: var(--ex-primary);">@produto.Nome</p>
+                        <p style="font-size: 0.82rem; color: var(--ex-text-muted);">Esta ação não pode ser desfeita.</p>
                     </div>
                     <div class="modal-footer justify-content-center" style="border: none;">
-                        <button type="button" class="btn" style="background: #e0e0e0; color: #333; font-weight: 600; border-radius: 8px;" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
                         <form asp-controller="Fornecedor" asp-action="ExcluirProduto" method="post" class="d-inline">
                             <input type="hidden" name="produtoId" value="@produto.Id" />
-                            <button type="submit" class="btn" style="background: #C62828; color: #fff; font-weight: 600; border-radius: 8px;">
-                                <i class="fas fa-trash me-2"></i>Excluir
-                            </button>
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash me-1"></i>Excluir</button>
                         </form>
                     </div>
                 </div>

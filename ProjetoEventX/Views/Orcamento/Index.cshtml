@@ -23,7 +23,7 @@
 
     <!-- Cards de Estatísticas -->
     <div class="row g-3 mb-4">
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-4 col-6">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
                 <div class="card-body text-center">
                     <div class="mb-2"><i class="fas fa-file-alt fa-2x" style="color: #6c757d;"></i></div>
@@ -32,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-4 col-6">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
                 <div class="card-body text-center">
                     <div class="mb-2"><i class="fas fa-clock fa-2x" style="color: #ffc107;"></i></div>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-4 col-6">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
                 <div class="card-body text-center">
                     <div class="mb-2"><i class="fas fa-reply fa-2x" style="color: #17a2b8;"></i></div>
@@ -50,7 +50,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
+                <div class="card-body text-center">
+                    <div class="mb-2"><i class="fas fa-exchange-alt fa-2x" style="color: #6a1b9a;"></i></div>
+                    <h3 class="mb-0 fw-bold" style="color: #6a1b9a;">@ViewBag.EmNegociacao</h3>
+                    <small class="text-muted">Em Negociação</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-2 col-md-4 col-6">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
                 <div class="card-body text-center">
                     <div class="mb-2"><i class="fas fa-check-circle fa-2x" style="color: #28a745;"></i></div>
@@ -59,16 +68,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-2">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 12px;">
-                <div class="card-body text-center">
-                    <div class="mb-2"><i class="fas fa-times-circle fa-2x" style="color: #dc3545;"></i></div>
-                    <h3 class="mb-0 fw-bold" style="color: #dc3545;">@ViewBag.Recusados</h3>
-                    <small class="text-muted">Recusados</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
+        <div class="col-lg-2 col-md-4 col-6">
             <div class="card border-0 shadow-sm h-100" style="border-radius: 12px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9);">
                 <div class="card-body text-center">
                     <div class="mb-2"><i class="fas fa-money-bill-wave fa-2x" style="color: #2e7d32;"></i></div>
@@ -89,6 +89,7 @@
                         <option value="">Todos os status</option>
                         <option value="Pendente" selected="@(ViewBag.FiltroStatus == "Pendente")">🟡 Pendente</option>
                         <option value="Respondido" selected="@(ViewBag.FiltroStatus == "Respondido")">🔵 Respondido</option>
+                        <option value="EmNegociacao" selected="@(ViewBag.FiltroStatus == "EmNegociacao")">🟣 Em Negociação</option>
                         <option value="Aceito" selected="@(ViewBag.FiltroStatus == "Aceito")">🟢 Aceito</option>
                         <option value="Recusado" selected="@(ViewBag.FiltroStatus == "Recusado")">🔴 Recusado</option>
                         <option value="Cancelado" selected="@(ViewBag.FiltroStatus == "Cancelado")">⚫ Cancelado</option>
@@ -213,6 +214,7 @@
                                             {
                                                 "Pendente" => "background: #fff3cd; color: #856404;",
                                                 "Respondido" => "background: #cce5ff; color: #004085;",
+                                                "EmNegociacao" => "background: #e1bee7; color: #6a1b9a;",
                                                 "Aceito" => "background: #d4edda; color: #155724;",
                                                 "Recusado" => "background: #f8d7da; color: #721c24;",
                                                 "Cancelado" => "background: #e2e3e5; color: #383d41;",
@@ -222,6 +224,7 @@
                                             {
                                                 "Pendente" => "fas fa-clock",
                                                 "Respondido" => "fas fa-reply",
+                                                "EmNegociacao" => "fas fa-exchange-alt",
                                                 "Aceito" => "fas fa-check-circle",
                                                 "Recusado" => "fas fa-times-circle",
                                                 "Cancelado" => "fas fa-ban",
@@ -229,8 +232,12 @@
                                             };
                                         }
                                         <span class="badge px-3 py-2" style="@badgeClass border-radius: 20px; font-size: 0.8em;">
-                                            <i class="@badgeIcon me-1"></i>@q.Status
+                                            <i class="@badgeIcon me-1"></i>@(q.Status == "EmNegociacao" ? "Em Negociação" : q.Status)
                                         </span>
+                                        @if (q.RodadaAtual > 1)
+                                        {
+                                            <small class="d-block text-muted mt-1" style="font-size: 0.7em;">Rodada @q.RodadaAtual</small>
+                                        }
                                     </td>
                                     <td class="py-3">
                                         <small>@q.CreatedAt.ToString("dd/MM/yyyy")</small>

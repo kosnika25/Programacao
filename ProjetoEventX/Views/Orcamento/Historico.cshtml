@@ -1,0 +1,232 @@
+@model List<ProjetoEventX.Models.NegociacaoHistorico>
+@{
+    ViewData["Title"] = "Histórico de Negociação";
+    var quote = ViewBag.Quote as ProjetoEventX.Models.Quote;
+    var tipoUsuario = ViewBag.TipoUsuario as string ?? "";
+}
+
+<div class="container py-4" style="max-width: 900px;">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <a asp-action="Detalhes" asp-route-id="@quote?.Id" class="btn btn-outline-dark" style="border-radius: 8px;">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Orçamento
+            </a>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px; overflow: hidden;">
+        <div class="card-header py-4 px-4" style="background: linear-gradient(135deg, #6a1b9a, #8e24aa); color: white;">
+            <h3 class="mb-1 fw-bold">
+                <i class="fas fa-history me-2"></i>Histórico de Negociação
+            </h3>
+            <p class="mb-0 opacity-75">
+                Orçamento #@(quote?.Id) — @(quote?.ServiceName)
+            </p>
+        </div>
+        <div class="card-body p-4">
+            <div class="row g-3">
+                <div class="col-md-3 text-center">
+                    <small class="text-muted d-block">Fornecedor</small>
+                    <span class="fw-bold">@(quote?.Supplier?.Pessoa?.Nome ?? "—")</span>
+                </div>
+                <div class="col-md-3 text-center">
+                    <small class="text-muted d-block">Evento</small>
+                    <span class="fw-bold">@(quote?.Event?.NomeEvento ?? "—")</span>
+                </div>
+                <div class="col-md-3 text-center">
+                    <small class="text-muted d-block">Rodada Atual</small>
+                    <span class="fw-bold" style="color: #6a1b9a;">@(quote?.RodadaAtual ?? 1)</span>
+                </div>
+                <div class="col-md-3 text-center">
+                    <small class="text-muted d-block">Status</small>
+                    @{
+                        var statusBg = (quote?.Status ?? "") switch
+                        {
+                            "Pendente" => "background: #fff3cd; color: #856404;",
+                            "Respondido" => "background: #cce5ff; color: #004085;",
+                            "EmNegociacao" => "background: #e1bee7; color: #6a1b9a;",
+                            "Aceito" => "background: #d4edda; color: #155724;",
+                            "Recusado" => "background: #f8d7da; color: #721c24;",
+                            "Cancelado" => "background: #e2e3e5; color: #383d41;",
+                            _ => "background: #e2e3e5; color: #383d41;"
+                        };
+                    }
+                    <span class="badge px-3 py-2" style="@statusBg border-radius: 20px;">@(quote?.Status ?? "—")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evolução de Valores -->
+    @if (Model.Any(h => h.Valor.HasValue))
+    {
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+            <div class="card-header py-3 px-4" style="background: #f5f5f5;">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-chart-line me-2"></i>Evolução dos Valores</h5>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex align-items-end justify-content-center gap-4 flex-wrap">
+                    @{
+                        var maxVal = Model.Where(h => h.Valor.HasValue).Max(h => h.Valor!.Value);
+                        if (maxVal == 0) maxVal = 1;
+                    }
+                    @foreach (var h in Model.Where(h => h.Valor.HasValue))
+                    {
+                        var pct = (double)(h.Valor!.Value / maxVal) * 100;
+                        if (pct < 15) pct = 15;
+                        var barColor = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "#1565c0",
+                            "Resposta" or "NovaOferta" => "#2e7d32",
+                            "ContraProposta" => "#6a1b9a",
+                            "Aceite" => "#43a047",
+                            _ => "#757575"
+                        };
+                        var label = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "Solicitação",
+                            "Resposta" => "Resposta",
+                            "ContraProposta" => "Contra",
+                            "NovaOferta" => "Nova Oferta",
+                            "Aceite" => "Aceite",
+                            _ => h.TipoAcao
+                        };
+                        <div class="text-center" style="min-width: 70px;">
+                            <small class="fw-bold d-block mb-1">R$ @h.Valor.Value.ToString("N0")</small>
+                            <div style="height: 120px; display: flex; align-items: flex-end; justify-content: center;">
+                                <div style="width: 40px; height: @(pct)%; background: @barColor; border-radius: 6px 6px 0 0; transition: height 0.5s;"></div>
+                            </div>
+                            <small class="text-muted d-block mt-1">@label</small>
+                            <small class="text-muted d-block" style="font-size: 0.7em;">R.@h.Rodada</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- Timeline Detalhada -->
+    <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+        <div class="card-header py-3 px-4" style="background: #f5f5f5;">
+            <h5 class="mb-0 fw-bold"><i class="fas fa-stream me-2"></i>Timeline Completa</h5>
+        </div>
+        <div class="card-body p-4">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3" style="opacity: 0.3;"></i>
+                    <p class="text-muted">Nenhum histórico de negociação registrado.</p>
+                </div>
+            }
+            else
+            {
+                <div class="position-relative" style="padding-left: 40px;">
+                    <!-- Linha vertical -->
+                    <div class="position-absolute" style="left: 18px; top: 0; bottom: 0; width: 3px; background: linear-gradient(180deg, #6a1b9a, #e0e0e0); border-radius: 2px;"></div>
+
+                    @foreach (var h in Model)
+                    {
+                        var icon = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "fas fa-paper-plane",
+                            "Resposta" => "fas fa-reply",
+                            "ContraProposta" => "fas fa-exchange-alt",
+                            "NovaOferta" => "fas fa-tag",
+                            "Aceite" => "fas fa-check-circle",
+                            "Recusa" => "fas fa-times-circle",
+                            "Cancelamento" => "fas fa-ban",
+                            _ => "fas fa-circle"
+                        };
+                        var color = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "#1565c0",
+                            "Resposta" => "#2e7d32",
+                            "ContraProposta" => "#6a1b9a",
+                            "NovaOferta" => "#e65100",
+                            "Aceite" => "#2e7d32",
+                            "Recusa" => "#c62828",
+                            "Cancelamento" => "#616161",
+                            _ => "#757575"
+                        };
+                        var bgColor = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "#e3f2fd",
+                            "Resposta" => "#e8f5e9",
+                            "ContraProposta" => "#f3e5f5",
+                            "NovaOferta" => "#fff3e0",
+                            "Aceite" => "#e8f5e9",
+                            "Recusa" => "#fce4ec",
+                            "Cancelamento" => "#f5f5f5",
+                            _ => "#f5f5f5"
+                        };
+                        var actionLabel = h.TipoAcao switch
+                        {
+                            "Solicitacao" => "Solicitação de Orçamento",
+                            "Resposta" => "Resposta do Fornecedor",
+                            "ContraProposta" => "Contra-Proposta do Organizador",
+                            "NovaOferta" => "Nova Oferta do Fornecedor",
+                            "Aceite" => "Proposta Aceita",
+                            "Recusa" => "Proposta Recusada",
+                            "Cancelamento" => "Orçamento Cancelado",
+                            _ => h.TipoAcao
+                        };
+                        <div class="mb-4 position-relative">
+                            <!-- Marcador -->
+                            <div class="position-absolute d-flex align-items-center justify-content-center"
+                                 style="left: -40px; width: 36px; height: 36px; border-radius: 50%; background: @bgColor; color: @color; border: 3px solid @color; z-index: 1;">
+                                <i class="@icon" style="font-size: 14px;"></i>
+                            </div>
+
+                            <!-- Card da ação -->
+                            <div class="card border-0" style="border-radius: 12px; background: @bgColor; border-left: 4px solid @color !important;">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <span class="fw-bold" style="color: @color;">@actionLabel</span>
+                                            <span class="badge bg-light text-dark ms-2" style="font-size: 0.75em;">Rodada @h.Rodada</span>
+                                        </div>
+                                        <div class="text-end">
+                                            @if (h.Valor.HasValue)
+                                            {
+                                                <span class="fw-bold d-block" style="color: @color; font-size: 1.1em;">R$ @h.Valor.Value.ToString("N2")</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (!string.IsNullOrEmpty(h.Mensagem))
+                                    {
+                                        <p class="mb-2 small" style="color: #555; white-space: pre-line;">@h.Mensagem</p>
+                                    }
+
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas @(h.TipoUsuario == "Organizador" ? "fa-user-tie" : "fa-store") me-1"></i>
+                                            @h.TipoUsuario
+                                        </small>
+                                        <small class="text-muted">
+                                            <i class="fas fa-clock me-1"></i>@h.DataAcao.ToString("dd/MM/yyyy HH:mm")
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="text-center mt-4">
+        <a asp-action="Detalhes" asp-route-id="@quote?.Id" class="btn btn-lg px-5" style="background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; border: none; border-radius: 10px; font-weight: 600;">
+            <i class="fas fa-arrow-left me-2"></i>Voltar ao Orçamento
+        </a>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card { transition: transform 0.2s ease; }
+    </style>
+}

@@ -304,6 +304,7 @@
     .ai-simulador { background: linear-gradient(135deg, #1565C0, #42A5F5); color: #fff; }
     .ai-editar { background: linear-gradient(135deg, #1565C0, #42A5F5); color: #fff; }
     .ai-voltar { background: linear-gradient(135deg, #546E7A, #90A4AE); color: #fff; }
+    .ai-historico { background: linear-gradient(135deg, #37474F, #78909C); color: #fff; }
 </style>
 
 <div class="det-wrapper">
@@ -524,6 +525,14 @@
                         <div>
                             <div>Assistente Virtual</div>
                             <small style="color: #999; font-weight: 400;">Ajuda com IA</small>
+                        </div>
+                    </a>
+
+                    <a asp-controller="EventLog" asp-action="Historico" asp-route-eventoId="@Model.Id" class="acao-link">
+                        <div class="acao-icon ai-historico"><i class="fas fa-clock-rotate-left"></i></div>
+                        <div>
+                            <div>Histórico</div>
+                            <small style="color: #999; font-weight: 400;">Atividades do evento</small>
                         </div>
                     </a>
                 </div>
