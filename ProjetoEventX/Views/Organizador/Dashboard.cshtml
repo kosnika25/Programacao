@@ -225,10 +225,12 @@
             }
             else
             {
-                <div class="empty-state">
-                    <i class="fas fa-calendar-plus d-block"></i>
+                <div class="eventx-empty-state">
+                    <div class="eventx-empty-state-icon">
+                        <i class="fas fa-calendar-plus"></i>
+                    </div>
                     <h5>Nenhum evento criado</h5>
-                    <p>Comece criando seu primeiro evento.</p>
+                    <p>Comece criando seu primeiro evento e organize tudo em um só lugar.</p>
                     <a asp-action="CriarEvento" class="btn btn-saas-primary btn-sm"><i class="fas fa-plus me-1"></i>Criar Evento</a>
                 </div>
             }
@@ -283,6 +285,9 @@
                 </div>
             }
         </div>
+
+        <!-- Onboarding Checklist -->
+        <div id="eventx-checklist-card" class="saas-card mb-4"></div>
 
         <!-- Quick Actions -->
         <div class="saas-card mb-4">

@@ -3,39 +3,159 @@
     ViewData["Title"] = "Meus Eventos";
 }
 
-<div class="container">
-    <h1 class="mb-4" style="color: var(--eventx-primary);">Meus Eventos</h1>
-    
-    <div class="event-grid">
+@{ ViewData["HeroIcon"] = "fas fa-calendar-alt"; ViewData["HeroTitle"] = "Meus Eventos"; ViewData["HeroSubtitle"] = "Gerencie, acompanhe e organize todos os seus eventos em um só lugar."; ViewData["HeroClass"] = "mb-3"; }
+@await Html.PartialAsync("_PageHero")
+
+<!-- Header com busca e botão criar -->
+<div class="page-header-bar">
+    <div>
+        <p><strong>@Model.Count()</strong> evento@(Model.Count() != 1 ? "s" : "") cadastrado@(Model.Count() != 1 ? "s" : "")</p>
+    </div>
+    <div class="d-flex gap-2 align-items-center">
+        <input type="text" id="searchEventos" class="form-control" placeholder="Buscar eventos..." style="max-width:260px; min-height:40px;" />
+        <a asp-action="CriarEvento" class="btn btn-eventx-primary">
+            <i class="fas fa-plus me-1"></i> Novo Evento
+        </a>
+    </div>
+</div>
+
+<!-- Filtros rápidos -->
+<div class="filters-bar" id="eventFilters">
+    <span class="fw-bold" style="font-size:0.85rem; color:var(--eventx-text-muted);"><i class="fas fa-filter me-1"></i>Filtrar:</span>
+    <button class="btn btn-sm btn-eventx-outline filter-btn active" data-filter="todos">Todos</button>
+    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Planejado">Planejado</button>
+    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Em Andamento">Em Andamento</button>
+    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Concluído">Concluído</button>
+    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Cancelado">Cancelado</button>
+</div>
+
+@if (Model.Any())
+{
+    <div class="event-card-grid" id="eventGrid">
         @foreach (var evento in Model)
         {
-            <div class="card card-eventx">
-                <div class="card-body">
-                    <h5 class="card-title">@evento.NomeEvento</h5>
-                    <p class="card-text">
-                        <strong>Data:</strong> @evento.DataEvento.ToString("dd/MM/yyyy")<br>
-                        <strong>Tipo:</strong> @evento.TipoEvento<br>
-                        <strong>Status:</strong> <span class="badge badge-eventx badge-pendente">@evento.StatusEvento</span>
-                    </p>
-                    <p class="card-text">@evento.DescricaoEvento</p>
-                    <div class="d-flex gap-2">
-                        <a asp-action="DetalhesEvento" asp-route-id="@evento.Id" class="btn btn-sm btn-eventx-primary">Ver Detalhes</a>
-                        <a asp-controller="Convite" asp-action="Criar" asp-route-eventoId="@evento.Id" class="btn btn-sm btn-eventx-secondary">Convidar</a>
-                        <a asp-controller="Administracao" asp-action="Index" asp-route-eventoId="@evento.Id" class="btn btn-sm btn-eventx-secondary">Administração</a>
+            var totalConvidados = evento.ListasConvidados?.Count ?? 0;
+            var confirmados = evento.ListasConvidados?.Count(lc => lc.ConfirmaPresenca == "Confirmado") ?? 0;
+            var totalDespesas = evento.Despesas?.Sum(d => d.Valor) ?? 0;
+
+            var statusClass = evento.StatusEvento switch {
+                "Planejado" => "badge-planejado",
+                "Em Andamento" => "badge-andamento",
+                "Concluído" => "badge-concluido",
+                "Cancelado" => "badge-cancelado",
+                _ => "badge-info"
+            };
+
+            <div class="event-card-pro animate-in" data-status="@evento.StatusEvento" data-name="@evento.NomeEvento.ToLower()">
+                <div class="event-cover">
+                    @if (!string.IsNullOrEmpty(evento.ImagemCapa))
+                    {
+                        <img src="@evento.ImagemCapa" alt="@evento.NomeEvento" loading="lazy" />
+                    }
+                    <span class="event-type-badge"><i class="fas fa-tag me-1"></i>@evento.TipoEvento</span>
+                    <span class="event-status-badge badge-eventx @statusClass">@evento.StatusEvento</span>
+                </div>
+                <div class="event-body">
+                    <h5 class="event-title">@evento.NomeEvento</h5>
+                    <div class="event-meta">
+                        <div class="event-meta-item">
+                            <i class="fas fa-calendar-day"></i>
+                            <span>@evento.DataEvento.ToString("dd/MM/yyyy") &middot; @evento.HoraInicio - @evento.HoraFim</span>
+                        </div>
+                        @if (evento.Local != null)
+                        {
+                            <div class="event-meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>@evento.Local.NomeLocal</span>
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(evento.DescricaoEvento))
+                        {
+                            <div class="event-meta-item">
+                                <i class="fas fa-align-left"></i>
+                                <span>@(evento.DescricaoEvento.Length > 80 ? evento.DescricaoEvento.Substring(0, 80) + "…" : evento.DescricaoEvento)</span>
+                            </div>
+                        }
+                    </div>
+                    <div class="event-stats">
+                        <div class="event-stat">
+                            <i class="fas fa-users"></i>
+                            <strong>@totalConvidados</strong> convidados
+                        </div>
+                        <div class="event-stat">
+                            <i class="fas fa-check-circle" style="color:var(--eventx-success);"></i>
+                            <strong>@confirmados</strong> confirmados
+                        </div>
+                        <div class="event-stat">
+                            <i class="fas fa-wallet" style="color:var(--eventx-warning);"></i>
+                            <strong>R$ @evento.CustoEstimado.ToString("N0")</strong>
+                        </div>
+                    </div>
+                    <div class="event-actions">
+                        <a asp-action="DetalhesEvento" asp-route-id="@evento.Id" class="btn btn-sm btn-eventx-primary"><i class="fas fa-eye me-1"></i>Ver</a>
+                        <a asp-controller="Convite" asp-action="Criar" asp-route-eventoId="@evento.Id" class="btn btn-sm btn-eventx-outline"><i class="fas fa-envelope me-1"></i>Convites</a>
+                        <div class="dropdown dropdown-actions ms-auto">
+                            <button class="dropdown-toggle" data-bs-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" asp-controller="Administracao" asp-action="Index" asp-route-eventoId="@evento.Id"><i class="fas fa-cog"></i> Administrar</a></li>
+                                <li><a class="dropdown-item" asp-controller="Pedido" asp-action="Index" asp-route-eventoId="@evento.Id"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+                                <li><a class="dropdown-item" asp-controller="TemplateConvite" asp-action="Index" asp-route-eventoId="@evento.Id"><i class="fas fa-palette"></i> Templates</a></li>
+                                @if (!string.IsNullOrEmpty(evento.Slug))
+                                {
+                                    <li><a class="dropdown-item" href="/evento/@evento.Slug" target="_blank"><i class="fas fa-external-link-alt"></i> Página Pública</a></li>
+                                }
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form asp-action="ExcluirEvento" asp-route-id="@evento.Id" method="post" onsubmit="return confirm('Tem certeza que deseja excluir este evento?')">
+                                        <button type="submit" class="dropdown-item text-danger"><i class="fas fa-trash-alt"></i> Excluir</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
         }
     </div>
-    
-    @if (!Model.Any())
-    {
-        <div class="text-center mt-5">
-            <p class="lead">Você ainda não tem eventos cadastrados.</p>
-            <a asp-action="CriarEvento" class="btn btn-eventx-primary">Criar Primeiro Evento</a>
+}
+else
+{
+    <div class="eventx-empty-state">
+        <div class="eventx-empty-state-icon">
+            <i class="fas fa-calendar-plus"></i>
         </div>
+        <h4>Você ainda não tem eventos</h4>
+        <p>Crie seu primeiro evento e comece a organizar tudo em um só lugar.</p>
+        <a asp-action="CriarEvento" class="btn btn-eventx-primary">
+            <i class="fas fa-plus me-1"></i> Criar Primeiro Evento
+        </a>
+    </div>
+}
+
+@section Scripts {
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Busca
+    const search = document.getElementById('searchEventos');
+    if (search) {
+        search.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('.event-card-pro').forEach(c => {
+                c.style.display = c.dataset.name.includes(q) ? '' : 'none';
+            });
+        });
     }
-</div>
-
-
-
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const f = this.dataset.filter;
+            document.querySelectorAll('.event-card-pro').forEach(c => {
+                c.style.display = (f === 'todos' || c.dataset.status === f) ? '' : 'none';
+            });
+        });
+    });
+});
+</script>
+}

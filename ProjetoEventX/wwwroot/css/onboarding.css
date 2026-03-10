@@ -1,0 +1,232 @@
+/* ============================================
+   EventX Onboarding & Tour Styles
+   ============================================ */
+
+/* Driver.js popover overrides */
+.eventx-tour-popover {
+    font-family: 'Manrope', 'Segoe UI', sans-serif !important;
+    border-radius: 16px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid var(--eventx-border) !important;
+    max-width: 380px !important;
+}
+
+.eventx-tour-popover .driver-popover-title {
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    color: var(--eventx-text) !important;
+    margin-bottom: 0.35rem !important;
+}
+
+.eventx-tour-popover .driver-popover-description {
+    font-size: 0.92rem !important;
+    line-height: 1.5 !important;
+    color: var(--eventx-text-muted) !important;
+}
+
+.eventx-tour-popover .driver-popover-progress-text {
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    color: var(--eventx-text-muted) !important;
+}
+
+.eventx-tour-popover .driver-popover-navigation-btns {
+    gap: 0.5rem !important;
+}
+
+.eventx-tour-popover .driver-popover-next-btn {
+    background: linear-gradient(120deg, var(--eventx-primary) 0%, var(--eventx-primary-light) 100%) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 1.2rem !important;
+    font-weight: 700 !important;
+    font-size: 0.85rem !important;
+    text-shadow: none !important;
+}
+
+.eventx-tour-popover .driver-popover-prev-btn {
+    background: transparent !important;
+    color: var(--eventx-text-muted) !important;
+    border: 1px solid var(--eventx-border) !important;
+    border-radius: 10px !important;
+    padding: 0.5rem 1.2rem !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+}
+
+.eventx-tour-popover .driver-popover-close-btn {
+    color: var(--eventx-text-muted) !important;
+}
+
+/* ============================================
+   Checklist Card
+   ============================================ */
+
+.eventx-checklist-progress {
+    padding: 0 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.eventx-checklist-bar {
+    height: 8px;
+    background: #eef0f5;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.eventx-checklist-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--eventx-primary), var(--eventx-primary-light));
+    border-radius: 4px;
+    transition: width 0.6s ease;
+}
+
+.eventx-checklist-items {
+    display: flex;
+    flex-direction: column;
+    padding: 0 0.5rem 0.5rem;
+}
+
+.eventx-checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--eventx-text);
+    transition: all 0.2s;
+    font-size: 0.88rem;
+    font-weight: 500;
+}
+
+.eventx-checklist-item:hover {
+    background: var(--eventx-background);
+    color: var(--eventx-text);
+    text-decoration: none;
+}
+
+.eventx-checklist-item.done {
+    opacity: 0.55;
+}
+
+.eventx-checklist-item.done .eventx-checklist-label {
+    text-decoration: line-through;
+}
+
+.eventx-checklist-check {
+    font-size: 1.1rem;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.eventx-checklist-item:not(.done) .eventx-checklist-check {
+    color: var(--eventx-border);
+}
+
+.eventx-checklist-item.done .eventx-checklist-check {
+    color: var(--eventx-success);
+}
+
+.eventx-checklist-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    background: var(--eventx-background);
+    color: var(--eventx-primary);
+    flex-shrink: 0;
+}
+
+.eventx-checklist-item.done .eventx-checklist-icon {
+    background: #eef0f5;
+    color: var(--eventx-text-muted);
+}
+
+.eventx-checklist-label {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ============================================
+   Empty States (enhanced)
+   ============================================ */
+
+.eventx-empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    border: 1.5px dashed var(--eventx-border);
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fafbfd 0%, #f4f6fa 100%);
+}
+
+.eventx-empty-state-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--eventx-background);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--eventx-primary);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.eventx-empty-state h4 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--eventx-text);
+    margin-bottom: 0.4rem;
+}
+
+.eventx-empty-state p {
+    font-size: 0.9rem;
+    color: var(--eventx-text-muted);
+    margin-bottom: 1.2rem;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.eventx-empty-state .btn {
+    border-radius: 10px;
+    font-weight: 700;
+    padding: 0.55rem 1.5rem;
+}
+
+/* ============================================
+   Restart Tour Button (sidebar)
+   ============================================ */
+
+.sidebar-tour-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.55rem 1.1rem;
+    border: none;
+    background: rgba(185, 56, 43, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+}
+
+.sidebar-tour-btn:hover {
+    background: rgba(185, 56, 43, 0.25);
+    color: #fff;
+}
+
+.sidebar-tour-btn i {
+    font-size: 0.9rem;
+}

@@ -452,12 +452,17 @@
     <!-- Hero -->
     <section class="hero-section">
         <div class="hero-bg"></div>
-        <div class="hero-content">
-            <div class="container">
-                <div class="event-badge">
-                    <i class="fas fa-calendar-star"></i> @Model.TipoEvento
-                </div>
-                <h1 class="event-title">@nomeEvento</h1>
+            <div class="hero-content">
+                <div class="container">
+                    <div class="event-badge">
+                        <i class="fas fa-calendar-star"></i> @Model.TipoEvento
+                    </div>
+                    <h1 class="event-title">@nomeEvento
+                        @if (Model.TipoEvento == "Premium")
+                        {
+                            <span class="badge-eventx badge-premium ms-2" title="Evento Premium"><i class="fas fa-star"></i> Premium</span>
+                        }
+                    </h1>
                 <p class="event-subtitle">@(descricao.Length > 180 ? descricao.Substring(0, 180) + "..." : descricao)</p>
             </div>
         </div>

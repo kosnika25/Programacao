@@ -6,6 +6,9 @@
     var isOrganizador = tipoUsuario == "Organizador";
 }
 
+@{ ViewData["HeroIcon"] = "fas fa-calendar-alt"; ViewData["HeroTitle"] = "Eventos"; ViewData["HeroSubtitle"] = "Organize, acompanhe status e mantenha sua operação de eventos centralizada."; }
+@await Html.PartialAsync("_PageHero")
+
 <div class="row mb-4">
     <div class="col-md-8">
         <h1 class="text-eventx-primary">
@@ -78,21 +81,21 @@
 }
 else
 {
-    <div class="text-center py-5">
-        <div class="mb-4">
-            <i class="fas fa-calendar-plus" style="font-size: 4rem; color: var(--eventx-primary); opacity: 0.3;"></i>
+    <div class="eventx-empty-state">
+        <div class="eventx-empty-state-icon">
+            <i class="fas fa-calendar-plus"></i>
         </div>
-        <h3 class="text-eventx-primary mb-3">Nenhum evento encontrado</h3>
+        <h3>Nenhum evento encontrado</h3>
         @if (isOrganizador)
         {
-            <p class="text-muted mb-4">Comece criando seu primeiro evento!</p>
+            <p>Comece criando seu primeiro evento e gerencie tudo em um só lugar!</p>
             <a asp-action="Create" class="btn btn-primary btn-lg">
                 <i class="fas fa-plus"></i> Criar Primeiro Evento
             </a>
         }
         else
         {
-            <p class="text-muted mb-4">Nenhum evento disponível no momento.</p>
+            <p>Nenhum evento disponível no momento.</p>
         }
     </div>
 }

@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 }
 
+@{ ViewData["HeroIcon"] = "fas fa-robot"; ViewData["HeroTitle"] = "Assistente IA"; ViewData["HeroSubtitle"] = "Interaja com inteligência contextual para decisões mais rápidas na gestão de eventos."; ViewData["HeroClass"] = "mb-3"; }
+@await Html.PartialAsync("_PageHero")
+
 <div class="container-fluid ia-container">
     <div class="row">
         <!-- SIDEBAR COM INFORMAÇÕES -->
@@ -406,12 +409,13 @@
             executarAcaoRapida('orcamento');
         });
         
-        // Perguntas sugeridas
+        // Perguntas sugeridas - enviar diretamente
         document.querySelectorAll(".pergunta-sugerida").forEach(btn => {
             btn.addEventListener("click", (e) => {
                 const pergunta = e.currentTarget.getAttribute("data-pergunta");
-                document.getElementById("perguntaInput").value = pergunta;
-                document.getElementById("perguntaInput").focus();
+                if (pergunta && !isTyping) {
+                    enviarPergunta(pergunta);
+                }
             });
         });
         

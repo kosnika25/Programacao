@@ -315,6 +315,9 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("LoginOrganizador", "Auth");
 
             var eventos = await _context.Eventos
+                .Include(e => e.Local)
+                .Include(e => e.ListasConvidados)
+                .Include(e => e.Despesas)
                 .Where(e => e.OrganizadorId == user.Id)
                 .OrderByDescending(e => e.DataEvento)
                 .ToListAsync();

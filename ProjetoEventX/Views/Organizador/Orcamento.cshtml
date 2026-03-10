@@ -12,297 +12,6 @@
     var corBarra = percentualUsado > 90 ? "#C62828" : percentualUsado > 70 ? "#E65100" : "#2E7D32";
 }
 
-<style>
-    .orc-wrapper {
-        background: #f5f1ed;
-        min-height: 100vh;
-        padding-bottom: 3rem;
-    }
-
-    .orc-header {
-        background: linear-gradient(135deg, #8B0000 0%, #B22222 50%, #D4A574 100%);
-        color: #fff;
-        padding: 2.5rem 0;
-        margin-bottom: 2rem;
-    }
-
-    .orc-header h1 {
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin-bottom: 0.3rem;
-    }
-
-    .orc-header p {
-        opacity: 0.85;
-        font-size: 1rem;
-        margin: 0;
-    }
-
-    .orc-header .header-icon {
-        width: 60px;
-        height: 60px;
-        background: rgba(255,255,255,0.2);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.8rem;
-        margin-right: 1rem;
-    }
-
-    /* Cards resumo */
-    .resumo-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-        transition: transform 0.2s, box-shadow 0.2s;
-        height: 100%;
-    }
-
-    .resumo-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-
-    .resumo-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        color: #fff;
-        margin-bottom: 1rem;
-    }
-
-    .resumo-icon.estimado { background: linear-gradient(135deg, #1565C0, #42A5F5); }
-    .resumo-icon.gasto { background: linear-gradient(135deg, #E65100, #FF8F00); }
-    .resumo-icon.saldo-pos { background: linear-gradient(135deg, #2E7D32, #43A047); }
-    .resumo-icon.saldo-neg { background: linear-gradient(135deg, #C62828, #EF5350); }
-    .resumo-icon.eventos { background: linear-gradient(135deg, #8B0000, #B22222); }
-
-    .resumo-valor {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #333;
-        line-height: 1;
-    }
-
-    .resumo-label {
-        font-size: 0.85rem;
-        color: #888;
-        margin-top: 2px;
-    }
-
-    /* Barra de Progresso */
-    .progress-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-
-    .progress-bar-custom {
-        height: 20px;
-        background: #e9ecef;
-        border-radius: 10px;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .progress-fill {
-        height: 100%;
-        border-radius: 10px;
-        transition: width 1s ease;
-    }
-
-    .progress-text {
-        font-size: 0.9rem;
-        color: #666;
-        margin-top: 0.5rem;
-    }
-
-    /* Tabela de eventos */
-    .eventos-orcamento-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-
-    .evento-orc-item {
-        display: flex;
-        align-items: center;
-        padding: 1rem;
-        border-radius: 12px;
-        background: #f8f9fa;
-        margin-bottom: 0.8rem;
-        transition: background 0.2s;
-    }
-
-    .evento-orc-item:hover {
-        background: #f0ebe5;
-    }
-
-    .evento-orc-info {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .evento-orc-nome {
-        font-weight: 600;
-        color: #333;
-        font-size: 0.95rem;
-    }
-
-    .evento-orc-meta {
-        font-size: 0.8rem;
-        color: #888;
-    }
-
-    .evento-orc-valores {
-        text-align: right;
-        min-width: 160px;
-    }
-
-    .valor-estimado {
-        font-size: 0.8rem;
-        color: #888;
-    }
-
-    .valor-gasto {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #333;
-    }
-
-    .valor-saldo {
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .valor-saldo.positivo { color: #2E7D32; }
-    .valor-saldo.negativo { color: #C62828; }
-
-    .mini-progress {
-        height: 6px;
-        background: #e9ecef;
-        border-radius: 3px;
-        overflow: hidden;
-        margin-top: 4px;
-        width: 140px;
-        margin-left: auto;
-    }
-
-    .mini-progress-fill {
-        height: 100%;
-        border-radius: 3px;
-        transition: width 0.8s ease;
-    }
-
-    /* Despesas recentes */
-    .despesa-recente-item {
-        display: flex;
-        align-items: center;
-        padding: 0.8rem 1rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .despesa-recente-item:last-child {
-        border-bottom: none;
-    }
-
-    .despesa-recente-icon {
-        width: 36px;
-        height: 36px;
-        background: #FFF3E0;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 0.8rem;
-        color: #E65100;
-        font-size: 0.9rem;
-    }
-
-    .despesa-recente-info {
-        flex: 1;
-    }
-
-    .despesa-recente-desc {
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: #333;
-    }
-
-    .despesa-recente-evento {
-        font-size: 0.75rem;
-        color: #999;
-    }
-
-    .despesa-recente-valor {
-        font-weight: 700;
-        color: #E65100;
-        font-size: 0.95rem;
-    }
-
-    .despesa-recente-data {
-        font-size: 0.75rem;
-        color: #999;
-        text-align: right;
-    }
-
-    .section-title {
-        font-weight: 700;
-        color: #333;
-        margin-bottom: 1.2rem;
-        font-size: 1.1rem;
-    }
-
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-    }
-
-    .status-badge.planejado { background: #FFF3E0; color: #E65100; }
-    .status-badge.andamento { background: #E3F2FD; color: #1565C0; }
-    .status-badge.concluido { background: #E8F5E9; color: #2E7D32; }
-    .status-badge.cancelado { background: #FFEBEE; color: #C62828; }
-
-    .empty-state {
-        text-align: center;
-        padding: 3rem 2rem;
-        color: #999;
-    }
-
-    .empty-state i {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        opacity: 0.3;
-    }
-
-    .btn-ver-detalhes {
-        background: transparent;
-        border: 1px solid #8B0000;
-        color: #8B0000;
-        padding: 4px 12px;
-        border-radius: 8px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-
-    .btn-ver-detalhes:hover {
-        background: #8B0000;
-        color: #fff;
-    }
-</style>
-
 <div class="orc-wrapper">
     <!-- Header -->
     <section class="orc-header">
@@ -429,10 +138,12 @@
                     }
                     else
                     {
-                        <div class="empty-state">
-                            <i class="fas fa-wallet d-block"></i>
-                            <p>Você ainda não tem eventos com orçamento.</p>
-                            <a asp-action="CriarEvento" class="btn" style="background: #8B0000; color: #fff; padding: 0.5rem 1.5rem; border-radius: 8px; font-weight: 600;">
+                        <div class="eventx-empty-state">
+                            <div class="eventx-empty-state-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                            <p>Você ainda não tem eventos com orçamento definido.</p>
+                            <a asp-action="CriarEvento" class="btn btn-eventx-action">
                                 <i class="fas fa-plus"></i> Criar Evento
                             </a>
                         </div>
@@ -467,7 +178,7 @@
                     }
                     else
                     {
-                        <div class="text-center py-3" style="color: #999;">
+                        <div class="text-center py-3 text-muted">
                             <i class="fas fa-receipt d-block mb-2" style="font-size: 2rem; opacity: 0.3;"></i>
                             <small>Nenhuma despesa registrada</small>
                         </div>
@@ -478,10 +189,10 @@
                 <div class="eventos-orcamento-card">
                     <h6 class="section-title"><i class="fas fa-bolt me-2"></i>Ações Rápidas</h6>
                     <div class="d-grid gap-2">
-                        <a asp-action="CriarEvento" class="btn" style="background: #8B0000; color: #fff; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; text-align: center;">
+                        <a asp-action="CriarEvento" class="btn btn-eventx-action">
                             <i class="fas fa-plus me-2"></i>Novo Evento
                         </a>
-                        <a asp-action="Dashboard" class="btn" style="background: #D4C5B9; color: #8B0000; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; border: 1px solid #8B0000; text-align: center;">
+                        <a asp-action="Dashboard" class="btn btn-eventx-outline">
                             <i class="fas fa-gauge me-2"></i>Voltar ao Dashboard
                         </a>
                     </div>

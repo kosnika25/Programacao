@@ -1,0 +1,14 @@
+@{
+    var icon = ViewData["HeroIcon"] as string ?? "fas fa-layer-group";
+    var title = ViewData["HeroTitle"] as string ?? "";
+    var subtitle = ViewData["HeroSubtitle"] as string ?? "";
+    var extraClass = ViewData["HeroClass"] as string ?? "";
+}
+
+<section class="eventx-page-hero @extraClass">
+    <h1><i class="@icon me-2"></i>@title</h1>
+    @if (!string.IsNullOrEmpty(subtitle))
+    {
+        <p>@subtitle</p>
+    }
+</section>

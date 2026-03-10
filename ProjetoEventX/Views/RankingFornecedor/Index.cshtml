@@ -12,20 +12,13 @@
 }
 
 <div class="container-fluid px-4 py-4">
-    <!-- Header -->
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h2 class="fw-bold mb-1" style="color: #1a1a2e;">
-                <i class="fas fa-trophy me-2" style="color: #f9a825;"></i>Ranking de Fornecedores
-            </h2>
-            <p class="text-muted mb-0">Classificação automática baseada em desempenho, avaliações e confiabilidade</p>
-        </div>
-    </div>
+    @{ ViewData["HeroIcon"] = "fas fa-ranking-star"; ViewData["HeroTitle"] = "Ranking de Fornecedores"; ViewData["HeroSubtitle"] = "Visualize desempenho, confiabilidade e qualidade dos parceiros em um painel unificado."; }
+    @await Html.PartialAsync("_PageHero")
 
     <!-- Cards de Estatísticas -->
     <div class="row g-3 mb-4">
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #1a237e, #283593);">
+            <div class="card ranking-stat-card tipo-cadastrados border-0 shadow-sm h-100">
                 <div class="card-body text-center text-white py-4">
                     <i class="fas fa-store fa-2x mb-2 opacity-75"></i>
                     <h2 class="fw-bold mb-0">@totalFornecedores</h2>
@@ -34,7 +27,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #e65100, #ff8f00);">
+            <div class="card ranking-stat-card tipo-top border-0 shadow-sm h-100">
                 <div class="card-body text-center text-white py-4">
                     <i class="fas fa-award fa-2x mb-2 opacity-75"></i>
                     <h2 class="fw-bold mb-0">@topFornecedores</h2>
@@ -43,7 +36,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px; background: linear-gradient(135deg, #2e7d32, #43a047);">
+            <div class="card ranking-stat-card tipo-avaliacao border-0 shadow-sm h-100">
                 <div class="card-body text-center text-white py-4">
                     <i class="fas fa-star fa-2x mb-2 opacity-75"></i>
                     <h2 class="fw-bold mb-0">@mediaGeral.ToString("0.1")</h2>
@@ -54,12 +47,12 @@
     </div>
 
     <!-- Filtros -->
-    <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+    <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="get" class="row g-3 align-items-end">
                 <div class="col-md-3">
                     <label class="form-label fw-semibold"><i class="fas fa-tag me-1"></i>Categoria</label>
-                    <select name="categoria" class="form-select" style="border-radius: 8px;">
+                    <select name="categoria" class="form-select">
                         <option value="">Todas as categorias</option>
                         @foreach (var cat in categorias)
                         {
@@ -69,7 +62,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold"><i class="fas fa-map-marker-alt me-1"></i>Estado</label>
-                    <select name="uf" class="form-select" style="border-radius: 8px;">
+                    <select name="uf" class="form-select">
                         <option value="">Todos os estados</option>
                         @foreach (var u in ufs)
                         {
@@ -79,7 +72,7 @@
                 </div>
                 <div class="col-md-3">
                     <label class="form-label fw-semibold"><i class="fas fa-sort-amount-down me-1"></i>Ordenar por</label>
-                    <select name="ordem" class="form-select" style="border-radius: 8px;">
+                    <select name="ordem" class="form-select">
                         <option value="" selected="@(string.IsNullOrEmpty(filtroOrdem))">Pontuação Geral</option>
                         <option value="avaliacao" selected="@(filtroOrdem == "avaliacao")">Melhor Avaliação</option>
                         <option value="pedidos" selected="@(filtroOrdem == "pedidos")">Mais Pedidos</option>
@@ -88,7 +81,7 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn w-100" style="background: linear-gradient(135deg, #1a237e, #283593); color: white; border-radius: 8px; font-weight: 600;">
+                    <button type="submit" class="btn ranking-filter-btn w-100">
                         <i class="fas fa-search me-1"></i>Filtrar
                     </button>
                 </div>
@@ -118,14 +111,13 @@
                 var alturaExtra = posicao == 1 ? "margin-top: -20px;" : "margin-top: 20px;";
 
                 <div class="@tamanho">
-                    <div class="card border-0 shadow text-center position-relative" style="border-radius: 20px; overflow: hidden; @alturaExtra">
+                    <div class="card ranking-podio-card border-0 shadow text-center position-relative" style="@alturaExtra">
                         <div class="py-4" style="background: @gradiente;">
                             <div style="font-size: 3rem; line-height: 1;">@medalha</div>
                             <div class="text-white fw-bold mt-1" style="font-size: 1.2rem;">#@posicao</div>
                         </div>
                         <div class="card-body pb-4">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                                 style="width: 70px; height: 70px; background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; font-size: 1.8rem; font-weight: 700; margin-top: -35px; border: 4px solid white; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
+                            <div class="rounded-circle ranking-avatar d-flex align-items-center justify-content-center mx-auto mb-3">
                                 @(r.Fornecedor?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "F")
                             </div>
                             <h5 class="fw-bold mb-1">@(r.Fornecedor?.Pessoa?.Nome ?? "Fornecedor")</h5>
@@ -138,15 +130,15 @@
                                 {
                                     if (i <= (int)r.MediaAvaliacoes)
                                     {
-                                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                                        <i class="fas fa-star star-gold"></i>
                                     }
                                     else if (i - 0.5m <= r.MediaAvaliacoes)
                                     {
-                                        <i class="fas fa-star-half-alt" style="color: #ffc107;"></i>
+                                        <i class="fas fa-star-half-alt star-gold"></i>
                                     }
                                     else
                                     {
-                                        <i class="far fa-star" style="color: #ddd;"></i>
+                                        <i class="far fa-star star-empty"></i>
                                     }
                                 }
                                 <span class="fw-bold ms-1">@r.MediaAvaliacoes.ToString("0.0")</span>
@@ -167,12 +159,12 @@
                             </div>
                             @if (r.IsTopFornecedor)
                             {
-                                <span class="badge px-3 py-2" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 20px;">
+                                <span class="badge ranking-top-badge px-3 py-2">
                                     <i class="fas fa-crown me-1"></i>Top Fornecedor
                                 </span>
                             }
                             <div class="mt-3">
-                                <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark px-4" style="border-radius: 10px;">
+                                <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark px-4">
                                     <i class="fas fa-user me-1"></i>Ver Perfil
                                 </a>
                             </div>
@@ -184,10 +176,10 @@
     }
 
     <!-- Tabela de Ranking Completo -->
-    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+    <div class="card ranking-table-card border-0 shadow-sm">
         <div class="card-header bg-white border-0 p-4 pb-2">
-            <h5 class="fw-bold mb-0" style="color: #1a1a2e;">
-                <i class="fas fa-list-ol me-2" style="color: #1a237e;"></i>Ranking Completo
+            <h5 class="fw-bold mb-0">
+                <i class="fas fa-list-ol me-2"></i>Ranking Completo
             </h5>
         </div>
         <div class="card-body p-0">
@@ -203,18 +195,18 @@
             {
                 <div class="table-responsive">
                     <table class="table table-hover mb-0 align-middle">
-                        <thead style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+                        <thead>
                             <tr>
-                                <th class="ps-4 py-3 text-center" style="width: 70px; font-weight: 700;">#</th>
-                                <th class="py-3" style="font-weight: 700;">Fornecedor</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Pontuação</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Avaliação</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Pedidos</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Eventos</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Resp. Média</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Aceitação</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Badge</th>
-                                <th class="py-3 text-center" style="font-weight: 700;">Ações</th>
+                                <th class="ps-4 py-3 text-center" style="width: 70px;">#</th>
+                                <th class="py-3">Fornecedor</th>
+                                <th class="py-3 text-center">Pontuação</th>
+                                <th class="py-3 text-center">Avaliação</th>
+                                <th class="py-3 text-center">Pedidos</th>
+                                <th class="py-3 text-center">Eventos</th>
+                                <th class="py-3 text-center">Resp. Média</th>
+                                <th class="py-3 text-center">Aceitação</th>
+                                <th class="py-3 text-center">Badge</th>
+                                <th class="py-3 text-center">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -235,8 +227,7 @@
                                     </td>
                                     <td class="py-3">
                                         <div class="d-flex align-items-center">
-                                            <div class="rounded-circle d-flex align-items-center justify-content-center me-3"
-                                                 style="width: 42px; height: 42px; background: linear-gradient(135deg, #8B0000, #a52a2a); color: white; font-weight: 700; font-size: 14px; flex-shrink: 0;">
+                                            <div class="rounded-circle ranking-table-avatar d-flex align-items-center justify-content-center me-3">
                                                 @(r.Fornecedor?.Pessoa?.Nome?.Substring(0, 1).ToUpper() ?? "F")
                                             </div>
                                             <div>
@@ -257,7 +248,7 @@
                                         </div>
                                     </td>
                                     <td class="py-3 text-center">
-                                        <i class="fas fa-star" style="color: #ffc107;"></i>
+                                        <i class="fas fa-star star-gold"></i>
                                         <span class="fw-semibold">@r.MediaAvaliacoes.ToString("0.0")</span>
                                         <small class="text-muted">(@r.QuantidadeAvaliacoes)</small>
                                     </td>
@@ -290,13 +281,13 @@
                                     <td class="py-3 text-center">
                                         @if (r.IsTopFornecedor)
                                         {
-                                            <span class="badge px-2 py-1" style="background: linear-gradient(135deg, #f9a825, #ff8f00); color: white; border-radius: 12px; font-size: 0.75em;">
+                                            <span class="badge ranking-top-badge px-2 py-1" style="font-size: 0.75em;">
                                                 <i class="fas fa-crown me-1"></i>Top
                                             </span>
                                         }
                                     </td>
                                     <td class="py-3 text-center">
-                                        <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark" style="border-radius: 8px;" title="Ver perfil completo">
+                                        <a asp-action="Perfil" asp-route-id="@r.FornecedorId" class="btn btn-sm btn-outline-dark" title="Ver perfil completo">
                                             <i class="fas fa-eye"></i>
                                         </a>
                                     </td>
@@ -310,7 +301,7 @@
     </div>
 
     <!-- Legenda -->
-    <div class="card border-0 shadow-sm mt-4" style="border-radius: 14px;">
+    <div class="card ranking-info-card border-0 shadow-sm mt-4">
         <div class="card-body">
             <h6 class="fw-bold mb-3"><i class="fas fa-info-circle me-2"></i>Como o ranking é calculado</h6>
             <div class="row g-3">
@@ -372,10 +363,3 @@
         </div>
     </div>
 </div>
-
-@section Styles {
-    <style>
-        .table-hover tbody tr:hover { background-color: #f5f5f5 !important; }
-        .card { transition: transform 0.2s ease; }
-    </style>
-}
