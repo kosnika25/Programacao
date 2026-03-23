@@ -4,112 +4,110 @@
     var googleMapsApiKey = ViewBag.GoogleMapsApiKey as string ?? "";
 }
 
-<div class="container">
+<div class="container py-5 animate-in">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card card-eventx mt-5">
-                <div class="card-body">
-                    <h2 class="mb-4" style="color: var(--eventx-primary);">Novo Evento</h2>
-                    
+        <div class="col-lg-8">
+            <div class="card shadow-lg rounded-4 border-0">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-2 text-primary"><i class="fas fa-calendar-plus me-2"></i> Novo Evento</h2>
+                    <div class="text-muted mb-4">Preencha os dados para criar um novo evento. Os campos estão agrupados para facilitar o preenchimento.</div>
                     <form asp-action="CriarEvento" method="post" id="formCriarEvento">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                        
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label asp-for="NomeEvento" class="form-label">Nome do evento</label>
-                                <input asp-for="NomeEvento" class="form-control" placeholder="Evento de Exemplo" />
-                                <span asp-validation-for="NomeEvento" class="text-danger"></span>
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4"></div>
+                        <!-- Dados principais -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Dados principais</h5>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label asp-for="NomeEvento" class="form-label">Nome do evento</label>
+                                    <input asp-for="NomeEvento" class="form-control form-control-lg rounded-pill" placeholder="Evento de Exemplo" />
+                                    <span asp-validation-for="NomeEvento" class="invalid-feedback d-block"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="TipoEvento" class="form-label">Tipo de evento</label>
+                                    <input asp-for="TipoEvento" class="form-control rounded-pill" placeholder="Casamento, Aniversário, etc." />
+                                    <span asp-validation-for="TipoEvento" class="invalid-feedback d-block"></span>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="DataEvento" class="form-label">Data do evento</label>
-                                <input asp-for="DataEvento" type="date" class="form-control" />
-                                <span asp-validation-for="DataEvento" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="TipoEvento" class="form-label">Tipo de evento</label>
-                                <input asp-for="TipoEvento" class="form-control" placeholder="Casamento, Aniversário, etc." />
-                                <span asp-validation-for="TipoEvento" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="DescricaoEvento" class="form-label">Descrição</label>
-                            <textarea asp-for="DescricaoEvento" class="form-control" rows="4" placeholder="Um evento especial para lembrar..."></textarea>
-                            <span asp-validation-for="DescricaoEvento" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="HoraInicio" class="form-label">Hora de início</label>
-                                <input asp-for="HoraInicio" type="time" class="form-control" />
-                                <span asp-validation-for="HoraInicio" class="text-danger"></span>
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="HoraFim" class="form-label">Hora de fim</label>
-                                <input asp-for="HoraFim" type="time" class="form-control" />
-                                <span asp-validation-for="HoraFim" class="text-danger"></span>
+                        <!-- Data e horário -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Data e horário</h5>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label asp-for="DataEvento" class="form-label">Data</label>
+                                    <input asp-for="DataEvento" type="date" class="form-control rounded-pill" />
+                                    <span asp-validation-for="DataEvento" class="invalid-feedback d-block"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="HoraInicio" class="form-label">Hora de início</label>
+                                    <input asp-for="HoraInicio" type="time" class="form-control rounded-pill" />
+                                    <span asp-validation-for="HoraInicio" class="invalid-feedback d-block"></span>
+                                </div>
+                                <div class="col-md-4">
+                                    <label asp-for="HoraFim" class="form-label">Hora de fim</label>
+                                    <input asp-for="HoraFim" type="time" class="form-control rounded-pill" />
+                                    <span asp-validation-for="HoraFim" class="invalid-feedback d-block"></span>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div class="mb-3">
-                            <label asp-for="PublicoEstimado" class="form-label">Público estimado</label>
-                            <input asp-for="PublicoEstimado" type="number" class="form-control" min="1" />
-                            <span asp-validation-for="PublicoEstimado" class="text-danger"></span>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label class="form-label">Custo estimado (R$)</label>
-                            <div style="position: relative;">
-                                <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #666; font-weight: 600;">R$</span>
-                                <input type="text" name="CustoEstimadoTexto" id="custoEstimadoTexto" class="form-control" 
-                                       inputmode="decimal" placeholder="0,00" 
-                                       style="padding-left: 40px;"
-                                       value="@(Model?.CustoEstimado > 0 ? Model.CustoEstimado.ToString("N2", new System.Globalization.CultureInfo("pt-BR")) : "")" />
-                            </div>
-                        </div>
-
-                        <!-- Local do Evento com Google Maps -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                <i class="fas fa-map-marker-alt" style="color: #8B0000;"></i> Local do evento
-                            </label>
-                            <div style="position: relative;">
-                                <input type="text" id="localBusca" class="form-control" 
-                                       placeholder="Busque o endereço do evento..." 
-                                       autocomplete="off"
-                                       style="padding-left: 12px; padding-right: 40px;" />
-                                <i class="fas fa-search" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #999;"></i>
+                        <!-- Local -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Local</h5>
+                            <label class="form-label"><i class="fas fa-map-marker-alt text-danger me-1"></i> Local do evento</label>
+                            <div class="position-relative mb-2">
+                                <input type="text" id="localBusca" class="form-control rounded-pill" placeholder="Busque o endereço do evento..." autocomplete="off" />
+                                <i class="fas fa-search position-absolute" style="right: 16px; top: 50%; transform: translateY(-50%); color: #999;"></i>
                             </div>
                             <input type="hidden" name="LocalNome" id="localNome" />
                             <input type="hidden" name="LocalEndereco" id="localEndereco" />
-                            
-                            <!-- Info do local selecionado -->
-                            <div id="localSelecionado" style="display: none; margin-top: 10px; padding: 12px 16px; background: linear-gradient(135deg, #f8f6f4 0%, #ede8e2 100%); border-radius: 10px; border-left: 4px solid #8B0000;">
-                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <div id="localSelecionado" class="bg-light rounded-3 p-3 mb-2 d-none">
+                                <div class="d-flex align-items-center justify-content-between">
                                     <div>
-                                        <strong id="localNomeDisplay" style="color: #8B0000; font-size: 0.95rem;"></strong>
-                                        <p id="localEnderecoDisplay" style="margin: 4px 0 0; color: #666; font-size: 0.85rem;"></p>
+                                        <strong id="localNomeDisplay" class="text-danger"></strong>
+                                        <p id="localEnderecoDisplay" class="mb-0 text-muted small"></p>
                                     </div>
-                                    <button type="button" id="btnRemoverLocal" style="background: none; border: none; color: #999; font-size: 1.2rem; cursor: pointer;" title="Remover local">
-                                        <i class="fas fa-times-circle"></i>
-                                    </button>
+                                    <button type="button" id="btnRemoverLocal" class="btn btn-sm btn-outline-secondary"><i class="fas fa-times-circle"></i></button>
                                 </div>
                             </div>
-
-                            <!-- Mapa preview -->
-                            <div id="mapContainer" style="display: none; margin-top: 10px; border-radius: 10px; overflow: hidden; border: 2px solid #e0d6cc; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                                <div id="map" style="width: 100%; height: 250px;"></div>
+                            <div id="mapContainer" class="mb-2 d-none rounded-3 overflow-hidden border border-secondary-subtle">
+                                <div id="map" style="width: 100%; height: 220px;"></div>
                             </div>
                         </div>
-                        
-                        <div class="d-flex gap-2 mt-3">
-                            <button type="submit" class="btn" style="background: #8B0000; color: #fff; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; border: none; transition: all 0.3s ease;">Criar Evento</button>
-                            <a asp-action="Dashboard" class="btn" style="background: #D4C5B9; color: #8B0000; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; border: 1px solid #8B0000; transition: all 0.3s ease;">Cancelar</a>
+                        <!-- Descrição -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Descrição</h5>
+                            <label asp-for="DescricaoEvento" class="form-label">Descrição do evento</label>
+                            <textarea asp-for="DescricaoEvento" class="form-control rounded-3" rows="4" placeholder="Um evento especial para lembrar..."></textarea>
+                            <span asp-validation-for="DescricaoEvento" class="invalid-feedback d-block"></span>
+                        </div>
+                        <!-- Capa/Imagem -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Capa/Imagem</h5>
+                            <label class="form-label">Imagem de capa (opcional)</label>
+                            <input type="file" name="ImagemCapa" class="form-control rounded-pill" accept="image/*" />
+                        </div>
+                        <!-- Público e custo -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">Público e custo</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="PublicoEstimado" class="form-label">Público estimado</label>
+                                    <input asp-for="PublicoEstimado" type="number" class="form-control rounded-pill" min="1" />
+                                    <span asp-validation-for="PublicoEstimado" class="invalid-feedback d-block"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Custo estimado (R$)</label>
+                                    <div class="position-relative">
+                                        <span class="position-absolute" style="left: 16px; top: 50%; transform: translateY(-50%); color: #666; font-weight: 600;">R$</span>
+                                        <input type="text" name="CustoEstimadoTexto" id="custoEstimadoTexto" class="form-control rounded-pill" inputmode="decimal" placeholder="0,00" style="padding-left: 40px;" value="@(Model?.CustoEstimado > 0 ? Model.CustoEstimado.ToString("N2", new System.Globalization.CultureInfo("pt-BR")) : "")" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Botões -->
+                        <div class="d-flex gap-3 mt-4 justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">Salvar Evento</button>
+                            <a asp-action="Dashboard" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold">Cancelar</a>
                         </div>
                     </form>
                 </div>

@@ -1,0 +1,112 @@
+@model IEnumerable<ProjetoEventX.Models.Convidado>
+@{
+    ViewBag.Title = "Lista de Convidados";
+    var eventoId = ViewBag.EventoId;
+}
+
+<div class="container py-4 animate-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-user-friends text-primary me-2"></i> Convidados do Evento</h2>
+            <div class="text-muted">Gerencie os convidados com facilidade e clareza.</div>
+        </div>
+        <a href="@Url.Action("Cadastro", new { eventoId = eventoId })" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-user-plus me-2"></i> Adicionar Convidado
+        </a>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 col-lg-4 mb-2">
+            <input type="text" id="searchConvidados" class="form-control form-control-lg rounded-pill shadow-sm" placeholder="Buscar por nome ou e-mail..." />
+        </div>
+        <div class="col-md-6 col-lg-8 d-flex gap-2 align-items-center">
+            <span class="fw-bold text-muted"><i class="fas fa-filter me-1"></i>Filtrar:</span>
+            <button class="btn btn-sm btn-outline-secondary filter-btn active" data-filter="todos">Todos</button>
+            <button class="btn btn-sm btn-outline-success filter-btn" data-filter="ativo">Ativo</button>
+            <button class="btn btn-sm btn-outline-warning filter-btn" data-filter="pendente">Pendente</button>
+            <button class="btn btn-sm btn-outline-info filter-btn" data-filter="primeiroacesso">Primeiro acesso</button>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-modern align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Telefone</th>
+                    <th>Status de Acesso</th>
+                    <th>Status de Presença</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="convidadosTable">
+                @foreach (var convidado in Model)
+                {
+                    var acessoStatus = convidado.EmailConfirmed ? "Ativo" : "Pendente";
+                    var acessoBadge = convidado.EmailConfirmed ? "badge bg-success" : "badge bg-warning text-dark";
+                    var lista = convidado.ListasConvidados?.FirstOrDefault(l => l.EventoId == eventoId);
+                    var presencaStatus = lista?.ConfirmaPresenca ?? "Pendente";
+                    var presencaBadge = presencaStatus == "Confirmado" ? "badge bg-success" : presencaStatus == "Rejeitado" ? "badge bg-danger" : "badge bg-secondary";
+                    <tr data-nome="@(convidado.Pessoa != null ? convidado.Pessoa.Nome.ToLower() : "")" data-email="@(convidado.Email != null ? convidado.Email.ToLower() : "")" data-acesso="@acessoStatus.ToLower()" data-presenca="@presencaStatus.ToLower()">
+                        <td class="fw-bold">@convidado.Pessoa?.Nome</td>
+                        <td>@convidado.Email</td>
+                        <td>@convidado.Pessoa?.Telefone</td>
+                        <td><span class="@acessoBadge">@acessoStatus</span></td>
+                        <td><span class="@presencaBadge">@presencaStatus</span></td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="@Url.Action("Detalhes", new { id = convidado.Id })" class="btn btn-sm btn-outline-primary rounded-pill" title="Visualizar"><i class="fas fa-eye"></i></a>
+                                <a href="@Url.Action("Editar", new { id = convidado.Id })" class="btn btn-sm btn-outline-info rounded-pill" title="Editar"><i class="fas fa-edit"></i></a>
+                                <form asp-action="Excluir" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@convidado.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Excluir" onclick="return confirm('Deseja realmente excluir este convidado?')"><i class="fas fa-trash-alt"></i></button>
+                                </form>
+                                <form asp-action="ReenviarAcesso" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@convidado.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill" title="Gerar/Reenviar acesso"><i class="fas fa-key"></i></button>
+                                </form>
+                                <a href="@Url.Action("PrimeiroAcesso", new { id = convidado.Id })" class="btn btn-sm btn-outline-secondary rounded-pill" title="Status do primeiro acesso"><i class="fas fa-user-check"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Busca
+    const search = document.getElementById('searchConvidados');
+    if (search) {
+        search.addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            document.querySelectorAll('#convidadosTable tr').forEach(row => {
+                const nome = row.dataset.nome || '';
+                const email = row.dataset.email || '';
+                row.style.display = nome.includes(q) || email.includes(q) ? '' : 'none';
+            });
+        });
+    }
+    // Filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            const f = this.dataset.filter;
+            document.querySelectorAll('#convidadosTable tr').forEach(row => {
+                if (f === 'todos') {
+                    row.style.display = '';
+                } else if (f === 'ativo') {
+                    row.style.display = row.dataset.acesso === 'ativo' ? '' : 'none';
+                } else if (f === 'pendente') {
+                    row.style.display = row.dataset.acesso === 'pendente' ? '' : 'none';
+                } else if (f === 'primeiroacesso') {
+                    // Exemplo: filtro por status de primeiro acesso
+                    row.style.display = row.dataset.presenca === 'primeiro acesso' ? '' : 'none';
+                }
+            });
+        });
+    });
+});
+</script>

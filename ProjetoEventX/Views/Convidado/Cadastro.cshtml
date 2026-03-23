@@ -1,0 +1,49 @@
+@model ProjetoEventX.Models.ConvidadoViewModel
+@{
+    ViewBag.Title = "Cadastro de Convidado";
+    var eventoId = ViewBag.EventoId;
+}
+
+<div class="container py-4 animate-in">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg rounded-4 border-0">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-2 text-primary"><i class="fas fa-user-plus me-2"></i> Adicionar Convidado</h2>
+                    <div class="text-muted mb-3">O convidado receberá acesso individual ao evento após o cadastro.</div>
+                    <form asp-action="Cadastro" method="post" autocomplete="off">
+                        <input type="hidden" name="EventoId" value="@eventoId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+                        <div class="mb-3">
+                            <label for="Nome" class="form-label">Nome completo</label>
+                            <input type="text" class="form-control form-control-lg rounded-pill" id="Nome" name="Nome" required placeholder="Nome do convidado" />
+                            <span asp-validation-for="Nome" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control rounded-pill" id="Email" name="Email" required placeholder="email@exemplo.com" />
+                            <span asp-validation-for="Email" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Telefone" class="form-label">Telefone <span class="text-muted">(opcional)</span></label>
+                            <input type="text" class="form-control rounded-pill" id="Telefone" name="Telefone" placeholder="(99) 99999-9999" />
+                            <span asp-validation-for="Telefone" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Observacoes" class="form-label">Observações <span class="text-muted">(opcional)</span></label>
+                            <textarea class="form-control rounded-3" id="Observacoes" name="Observacoes" rows="2" placeholder="Informações adicionais..."></textarea>
+                            <span asp-validation-for="Observacoes" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="mb-4">
+                            <span class="badge bg-info text-dark px-3 py-2">O acesso será gerado automaticamente e enviado ao convidado.</span>
+                        </div>
+                        <div class="d-flex gap-3 mt-4 justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">Salvar Convidado</button>
+                            <a href="@Url.Action("Listagem", new { eventoId = eventoId })" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

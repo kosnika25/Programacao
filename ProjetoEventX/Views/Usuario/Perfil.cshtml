@@ -1,0 +1,158 @@
+@model ProjetoEventX.Models.UsuarioPerfilViewModel
+@{
+    ViewData["Title"] = "Meu Perfil";
+    var usuario = Model;
+}
+
+<style>
+    .perfil-section {
+        background: #f5f0eb;
+        min-height: 80vh;
+        padding: 2rem 0 3rem;
+    }
+    .perfil-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        padding: 2rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .perfil-header {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .perfil-avatar {
+        width: 90px;
+        height: 90px;
+        background: #8B0000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 2.2rem;
+        overflow: hidden;
+    }
+    .perfil-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .perfil-info {
+        flex: 1;
+    }
+    .perfil-info h3 {
+        margin: 0;
+        font-weight: 700;
+        color: #8B0000;
+        font-size: 1.5rem;
+    }
+    .perfil-info .email {
+        font-size: 1rem;
+        color: #555;
+        margin-bottom: 0.3rem;
+    }
+    .perfil-info .telefone {
+        font-size: 1rem;
+        color: #555;
+    }
+    .form-label-custom {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.9rem;
+        margin-bottom: 0.3rem;
+    }
+    .form-control-custom {
+        border: 1px solid #e0d6cc;
+        border-radius: 12px;
+        padding: 0.7rem 1rem;
+        background: #faf8f5;
+        transition: all 0.3s;
+    }
+    .form-control-custom:focus {
+        border-color: #8B0000;
+        background: #fff;
+    }
+    .btn-salvar {
+        background: #8B0000;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 0.8rem 2.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .btn-salvar:hover { background: #a00000; color: #fff; }
+    .btn-alterar-senha {
+        background: none;
+        color: #8B0000;
+        border: 2px solid #8B0000;
+        border-radius: 12px;
+        padding: 0.8rem 2rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        margin-top: 1rem;
+    }
+    .btn-alterar-senha:hover { background: #8B0000; color: #fff; }
+</style>
+
+<section class="perfil-section">
+    <div class="container">
+        <div class="perfil-card">
+            <div class="perfil-header">
+                <div class="perfil-avatar">
+                    @if (!string.IsNullOrEmpty(usuario.FotoUrl))
+                    {
+                        <img src="@usuario.FotoUrl" alt="Avatar" />
+                    }
+                    else
+                    {
+                        @(usuario.Nome?.Substring(0, 1).ToUpper() ?? "U")
+                    }
+                </div>
+                <div class="perfil-info">
+                    <h3>@usuario.Nome</h3>
+                    <div class="email"><i class="fas fa-envelope"></i> @usuario.Email</div>
+                    <div class="telefone"><i class="fas fa-phone"></i> @usuario.Telefone</div>
+                </div>
+            </div>
+
+            <form method="post" asp-action="SalvarPerfil">
+                <div class="mb-3">
+                    <label class="form-label-custom">Nome</label>
+                    <input type="text" name="Nome" class="form-control form-control-custom" value="@usuario.Nome" maxlength="100" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">E-mail</label>
+                    <input type="email" name="Email" class="form-control form-control-custom" value="@usuario.Email" maxlength="100" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label-custom">Telefone</label>
+                    <input type="text" name="Telefone" class="form-control form-control-custom" value="@usuario.Telefone" maxlength="20" />
+                </div>
+                @if (usuario.Preferencias != null)
+                {
+                    <div class="mb-3">
+                        <label class="form-label-custom">Preferências</label>
+                        <input type="text" name="Preferencias" class="form-control form-control-custom" value="@usuario.Preferencias" maxlength="200" />
+                    </div>
+                }
+                <div class="d-flex gap-3 mt-4">
+                    <button type="submit" class="btn btn-salvar">
+                        <i class="fas fa-save"></i> Salvar Dados
+                    </button>
+                    <a asp-action="AlterarSenha" class="btn-alterar-senha">
+                        <i class="fas fa-key"></i> Alterar Senha
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

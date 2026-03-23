@@ -44,6 +44,8 @@ namespace ProjetoEventX.Data
         public DbSet<NegociacaoHistorico> NegociacaoHistoricos { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<EventLog> EventLogs { get; set; }
+            public DbSet<PublicacaoFeed> PublicacoesFeed { get; set; }
+            public DbSet<ComentarioFeed> ComentariosFeed { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

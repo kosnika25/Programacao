@@ -5,6 +5,16 @@ namespace ProjetoEventX.Models
 {
     public class SolicitacaoOrcamento
     {
+        // Dados da proposta do fornecedor
+        [StringLength(200)]
+        public string? PrazoProposto { get; set; }
+
+        // ...existing code...
+
+            [StringLength(1000)]
+            public string? ObservacoesProposta { get; set; }
+
+            public DateTime? DataResposta { get; set; }
         [Key]
         public int Id { get; set; }
 
@@ -59,7 +69,7 @@ namespace ProjetoEventX.Models
 
         public DateTime DataSolicitacao { get; set; } = DateTime.UtcNow;
 
-        public DateTime? DataResposta { get; set; }
+        // ...existing code...
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

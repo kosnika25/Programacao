@@ -39,5 +39,8 @@ namespace ProjetoEventX.Models
         public Convidado? Convidado { get; set; }
         public ICollection<TarefaEvento> TarefasResponsaveis { get; set; } = new List<TarefaEvento>();
         public ICollection<Notificacao> Notificacoes { get; set; } = new List<Notificacao>();
+
+        // Propriedade adicionada
+        public string FotoPerfilUrl { get; set; }
     }
 }

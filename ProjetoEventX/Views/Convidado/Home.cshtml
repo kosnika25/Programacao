@@ -1,0 +1,82 @@
+@model ProjetoEventX.Models.Convidado
+@{
+    ViewBag.Title = "Área do Convidado";
+    var evento = Model.ListasConvidados.FirstOrDefault()?.Evento;
+    var organizador = evento?.Organizador;
+}
+<div class="container mt-5">
+    <div class="card shadow-lg rounded-4 mb-4">
+        <div class="event-cover" style="background-image:url('@evento?.ImagemCapa'); height:220px; border-radius:2rem 2rem 0 0; background-size:cover; background-position:center;"></div>
+        <div class="card-body">
+            <h2 class="mb-2 text-center">@evento?.NomeEvento</h2>
+            <p class="text-center text-muted">@evento?.DataEvento.ToString("dd/MM/yyyy") às @evento?.HoraInicio - @evento?.HoraFim</p>
+            <p class="text-center"><i class="bi bi-geo-alt"></i> @evento?.Local?.NomeLocal</p>
+            <div class="d-flex justify-content-center mb-3">
+                <form asp-action="ConfirmarPresenca" method="post">
+                    <input type="hidden" name="eventoId" value="@evento?.Id" />
+                    <button type="submit" class="btn btn-success rounded-pill px-4">Confirmar Presença</button>
+                </form>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-8">
+                    <section class="mb-4">
+                        <h4 class="mb-2">Feed Oficial</h4>
+                        <div class="feed rounded-3 p-3 bg-light shadow-sm">
+                            <!-- Placeholder para posts/avisos -->
+                            <p class="text-muted">Nenhum aviso publicado ainda.</p>
+                        </div>
+                    </section>
+                    <section class="mb-4">
+                        <h4 class="mb-2">Mural de Fotos</h4>
+                        <div class="photos rounded-3 p-3 bg-light shadow-sm">
+                            <!-- Placeholder para mural de fotos -->
+                            <p class="text-muted">Nenhuma foto enviada ainda.</p>
+                        </div>
+                    </section>
+                    <section class="mb-4">
+                        <h4 class="mb-2">Comentários</h4>
+                        <div class="comments rounded-3 p-3 bg-light shadow-sm">
+                            <!-- Placeholder para comentários -->
+                            <p class="text-muted">Seja o primeiro a comentar!</p>
+                        </div>
+                    </section>
+                </div>
+                <div class="col-md-4">
+                    <section class="mb-4">
+                        <h4 class="mb-2">Cronograma</h4>
+                        <div class="schedule rounded-3 p-3 bg-light shadow-sm">
+                            <!-- Placeholder para cronograma -->
+                            <p class="text-muted">Cronograma não disponível.</p>
+                        </div>
+                    </section>
+                    <section class="mb-4">
+                        <h4 class="mb-2">Avisos Importantes</h4>
+                        <div class="alerts rounded-3 p-3 bg-warning bg-opacity-25 shadow-sm">
+                            <!-- Placeholder para avisos -->
+                            <p class="text-muted">Nenhum aviso importante.</p>
+                        </div>
+                    </section>
+                    <section>
+                        <h4 class="mb-2">Organizador</h4>
+                        <div class="organizer rounded-3 p-3 bg-light shadow-sm">
+                            <strong>@organizador?.Pessoa?.Nome</strong><br />
+                            <span class="text-muted">@organizador?.Pessoa?.Email</span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.event-cover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.card {
+    border-radius: 2rem;
+}
+.feed, .photos, .comments, .schedule, .alerts, .organizer {
+    border-radius: 1rem;
+}
+</style>

@@ -1,0 +1,71 @@
+@model IEnumerable<ProjetoEventX.Models.ConvidadoAcessoViewModel>
+@{
+    ViewBag.Title = "Gerenciamento de Acesso dos Convidados";
+    var eventoId = ViewBag.EventoId;
+}
+
+<div class="container py-4 animate-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-key text-primary me-2"></i> Gerenciar Acesso dos Convidados</h2>
+            <div class="text-muted">Controle prático sobre o acesso individual de cada convidado.</div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-modern align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nome</th>
+                    <th>E-mail</th>
+                    <th>Evento</th>
+                    <th>Acesso Gerado</th>
+                    <th>Primeiro Acesso</th>
+                    <th>Status</th>
+                    <th>Último Acesso</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var acesso in Model)
+                {
+                    var acessoBadge = acesso.AcessoGerado ? "badge bg-success" : "badge bg-warning text-dark";
+                    var primeiroAcessoBadge = acesso.PrimeiroAcessoConcluido ? "badge bg-info text-dark" : "badge bg-secondary";
+                    var statusBadge = acesso.Ativo ? "badge bg-success" : "badge bg-danger";
+                    <tr>
+                        <td class="fw-bold">@acesso.Nome</td>
+                        <td>@acesso.Email</td>
+                        <td>@acesso.EventoNome</td>
+                        <td><span class="@acessoBadge">@(acesso.AcessoGerado ? "Sim" : "Não")</span></td>
+                        <td><span class="@primeiroAcessoBadge">@(acesso.PrimeiroAcessoConcluido ? "Concluído" : "Pendente")</span></td>
+                        <td><span class="@statusBadge">@(acesso.Ativo ? "Ativo" : "Inativo")</span></td>
+                        <td>@acesso.UltimoAcesso.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form asp-action="GerarAcesso" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@acesso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-primary rounded-pill" title="Gerar acesso"><i class="fas fa-key"></i></button>
+                                </form>
+                                <form asp-action="ReenviarAcesso" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@acesso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-warning rounded-pill" title="Reenviar acesso"><i class="fas fa-envelope"></i></button>
+                                </form>
+                                <form asp-action="RedefinirSenha" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@acesso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-info rounded-pill" title="Redefinir senha"><i class="fas fa-sync-alt"></i></button>
+                                </form>
+                                <form asp-action="BloquearAcesso" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@acesso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill" title="Bloquear acesso"><i class="fas fa-ban"></i></button>
+                                </form>
+                                <form asp-action="AtivarAcesso" method="post" style="display:inline">
+                                    <input type="hidden" name="convidadoId" value="@acesso.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-success rounded-pill" title="Ativar acesso"><i class="fas fa-check"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

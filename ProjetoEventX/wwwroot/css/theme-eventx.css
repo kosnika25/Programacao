@@ -1,18 +1,17 @@
+/* Tokens EventX para home moderna */
 :root {
-    --eventx-primary: #b9382b;
-    --eventx-primary-light: #d65a4e;
-    --eventx-background: #f4f6fa;
-    --eventx-card: #ffffff;
-    --eventx-border: #e8ebf2;
-    --eventx-success: #199473;
-    --eventx-warning: #d38a13;
-    --eventx-danger: #d14343;
-
-    --eventx-text: #182433;
-    --eventx-text-muted: #6f7a89;
-    --eventx-sidebar: #111722;
+    --eventx-primary: #992008;
+    --eventx-primary-light: #E74C3C;
+    --eventx-background: #F8FAFC;
+    --eventx-card: #fff;
+    --eventx-border: #E5E7EB;
+    --eventx-success: #10B981;
+    --eventx-warning: #F59E0B;
+    --eventx-danger: #EF4444;
+    --eventx-text: #2C3E50;
+    --eventx-text-muted: #6B7280;
+    --eventx-sidebar: #111827;
     --eventx-shadow: 0 10px 30px rgba(21, 28, 39, 0.08);
-
     --ex-primary: var(--eventx-primary);
     --ex-primary-light: var(--eventx-primary-light);
     --ex-bg: var(--eventx-background);
@@ -23,10 +22,200 @@
     --ex-danger: var(--eventx-danger);
 }
 
-body {
-    font-family: 'Manrope', 'Segoe UI', sans-serif;
+    font-family: 'Inter', 'Poppins', 'Segoe UI', sans-serif;
     color: var(--eventx-text);
-    background: radial-gradient(circle at top right, #f7ebea 0%, #f4f6fa 35%, #f4f6fa 100%);
+    background: var(--eventx-background);
+}
+
+/* Hero moderno */
+.hero-modern {
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+    margin-bottom: 0;
+}
+.hero-bg-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    overflow: hidden;
+}
+.hero-img-modern {
+    width: 100vw;
+    height: 520px;
+    object-fit: cover;
+    filter: brightness(0.85) saturate(1.1);
+    border-radius: 0 0 40px 40px;
+}
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, rgba(0,0,0,0.18) 0%, rgba(153,32,8,0.12) 100%);
+    z-index: 2;
+}
+.hero-content-modern {
+    position: relative;
+    z-index: 3;
+    margin-top: 80px;
+    margin-bottom: 60px;
+}
+.hero-title-modern {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--ex-primary);
+    text-shadow: 0 2px 16px rgba(0,0,0,0.12);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.04em;
+}
+.hero-subtitle-modern {
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--ex-text-secondary);
+    margin-bottom: 2.2rem;
+}
+.btn-hero {
+    min-width: 180px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    box-shadow: var(--eventx-shadow);
+    padding: 0.9rem 2.2rem;
+    transition: all 0.2s;
+}
+.btn-hero:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 10px 30px rgba(153,32,8,0.18);
+}
+.cta-modern {
+    background: var(--ex-primary-bg);
+    border-radius: 24px;
+    margin-top: -40px;
+    margin-bottom: 40px;
+    box-shadow: var(--eventx-shadow);
+}
+.btn-cta {
+    border-radius: 30px;
+    font-size: 1.1rem;
+    padding: 0.9rem 2.2rem;
+    font-weight: 600;
+    box-shadow: var(--eventx-shadow);
+    transition: all 0.2s;
+}
+.btn-cta:hover {
+    background: var(--ex-primary);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(153,32,8,0.18);
+}
+.avaliacoes-modern {
+    background: var(--eventx-background);
+    border-radius: 24px;
+    box-shadow: var(--eventx-shadow);
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+.depo-card-modern {
+    border-radius: 20px;
+    box-shadow: var(--eventx-shadow);
+    border: 1.5px solid var(--eventx-border);
+    padding: 1.5rem 1.2rem;
+    transition: box-shadow 0.2s;
+    background: var(--eventx-card);
+}
+.depo-card-modern:hover {
+    box-shadow: 0 10px 30px rgba(153,32,8,0.18);
+}
+.depo-avatar-modern {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 18px;
+    box-shadow: 0 2px 8px rgba(153,32,8,0.08);
+}
+.depo-name-modern {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--ex-primary);
+    margin-bottom: 2px;
+}
+.depo-rating-modern {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+.depo-star-modern {
+    height: 22px;
+    margin-right: 2px;
+}
+.depo-text-modern {
+    font-size: 1rem;
+    color: var(--ex-text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+.depo-icon-modern {
+    height: 22px;
+    margin-top: 4px;
+}
+.btn-view-modern {
+    border-radius: 30px;
+    font-size: 1.1rem;
+    padding: 0.9rem 2.2rem;
+    font-weight: 600;
+    box-shadow: var(--eventx-shadow);
+    border: 2px solid var(--ex-primary);
+    color: var(--ex-primary);
+    background: #fff;
+    transition: all 0.2s;
+}
+.btn-view-modern:hover {
+    background: var(--ex-primary);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(153,32,8,0.18);
+}
+.text-eventx {
+    color: var(--ex-primary);
+}
+@media (max-width: 991px) {
+    .hero-img-modern {
+        height: 320px;
+    }
+    .hero-title-modern {
+        font-size: 2.1rem;
+    }
+    .hero-content-modern {
+        margin-top: 40px;
+        margin-bottom: 30px;
+    }
+    .btn-hero, .btn-cta, .btn-view-modern {
+        font-size: 1rem;
+        padding: 0.7rem 1.2rem;
+    }
+}
+@media (max-width: 767px) {
+    .hero-img-modern {
+        height: 180px;
+    }
+    .hero-title-modern {
+        font-size: 1.3rem;
+    }
+    .hero-content-modern {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .depo-card-modern {
+        padding: 1rem 0.5rem;
+    }
+}
 }
 
 .saas-sidebar {

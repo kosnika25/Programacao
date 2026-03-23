@@ -1,0 +1,84 @@
+@model ProjetoEventX.Models.PublicacaoFeedViewModel
+@{
+    ViewBag.Title = "Nova Publicação Oficial";
+    var eventoId = ViewBag.EventoId;
+}
+
+<div class="container py-4 animate-in">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow-lg rounded-4 border-0">
+                <div class="card-body p-4">
+                    <h2 class="fw-bold mb-2 text-primary"><i class="fas fa-bullhorn me-2"></i> Nova Publicação Oficial</h2>
+                    <div class="text-muted mb-3">Publique avisos e atualizações para todos os convidados do evento.</div>
+                    <form asp-action="Criar" method="post" enctype="multipart/form-data" autocomplete="off">
+                        <input type="hidden" name="EventoId" value="@eventoId" />
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3"></div>
+                        <div class="mb-3">
+                            <label for="Texto" class="form-label">Texto da publicação</label>
+                            <textarea class="form-control form-control-lg rounded-3" id="Texto" name="Texto" rows="4" required placeholder="Escreva o aviso ou atualização..."></textarea>
+                            <span asp-validation-for="Texto" class="invalid-feedback d-block"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ImagemUrl" class="form-label">Imagem (opcional)</label>
+                            <input type="file" class="form-control rounded-pill" id="ImagemUrl" name="ImagemUrl" accept="image/*" />
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="Fixado" name="Fixado" />
+                            <label class="form-check-label" for="Fixado">Fixar publicação como aviso</label>
+                        </div>
+                        <div class="d-flex gap-3 mt-4 justify-content-end">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">Publicar</button>
+                            <button type="button" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold" onclick="previewPost()">Pré-visualizar</button>
+                        </div>
+                    </form>
+                    <div id="previewArea" class="mt-4 d-none">
+                        <h5 class="fw-bold mb-2">Pré-visualização</h5>
+                        <div class="card feed-card shadow-sm rounded-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="/img/logo-eventx.svg" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;" />
+                                    <strong>Organizador</strong>
+                                    <span class="ms-2 text-muted small">Agora</span>
+                                    <span id="previewFixado" class="badge bg-warning ms-2 d-none">Aviso fixado</span>
+                                </div>
+                                <p class="mb-2" id="previewTexto"></p>
+                                <img id="previewImagem" class="img-fluid rounded mb-2 d-none" style="max-height:300px;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function previewPost() {
+    const texto = document.getElementById('Texto').value;
+    const fixado = document.getElementById('Fixado').checked;
+    const imgInput = document.getElementById('ImagemUrl');
+    const previewArea = document.getElementById('previewArea');
+    const previewTexto = document.getElementById('previewTexto');
+    const previewFixado = document.getElementById('previewFixado');
+    const previewImagem = document.getElementById('previewImagem');
+    previewTexto.textContent = texto;
+    previewFixado.classList.toggle('d-none', !fixado);
+    previewArea.classList.remove('d-none');
+    if (imgInput.files && imgInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImagem.src = e.target.result;
+            previewImagem.classList.remove('d-none');
+        };
+        reader.readAsDataURL(imgInput.files[0]);
+    } else {
+        previewImagem.classList.add('d-none');
+    }
+}
+</script>
+<style>
+.feed-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+</style>

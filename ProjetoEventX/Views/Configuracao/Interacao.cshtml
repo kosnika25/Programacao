@@ -1,0 +1,53 @@
+@model ProjetoEventX.Models.ConfiguracaoInteracaoViewModel
+@{
+    ViewBag.Title = "Configurações de Interação do Evento";
+    var eventoId = ViewBag.EventoId;
+}
+
+<div class="container py-4 animate-in" style="max-width:520px;">
+    <div class="card shadow-lg rounded-4 border-0">
+        <div class="card-body p-4">
+            <h2 class="fw-bold mb-2 text-primary"><i class="fas fa-cogs me-2"></i> Configurações de Interação</h2>
+            <div class="text-muted mb-3">Controle a experiência social do evento.</div>
+            <form asp-action="SalvarInteracao" method="post" autocomplete="off">
+                <input type="hidden" name="EventoId" value="@eventoId" />
+                <div class="mb-4">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="PermitirComentarios" name="PermitirComentarios" @(Model.PermitirComentarios ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="PermitirComentarios">Permitir comentários</label>
+                        <div class="text-muted small">Convidados podem comentar nas publicações e fotos.</div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="PermitirEnvioFotos" name="PermitirEnvioFotos" @(Model.PermitirEnvioFotos ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="PermitirEnvioFotos">Permitir envio de fotos</label>
+                        <div class="text-muted small">Convidados podem enviar fotos para o mural.</div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="PermitirCurtidas" name="PermitirCurtidas" @(Model.PermitirCurtidas ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="PermitirCurtidas">Permitir curtidas</label>
+                        <div class="text-muted small">Convidados podem curtir publicações e fotos.</div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="ExigirAprovacaoFotos" name="ExigirAprovacaoFotos" @(Model.ExigirAprovacaoFotos ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="ExigirAprovacaoFotos">Exigir aprovação de fotos</label>
+                        <div class="text-muted small">Fotos enviadas só aparecem após aprovação do organizador.</div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="MuralVisivel" name="MuralVisivel" @(Model.MuralVisivel ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="MuralVisivel">Mural visível</label>
+                        <div class="text-muted small">O mural de fotos fica visível para todos os convidados.</div>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="PermitirInteracoes" name="PermitirInteracoes" @(Model.PermitirInteracoes ? "checked" : "") />
+                        <label class="form-check-label fw-bold" for="PermitirInteracoes">Permitir interações dos convidados</label>
+                        <div class="text-muted small">Convidados podem interagir com o evento (curtir, comentar, enviar fotos).</div>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 mt-4 justify-content-end">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm">Salvar Configurações</button>
+                    <a href="@Url.Action("Dashboard", new { eventoId = eventoId })" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

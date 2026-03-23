@@ -3,60 +3,109 @@
    ============================================ */
 
 /* Driver.js popover overrides */
+/* Card do tour moderno */
 .eventx-tour-popover {
-    font-family: 'Manrope', 'Segoe UI', sans-serif !important;
-    border-radius: 16px !important;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25) !important;
-    border: 1px solid var(--eventx-border) !important;
-    max-width: 380px !important;
+    font-family: 'Inter', 'Poppins', 'Segoe UI', sans-serif !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(153,32,8,0.12), 0 2px 8px rgba(0,0,0,0.08) !important;
+    border: 1.5px solid var(--eventx-border) !important;
+    max-width: 400px !important;
+    padding: 1.2rem 1.1rem !important;
+    background: var(--eventx-card) !important;
+    animation: fadeInTour 0.25s ease;
 }
 
 .eventx-tour-popover .driver-popover-title {
-    font-size: 1.15rem !important;
+    font-size: 1.35rem !important;
     font-weight: 800 !important;
-    color: var(--eventx-text) !important;
-    margin-bottom: 0.35rem !important;
+    color: var(--eventx-primary) !important;
+    margin-bottom: 0.45rem !important;
+    letter-spacing: 0.02em !important;
 }
 
 .eventx-tour-popover .driver-popover-description {
-    font-size: 0.92rem !important;
-    line-height: 1.5 !important;
-    color: var(--eventx-text-muted) !important;
+    font-size: 1rem !important;
+    line-height: 1.6 !important;
+    color: var(--eventx-text-secondary) !important;
+    margin-bottom: 0.7rem !important;
 }
 
 .eventx-tour-popover .driver-popover-progress-text {
-    font-size: 0.75rem !important;
+    font-size: 0.82rem !important;
     font-weight: 600 !important;
     color: var(--eventx-text-muted) !important;
+    margin-bottom: 0.5rem !important;
+    opacity: 0.7 !important;
 }
 
 .eventx-tour-popover .driver-popover-navigation-btns {
-    gap: 0.5rem !important;
+    gap: 0.7rem !important;
+    margin-top: 0.7rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
 }
 
 .eventx-tour-popover .driver-popover-next-btn {
-    background: linear-gradient(120deg, var(--eventx-primary) 0%, var(--eventx-primary-light) 100%) !important;
+    background: linear-gradient(135deg, var(--eventx-primary), var(--eventx-primary-light)) !important;
     color: #fff !important;
     border: none !important;
-    border-radius: 10px !important;
-    padding: 0.5rem 1.2rem !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 1.6rem !important;
     font-weight: 700 !important;
-    font-size: 0.85rem !important;
-    text-shadow: none !important;
+    font-size: 1rem !important;
+    box-shadow: 0 2px 8px rgba(153,32,8,0.12) !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+}
+.eventx-tour-popover .driver-popover-next-btn:hover {
+    background: linear-gradient(135deg, var(--eventx-primary-dark), var(--eventx-primary)) !important;
+    box-shadow: 0 4px 14px rgba(153,32,8,0.18) !important;
 }
 
 .eventx-tour-popover .driver-popover-prev-btn {
-    background: transparent !important;
+    background: #fff !important;
     color: var(--eventx-text-muted) !important;
-    border: 1px solid var(--eventx-border) !important;
-    border-radius: 10px !important;
-    padding: 0.5rem 1.2rem !important;
+    border: 1.5px solid var(--eventx-border) !important;
+    border-radius: 12px !important;
+    padding: 0.7rem 1.6rem !important;
     font-weight: 600 !important;
-    font-size: 0.85rem !important;
+    font-size: 1rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
+    transition: background 0.2s, box-shadow 0.2s !important;
+}
+.eventx-tour-popover .driver-popover-prev-btn:hover {
+    background: var(--eventx-primary-bg) !important;
+    color: var(--eventx-primary) !important;
 }
 
 .eventx-tour-popover .driver-popover-close-btn {
     color: var(--eventx-text-muted) !important;
+    font-size: 1.2rem !important;
+    opacity: 0.7 !important;
+}
+/* Overlay suave do tour */
+.driver-overlay {
+    background: rgba(0,0,0,0.35) !important;
+    transition: background 0.2s !important;
+}
+
+/* Elemento destacado com glow leve */
+.driver-highlighted-element {
+    box-shadow: 0 0 0 4px rgba(153,32,8,0.18), 0 2px 8px rgba(153,32,8,0.12);
+    border-radius: 12px !important;
+    border: 2px solid var(--eventx-primary);
+    animation: focusGlow 0.3s ease;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+@keyframes fadeInTour {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes focusGlow {
+    0% { box-shadow: 0 0 0 0 rgba(153,32,8,0.18); }
+    50% { box-shadow: 0 0 0 8px rgba(153,32,8,0.12); }
+    100% { box-shadow: 0 0 0 4px rgba(153,32,8,0.18); }
 }
 
 /* ============================================

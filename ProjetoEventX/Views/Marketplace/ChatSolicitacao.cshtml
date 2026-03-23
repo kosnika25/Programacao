@@ -1,0 +1,179 @@
+@model ProjetoEventX.Models.ChatSolicitacaoViewModel
+@{
+    ViewData["Title"] = "Conversa da Solicitação";
+    var solicitacao = ViewBag.Solicitacao as ProjetoEventX.Models.SolicitacaoOrcamento;
+    var mensagens = Model.Mensagens?.OrderBy(m => m.DataEnvio).ToList() ?? new List<ProjetoEventX.Models.MensagemSolicitacao>();
+    var usuarioAtualId = Model.UsuarioAtualId;
+    var organizador = solicitacao?.Organizador;
+    var fornecedor = solicitacao?.Fornecedor;
+}
+
+<style>
+    .chat-section {
+        background: #f5f0eb;
+        min-height: 80vh;
+        padding: 2rem 0 3rem;
+    }
+    .chat-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        padding: 2rem;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .chat-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .chat-header .avatar {
+        width: 45px;
+        height: 45px;
+        background: #8B0000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+    .chat-header .context-info {
+        flex: 1;
+    }
+    .chat-header .context-info h5 {
+        margin: 0;
+        font-weight: 700;
+        color: #8B0000;
+    }
+    .chat-header .context-info .sub {
+        font-size: 0.95rem;
+        color: #555;
+    }
+    .chat-history {
+        max-height: 350px;
+        overflow-y: auto;
+        margin-bottom: 2rem;
+        padding-right: 0.5rem;
+    }
+    .msg-row {
+        display: flex;
+        margin-bottom: 1.2rem;
+    }
+    .msg-bubble {
+        border-radius: 16px;
+        padding: 1rem 1.3rem;
+        font-size: 1rem;
+        max-width: 70%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        word-break: break-word;
+    }
+    .msg-remetente {
+        background: #8B0000;
+        color: #fff;
+        margin-left: auto;
+    }
+    .msg-destinatario {
+        background: #faf8f5;
+        color: #333;
+        margin-right: auto;
+    }
+    .msg-meta {
+        font-size: 0.8rem;
+        color: #999;
+        margin-top: 0.3rem;
+        text-align: right;
+    }
+    .chat-form {
+        display: flex;
+        gap: 0.8rem;
+        margin-top: 1rem;
+    }
+    .chat-form textarea {
+        flex: 1;
+        border-radius: 12px;
+        border: 1px solid #e0d6cc;
+        padding: 0.7rem 1rem;
+        background: #faf8f5;
+        font-size: 1rem;
+        resize: none;
+        min-height: 60px;
+    }
+    .chat-form textarea:focus {
+        border-color: #8B0000;
+        background: #fff;
+    }
+    .btn-enviar {
+        background: #8B0000;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 0.8rem 2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+    .btn-enviar:hover { background: #a00000; color: #fff; }
+</style>
+
+<section class="chat-section">
+    <div class="container">
+        <div class="chat-card">
+            <div class="chat-header">
+                <div class="avatar"><i class="fas fa-comments"></i></div>
+                <div class="context-info">
+                    <h5>Conversa da Solicitação</h5>
+                    <div class="sub">
+                        <i class="fas fa-file-invoice-dollar"></i> @solicitacao?.Titulo
+                        @if (solicitacao?.Evento != null)
+                        {
+                            <span>&nbsp;|&nbsp;<i class="fas fa-calendar-alt"></i> @solicitacao.Evento.NomeEvento</span>
+                        }
+                        <span>&nbsp;|&nbsp;<i class="fas fa-user-tie"></i> @organizador?.Pessoa?.Nome</span>
+                        <span>&nbsp;|&nbsp;<i class="fas fa-store"></i> @fornecedor?.Pessoa?.Nome</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-history" id="chatHistory">
+                @if (mensagens.Any())
+                {
+                    @foreach (var msg in mensagens)
+                    {
+                        var isRemetente = msg.UsuarioId == usuarioAtualId;
+                        <div class="msg-row">
+                            <div class="msg-bubble @(isRemetente ? "msg-remetente" : "msg-destinatario")">
+                                @msg.Texto
+                                <div class="msg-meta">@msg.NomeUsuario - @msg.DataEnvio.ToString("dd/MM/yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-muted text-center py-3">Nenhuma mensagem ainda.</div>
+                }
+            </div>
+
+            <form method="post" asp-action="EnviarMensagem" class="chat-form">
+                <input type="hidden" name="solicitacaoId" value="@solicitacao?.Id" />
+                <textarea name="mensagem" placeholder="Digite sua mensagem..." required maxlength="1000"></textarea>
+                <button type="submit" class="btn-enviar">
+                    <i class="fas fa-paper-plane"></i> Enviar
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Scroll automático para o final do histórico
+    window.onload = function() {
+        var chatHistory = document.getElementById('chatHistory');
+        if (chatHistory) {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    };
+</script>

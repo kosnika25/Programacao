@@ -3,30 +3,135 @@
     ViewData["Title"] = "Meus Eventos";
 }
 
-@{ ViewData["HeroIcon"] = "fas fa-calendar-alt"; ViewData["HeroTitle"] = "Meus Eventos"; ViewData["HeroSubtitle"] = "Gerencie, acompanhe e organize todos os seus eventos em um só lugar."; ViewData["HeroClass"] = "mb-3"; }
-@await Html.PartialAsync("_PageHero")
-
-<!-- Header com busca e botão criar -->
-<div class="page-header-bar">
-    <div>
-        <p><strong>@Model.Count()</strong> evento@(Model.Count() != 1 ? "s" : "") cadastrado@(Model.Count() != 1 ? "s" : "")</p>
-    </div>
-    <div class="d-flex gap-2 align-items-center">
-        <input type="text" id="searchEventos" class="form-control" placeholder="Buscar eventos..." style="max-width:260px; min-height:40px;" />
-        <a asp-action="CriarEvento" class="btn btn-eventx-primary">
-            <i class="fas fa-plus me-1"></i> Novo Evento
+<div class="container-fluid py-4 animate-in">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1"><i class="fas fa-calendar-alt text-primary me-2"></i> Meus Eventos</h2>
+            <div class="text-muted">Gerencie, acompanhe e organize todos os seus eventos em um só lugar.</div>
+        </div>
+        <a asp-action="CriarEvento" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+            <i class="fas fa-plus me-2"></i> Novo Evento
         </a>
     </div>
-</div>
+    <div class="row mb-3">
+        <div class="col-md-6 col-lg-4 mb-2">
+            <input type="text" id="searchEventos" class="form-control form-control-lg rounded-pill shadow-sm" placeholder="Buscar eventos..." />
+        </div>
+        <div class="col-md-6 col-lg-8 d-flex gap-2 align-items-center">
+            <span class="fw-bold text-muted"><i class="fas fa-filter me-1"></i>Filtrar:</span>
+            <button class="btn btn-sm btn-outline-secondary filter-btn active" data-filter="todos">Todos</button>
+            <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="Planejado">Planejado</button>
+            <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="Em Andamento">Em Andamento</button>
+            <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="Concluído">Concluído</button>
+            <button class="btn btn-sm btn-outline-secondary filter-btn" data-filter="Cancelado">Cancelado</button>
+        </div>
+    </div>
 
-<!-- Filtros rápidos -->
-<div class="filters-bar" id="eventFilters">
-    <span class="fw-bold" style="font-size:0.85rem; color:var(--eventx-text-muted);"><i class="fas fa-filter me-1"></i>Filtrar:</span>
-    <button class="btn btn-sm btn-eventx-outline filter-btn active" data-filter="todos">Todos</button>
-    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Planejado">Planejado</button>
-    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Em Andamento">Em Andamento</button>
-    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Concluído">Concluído</button>
-    <button class="btn btn-sm btn-eventx-outline filter-btn" data-filter="Cancelado">Cancelado</button>
+    <div class="mb-3">
+        <span class="fw-bold">@Model.Count()</span> evento@(Model.Count() != 1 ? "s" : "") cadastrado@(Model.Count() != 1 ? "s" : "")
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="row g-4" id="eventGrid">
+            @foreach (var evento in Model)
+            {
+                var totalConvidados = evento.ListasConvidados?.Count ?? 0;
+                var confirmados = evento.ListasConvidados?.Count(lc => lc.ConfirmaPresenca == "Confirmado") ?? 0;
+                var totalDespesas = evento.Despesas?.Sum(d => d.Valor) ?? 0;
+
+                var statusClass = evento.StatusEvento switch {
+                    "Planejado" => "badge-planejado",
+                    "Em Andamento" => "badge-andamento",
+                    "Concluído" => "badge-concluido",
+                    "Cancelado" => "badge-cancelado",
+                    _ => "badge-info"
+                };
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="card event-card shadow-lg rounded-4 border-0 animate-in" data-status="@evento.StatusEvento" data-name="@evento.NomeEvento.ToLower()">
+                        <div class="event-cover position-relative">
+                            @if (!string.IsNullOrEmpty(evento.ImagemCapa))
+                            {
+                                <img src="@evento.ImagemCapa" alt="@evento.NomeEvento" class="rounded-top-4" loading="lazy" style="height:180px;width:100%;object-fit:cover;" />
+                            }
+                            <span class="event-type-badge position-absolute top-0 start-0 m-2 bg-primary text-white rounded-pill px-2 py-1 small"><i class="fas fa-tag me-1"></i>@evento.TipoEvento</span>
+                            <span class="event-status-badge position-absolute top-0 end-0 m-2 badge @statusClass">@evento.StatusEvento</span>
+                        </div>
+                        <div class="card-body event-body">
+                            <h5 class="event-title fw-bold mb-2">@evento.NomeEvento</h5>
+                            <div class="event-meta mb-2">
+                                <div class="event-meta-item mb-1">
+                                    <i class="fas fa-calendar-day text-primary"></i>
+                                    <span class="ms-1">@evento.DataEvento.ToString("dd/MM/yyyy") &middot; @evento.HoraInicio - @evento.HoraFim</span>
+                                </div>
+                                @if (evento.Local != null)
+                                {
+                                    <div class="event-meta-item mb-1">
+                                        <i class="fas fa-map-marker-alt text-danger"></i>
+                                        <span class="ms-1">@evento.Local.NomeLocal</span>
+                                    </div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(evento.DescricaoEvento))
+                                {
+                                    <div class="event-meta-item mb-1">
+                                        <i class="fas fa-align-left text-muted"></i>
+                                        <span class="ms-1">@(evento.DescricaoEvento.Length > 80 ? evento.DescricaoEvento.Substring(0, 80) + "…" : evento.DescricaoEvento)</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="event-stats d-flex gap-3 mb-3">
+                                <div class="event-stat">
+                                    <i class="fas fa-users text-secondary"></i>
+                                    <strong>@totalConvidados</strong> convidados
+                                </div>
+                                <div class="event-stat">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>@confirmados</strong> confirmados
+                                </div>
+                                <div class="event-stat">
+                                    <i class="fas fa-wallet text-warning"></i>
+                                    <strong>R$ @evento.CustoEstimado.ToString("N0")</strong>
+                                </div>
+                            </div>
+                            <div class="event-actions d-flex gap-2">
+                                <a asp-action="DetalhesEvento" asp-route-id="@evento.Id" class="btn btn-sm btn-primary rounded-pill"><i class="fas fa-eye me-1"></i>Ver</a>
+                                <a asp-controller="Convite" asp-action="Criar" asp-route-eventoId="@evento.Id" class="btn btn-sm btn-outline-secondary rounded-pill"><i class="fas fa-envelope me-1"></i>Convites</a>
+                                <a asp-controller="Organizador" asp-action="Edit" asp-route-id="@evento.Id" class="btn btn-sm btn-outline-info rounded-pill"><i class="fas fa-edit me-1"></i>Editar</a>
+                                <a asp-controller="Organizador" asp-action="Delete" asp-route-id="@evento.Id" class="btn btn-sm btn-outline-danger rounded-pill"><i class="fas fa-trash-alt me-1"></i>Excluir</a>
+                                <a asp-action="DetalhesEvento" asp-route-id="@evento.Id" class="btn btn-sm btn-outline-primary rounded-pill"><i class="fas fa-door-open me-1"></i>Área do Evento</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Paginação elegante (placeholder) -->
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Paginação de eventos">
+                <ul class="pagination pagination-lg rounded-pill shadow-sm">
+                    <li class="page-item disabled"><a class="page-link">Anterior</a></li>
+                    <li class="page-item active"><a class="page-link">1</a></li>
+                    <li class="page-item"><a class="page-link">2</a></li>
+                    <li class="page-item"><a class="page-link">3</a></li>
+                    <li class="page-item"><a class="page-link">Próximo</a></li>
+                </ul>
+            </nav>
+        </div>
+    }
+    else
+    {
+        <div class="eventx-empty-state text-center py-5">
+            <div class="eventx-empty-state-icon mb-3">
+                <i class="fas fa-calendar-plus fa-3x text-primary"></i>
+            </div>
+            <h4 class="fw-bold mb-2">Você ainda não tem eventos</h4>
+            <p class="text-muted mb-3">Crie seu primeiro evento e comece a organizar tudo em um só lugar.</p>
+            <a asp-action="CriarEvento" class="btn btn-primary btn-lg rounded-pill">
+                <i class="fas fa-plus me-2"></i> Criar Primeiro Evento
+            </a>
+        </div>
+    }
 </div>
 
 @if (Model.Any())

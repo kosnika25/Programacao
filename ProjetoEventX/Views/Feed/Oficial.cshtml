@@ -1,0 +1,92 @@
+@model IEnumerable<ProjetoEventX.Models.PublicacaoFeedViewModel>
+@{
+    ViewBag.Title = "Feed Oficial do Evento";
+    var evento = ViewBag.Evento as ProjetoEventX.Models.Evento;
+    var podeComentar = ViewBag.PodeComentar ?? false;
+}
+
+<div class="container py-4 animate-in">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1"><i class="fas fa-bullhorn text-primary me-2"></i> Feed Oficial do Evento</h2>
+        <div class="text-muted">Publicações do organizador para todos os convidados.</div>
+    </div>
+    <div class="feed-list">
+        @if (!Model.Any())
+        {
+            <div class="text-center text-muted py-5">
+                <i class="fas fa-bullhorn fa-2x mb-2"></i>
+                <div>Nenhuma publicação ainda.</div>
+            </div>
+        }
+        else
+        {
+            @foreach (var post in Model.OrderByDescending(p => p.DataHora))
+            {
+                var fixado = post.Fixado;
+                <div class="card feed-card shadow-sm rounded-4 mb-4 @(fixado ? "border border-warning" : "")">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="@post.Autor.FotoPerfilUrl" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;" />
+                            <strong>@post.Autor.Nome</strong>
+                            <span class="ms-2 text-muted small">@post.DataHora.ToString("dd/MM/yyyy HH:mm")</span>
+                            @if (fixado)
+                            {
+                                <span class="badge bg-warning ms-2">Aviso fixado</span>
+                            }
+                        </div>
+                        <p class="mb-2">@post.Texto</p>
+                        @if (!string.IsNullOrEmpty(post.ImagemUrl))
+                        {
+                            <img src="@post.ImagemUrl" class="img-fluid rounded mb-2" style="max-height:300px;" />
+                        }
+                        <!-- Comentários -->
+                        <div class="feed-comments mt-3">
+                            <h6 class="fw-bold mb-2">Comentários</h6>
+                            @if (post.Comentarios != null && post.Comentarios.Any())
+                            {
+                                @foreach (var comentario in post.Comentarios.OrderBy(c => c.DataHora))
+                                {
+                                    <div class="comment mb-2 p-2 rounded bg-light">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <img src="@comentario.Autor.FotoPerfilUrl" class="rounded-circle me-2" style="width:28px;height:28px;object-fit:cover;" />
+                                            <strong>@comentario.Autor.Nome</strong>
+                                            <span class="ms-2 text-muted small">@comentario.DataHora.ToString("dd/MM/yyyy HH:mm")</span>
+                                        </div>
+                                        <div>@comentario.Texto</div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-muted small">Nenhum comentário ainda.</div>
+                            }
+                            @if (podeComentar)
+                            {
+                                <form asp-action="Comentar" method="post" class="mt-2">
+                                    <input type="hidden" name="postId" value="@post.Id" />
+                                    <textarea name="texto" class="form-control rounded-3 mb-2" rows="2" placeholder="Escreva um comentário..."></textarea>
+                                    <button type="submit" class="btn btn-sm btn-primary rounded-pill">Comentar</button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<style>
+.feed-card {
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.feed-comments {
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1rem;
+}
+.comment {
+    border-radius: 1rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+</style>

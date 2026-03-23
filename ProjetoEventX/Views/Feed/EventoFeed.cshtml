@@ -1,0 +1,58 @@
+@model IEnumerable<ProjetoEventX.Models.PublicacaoFeed>
+@{
+    ViewBag.Title = "Feed Oficial do Evento";
+    var eventoId = ViewBag.EventoId;
+}
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Feed Oficial</h2>
+    @foreach (var pub in Model)
+    {
+        <div class="card mb-4 shadow-sm rounded-3">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-2">
+                    <img src="@pub.Autor.Pessoa?.FotoPerfilUrl" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;" />
+                    <strong>@pub.Autor.Pessoa?.Nome</strong>
+                    <span class="ms-2 text-muted small">@pub.DataHora.ToString("dd/MM/yyyy HH:mm")</span>
+                    @if(pub.Fixado)
+                    {
+                        <span class="badge bg-warning ms-2">Fixado</span>
+                    }
+                </div>
+                <p class="mb-2">@pub.Texto</p>
+                @if (!string.IsNullOrEmpty(pub.ImagemUrl))
+                {
+                    <img src="@pub.ImagemUrl" class="img-fluid rounded mb-2" style="max-height:300px;" />
+                }
+                <hr />
+                <div class="comments">
+                    <h6>Comentários</h6>
+                    @foreach (var c in pub.Comentarios.OrderByDescending(x => x.DataHora))
+                    {
+                        <div class="d-flex align-items-center mb-2">
+                            <img src="@c.Autor.Pessoa?.FotoPerfilUrl" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;" />
+                            <span><strong>@c.Autor.Pessoa?.Nome</strong> <span class="text-muted small">@c.DataHora.ToString("dd/MM/yyyy HH:mm")</span></span>
+                            @if (User.IsInRole("Organizador"))
+                            {
+                                <form asp-action="ExcluirComentario" method="post" class="ms-2">
+                                    <input type="hidden" name="comentarioId" value="@c.Id" />
+                                    <button type="submit" class="btn btn-sm btn-danger">Excluir</button>
+                                </form>
+                            }
+                        </div>
+                        <div class="ms-5 mb-2">@c.Texto</div>
+                    }
+                    @if (User.IsInRole("Convidado"))
+                    {
+                        <form asp-action="Comentar" method="post" class="mt-3">
+                            <input type="hidden" name="publicacaoId" value="@pub.Id" />
+                            <div class="input-group">
+                                <input type="text" name="texto" class="form-control" placeholder="Comente aqui..." required />
+                                <button type="submit" class="btn btn-primary">Comentar</button>
+                            </div>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

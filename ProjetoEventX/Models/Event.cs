@@ -5,6 +5,12 @@ namespace ProjetoEventX.Models
 {
     public class Evento
     {
+        // Permissões sociais e moderação
+        public bool PermitirComentarios { get; set; } = true;
+        public bool PermitirEnvioFotos { get; set; } = true;
+        public bool PermitirCurtidas { get; set; } = true;
+        public bool AprovarFotosAntesPublicar { get; set; } = false;
+        public bool PermitirVisualizacaoMural { get; set; } = true;
         [Key]
         public int Id { get; set; }
 

@@ -3,18 +3,17 @@
     ViewData["Title"] = "Dashboard - Fornecedor";
 }
 
-<!-- Welcome Banner -->
-<div class="welcome-banner animate-in">
-    <div class="d-flex align-items-center">
-        <div class="me-3" style="width: 52px; height: 52px; background: rgba(255,255,255,0.15); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.5rem;">
-            <i class="fas fa-store" style="color: #FDE68A;"></i>
+<div class="dashboard-main-grid">
+    <div class="dashboard-main-area">
+        <div class="dashboard-welcome-card mb-4">
+            <div class="dashboard-welcome-avatar">
+                <i class="fas fa-store"></i>
+            </div>
+            <div>
+                <div class="dashboard-welcome-title">Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</div>
+                <div class="dashboard-welcome-desc">Gerencie sua loja, produtos e pedidos</div>
+            </div>
         </div>
-        <div>
-            <h2>Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h2>
-            <p>Gerencie sua loja, produtos e pedidos</p>
-        </div>
-    </div>
-</div>
 
 @if (TempData["Sucesso"] != null)
 {
@@ -24,44 +23,35 @@
     </div>
 }
 
-<!-- Stat Cards -->
-<div class="row g-3 mb-4">
-    <div class="col-6 col-xl-3">
-        <div class="stat-card purple">
-            <div class="stat-icon purple"><i class="fas fa-box"></i></div>
-            <div class="stat-info">
-                <div class="stat-label">Produtos</div>
-                <div class="stat-value">@ViewBag.TotalProdutos</div>
-            </div>
+<div class="dashboard-metrics-grid mb-4">
+    <div class="dashboard-metric-card dashboard-metric-eventos">
+        <div class="dashboard-metric-icon dashboard-metric-eventos"><i class="fas fa-box"></i></div>
+        <div class="dashboard-metric-info">
+            <div class="dashboard-metric-label">Produtos</div>
+            <div class="dashboard-metric-value">@ViewBag.TotalProdutos</div>
         </div>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-card orange">
-            <div class="stat-icon orange"><i class="fas fa-shopping-cart"></i></div>
-            <div class="stat-info">
-                <div class="stat-label">Pedidos</div>
-                <div class="stat-value">@ViewBag.TotalPedidos</div>
-                <div class="stat-change"><i class="fas fa-clock"></i> @ViewBag.PedidosPendentes pendentes</div>
-            </div>
+    <div class="dashboard-metric-card dashboard-metric-convidados">
+        <div class="dashboard-metric-icon dashboard-metric-convidados"><i class="fas fa-shopping-cart"></i></div>
+        <div class="dashboard-metric-info">
+            <div class="dashboard-metric-label">Pedidos</div>
+            <div class="dashboard-metric-value">@ViewBag.TotalPedidos</div>
+            <div class="dashboard-metric-change"><i class="fas fa-clock"></i> @ViewBag.PedidosPendentes pendentes</div>
         </div>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-card green">
-            <div class="stat-icon green"><i class="fas fa-dollar-sign"></i></div>
-            <div class="stat-info">
-                <div class="stat-label">Receita</div>
-                <div class="stat-value">R$ @(((decimal)ViewBag.ReceitaTotal).ToString("N0"))</div>
-            </div>
+    <div class="dashboard-metric-card dashboard-metric-despesas">
+        <div class="dashboard-metric-icon dashboard-metric-despesas"><i class="fas fa-dollar-sign"></i></div>
+        <div class="dashboard-metric-info">
+            <div class="dashboard-metric-label">Receita</div>
+            <div class="dashboard-metric-value">R$ @(((decimal)ViewBag.ReceitaTotal).ToString("N0"))</div>
         </div>
     </div>
-    <div class="col-6 col-xl-3">
-        <div class="stat-card blue">
-            <div class="stat-icon blue"><i class="fas fa-star"></i></div>
-            <div class="stat-info">
-                <div class="stat-label">Avaliação</div>
-                <div class="stat-value">@(Model.AvaliacaoMedia.ToString("N1"))</div>
-                <div class="stat-change">@ViewBag.TotalAvaliacoes avaliações</div>
-            </div>
+    <div class="dashboard-metric-card dashboard-metric-concluidos">
+        <div class="dashboard-metric-icon dashboard-metric-concluidos"><i class="fas fa-star"></i></div>
+        <div class="dashboard-metric-info">
+            <div class="dashboard-metric-label">Avaliação</div>
+            <div class="dashboard-metric-value">@(Model.AvaliacaoMedia.ToString("N1"))</div>
+            <div class="dashboard-metric-change">@ViewBag.TotalAvaliacoes avaliações</div>
         </div>
     </div>
 </div>
@@ -70,185 +60,177 @@
     <!-- Left Column -->
     <div class="col-lg-8">
         <!-- Store Profile -->
-        <div class="saas-card mb-4" style="border-left: 4px solid var(--ex-primary);">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-store me-2"></i>Informações da Loja</h5>
-                <button class="btn btn-saas-outline btn-sm" data-bs-toggle="modal" data-bs-target="#editPerfilModal">
-                    <i class="fas fa-pen me-1"></i>Editar
-                </button>
-            </div>
-            <div class="d-flex flex-column gap-1">
-                @{
-                    var perfilItems = new[] {
-                        ("fa-store", "Nome", Model.Pessoa?.Nome ?? "Não informado"),
-                        ("fa-id-card", "CNPJ", Model.Cnpj ?? "Não informado"),
-                        ("fa-phone", "Telefone", Model.PhoneNumber ?? Model.Pessoa?.Telefone ?? "Não informado"),
-                        ("fa-envelope", "Email", Model.Email ?? "Não informado"),
-                        ("fa-map-marker-alt", "Local", $"{Model.Cidade ?? ""}/{Model.UF ?? ""}"),
-                        ("fa-concierge-bell", "Serviço", Model.TipoServico ?? "Não informado"),
-                        ("fa-calendar-check", "Desde", Model.DataCadastro.ToString("dd/MM/yyyy"))
-                    };
-                }
-                @foreach (var (icon, label, value) in perfilItems)
-                {
-                    <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--ex-border-light);">
-                        <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--ex-primary-bg); color: var(--ex-primary); border-radius: 8px; font-size: 0.8rem; flex-shrink: 0;">
-                            <i class="fas @icon"></i>
-                        </div>
-                        <div>
-                            <div style="font-size: 0.7rem; color: var(--ex-text-muted); line-height: 1;">@label</div>
-                            <div style="font-weight: 600; color: var(--ex-text); font-size: 0.88rem;">@value</div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Products List -->
-        <div class="saas-card">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-box-open me-2"></i>Meus Produtos</h5>
-                <button class="btn btn-saas-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                    <i class="fas fa-plus me-1"></i>Novo Produto
-                </button>
-            </div>
-
-            @if (Model.Produtos != null && Model.Produtos.Any())
-            {
-                @foreach (var produto in Model.Produtos)
-                {
-                    <div style="display: flex; align-items: center; padding: 0.85rem; border-radius: var(--radius-md); background: var(--ex-bg); margin-bottom: 0.6rem; transition: all 0.2s;">
-                        <div style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--ex-primary), var(--ex-primary-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1rem; margin-right: 0.85rem; flex-shrink: 0;">
-                            <i class="fas fa-box"></i>
-                        </div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-weight: 600; font-size: 0.92rem; color: var(--ex-text);">@produto.Nome</div>
-                            <div style="font-size: 0.78rem; color: var(--ex-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@produto.Tipo · @produto.Descricao</div>
-                        </div>
-                        <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.95rem; margin: 0 0.75rem; white-space: nowrap;">R$ @produto.Preco.ToString("N2")</div>
-                        <div style="display: flex; gap: 4px; flex-shrink: 0;">
-                            <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-info-bg); color: var(--ex-info); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Editar" data-bs-toggle="modal" data-bs-target="#editModal-@produto.Id.ToString().Replace("-","")">
-                                <i class="fas fa-pen"></i>
-                            </button>
-                            <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-danger-bg); color: var(--ex-danger); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal-@produto.Id.ToString().Replace("-","")">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="empty-state">
-                    <i class="fas fa-box-open d-block"></i>
-                    <h5>Nenhum produto cadastrado</h5>
-                    <p>Comece adicionando seu primeiro produto.</p>
-                    <button class="btn btn-saas-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                        <i class="fas fa-plus me-1"></i>Cadastrar Produto
+        <div class="dashboard-charts-grid">
+            <div class="dashboard-profile-card mb-4">
+                <div class="dashboard-chart-title"><i class="fas fa-store"></i>Informações da Loja
+                    <button class="btn btn-saas-outline btn-sm float-end" data-bs-toggle="modal" data-bs-target="#editPerfilModal">
+                        <i class="fas fa-pen me-1"></i>Editar
                     </button>
                 </div>
-            }
-        </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="col-lg-4">
-        <!-- Quick Actions -->
-        <div class="saas-card mb-4">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-bolt me-2" style="color: var(--ex-warning);"></i>Ações Rápidas</h5>
-            </div>
-            <div class="row g-2">
-                <div class="col-6">
-                    <div class="quick-action" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#addProductModal">
-                        <i class="fas fa-plus-circle"></i><span>Novo Produto</span>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <a asp-controller="Pedido" asp-action="Index" class="quick-action">
-                        <i class="fas fa-shopping-bag"></i><span>Pedidos</span>
-                    </a>
-                </div>
-                <div class="col-6">
-                    <a asp-controller="Fornecedor" asp-action="Performance" class="quick-action">
-                        <i class="fas fa-chart-line"></i><span>Performance</span>
-                    </a>
-                </div>
-                <div class="col-6">
-                    <a asp-controller="RankingFornecedor" asp-action="Index" class="quick-action">
-                        <i class="fas fa-trophy"></i><span>Ranking</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recent Orders -->
-        <div class="saas-card mb-4">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-shopping-bag me-2" style="color: var(--ex-warning);"></i>Pedidos Recentes</h5>
-            </div>
-            @{
-                var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido>;
-            }
-            @if (pedidosRecentes != null && pedidosRecentes.Any())
-            {
-                @foreach (var pedido in pedidosRecentes)
-                {
-                    <div style="display: flex; align-items: center; padding: 0.7rem; border-radius: var(--radius-sm); background: var(--ex-bg); margin-bottom: 0.4rem;">
-                        <div style="width: 36px; height: 36px; background: linear-gradient(135deg, var(--ex-warning), #F97316); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.85rem; margin-right: 0.75rem; flex-shrink: 0;">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-weight: 600; font-size: 0.82rem; color: var(--ex-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@(pedido.Produto?.Nome ?? "Produto") — @(pedido.Evento?.NomeEvento ?? "")</div>
-                            <div style="font-size: 0.72rem; color: var(--ex-text-muted);">
-                                @pedido.DataPedido.ToString("dd/MM/yyyy") ·
-                                <span class="badge-saas @(pedido.StatusPedido == "Pendente" ? "badge-warning" : pedido.StatusPedido == "Pago" ? "badge-info" : pedido.StatusPedido == "Entregue" ? "badge-success" : "badge-primary")" style="font-size: 0.65rem;">@pedido.StatusPedido</span>
+                <div>
+                    @{
+                        var perfilItems = new[] {
+                            ("fa-store", "Nome", Model.Pessoa?.Nome ?? "Não informado"),
+                            ("fa-id-card", "CNPJ", Model.Cnpj ?? "Não informado"),
+                            ("fa-phone", "Telefone", Model.PhoneNumber ?? Model.Pessoa?.Telefone ?? "Não informado"),
+                            ("fa-envelope", "Email", Model.Email ?? "Não informado"),
+                            ("fa-map-marker-alt", "Local", $"{Model.Cidade ?? ""}/{Model.UF ?? ""}"),
+                            ("fa-concierge-bell", "Serviço", Model.TipoServico ?? "Não informado"),
+                            ("fa-calendar-check", "Desde", Model.DataCadastro.ToString("dd/MM/yyyy"))
+                        };
+                    }
+                    @foreach (var item in perfilItems)
+                    {
+                        <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--ex-border-light);">
+                            <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: var(--ex-primary-bg); color: var(--ex-primary); border-radius: 8px; font-size: 0.8rem; flex-shrink: 0;">
+                                <i class="fas @item.Item1"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.7rem; color: var(--ex-text-muted); line-height: 1;">@item.Item2</div>
+                                <div style="font-weight: 600; color: var(--ex-text); font-size: 0.88rem;">@item.Item3</div>
                             </div>
                         </div>
-                        <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.85rem; white-space: nowrap; margin-left: 0.5rem;">R$ @pedido.PrecoTotal.ToString("N2")</div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="empty-state" style="padding: 1.5rem;">
-                    <i class="fas fa-inbox d-block" style="font-size: 2rem;"></i>
-                    <p style="font-size: 0.85rem; margin: 0;">Nenhum pedido recebido ainda.</p>
+                    }
                 </div>
-            }
-        </div>
-
-        <!-- Recent Reviews -->
-        <div class="saas-card">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-star me-2" style="color: var(--ex-warning);"></i>Avaliações Recentes</h5>
             </div>
-            @{
-                var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor>;
-            }
-            @if (avaliacoesRecentes != null && avaliacoesRecentes.Any())
-            {
-                @foreach (var avaliacao in avaliacoesRecentes)
+            <div class="dashboard-events-card mb-4">
+                <div class="dashboard-events-header">
+                    <span><i class="fas fa-box-open"></i>Meus Produtos</span>
+                    <button class="btn btn-saas-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                        <i class="fas fa-plus me-1"></i>Novo Produto
+                    </button>
+                </div>
+                @if (Model.Produtos != null && Model.Produtos.Any())
                 {
-                    <div style="padding: 0.7rem; border-radius: var(--radius-sm); background: var(--ex-bg); margin-bottom: 0.4rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                            <div style="display: flex; gap: 1px;">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    <i class="fa@(i <= avaliacao.Nota ? "s" : "r") fa-star" style="color: @(i <= avaliacao.Nota ? "#F59E0B" : "#E5E7EB"); font-size: 0.75rem;"></i>
-                                }
+                    <div class="dashboard-events-list">
+                    @foreach (var produto in Model.Produtos)
+                    {
+                        <div class="dashboard-event-item">
+                            <div class="dashboard-event-date">
+                                <i class="fas fa-box"></i>
                             </div>
-                            <span style="font-size: 0.72rem; color: var(--ex-text-muted);">@avaliacao.Organizador?.Pessoa?.Nome</span>
+                            <div class="dashboard-event-info">
+                                <div class="dashboard-event-title">@produto.Nome</div>
+                                <div class="dashboard-event-meta">@produto.Tipo · @produto.Descricao</div>
+                            </div>
+                            <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.95rem; margin: 0 0.75rem; white-space: nowrap;">R$ @produto.Preco.ToString("N2")</div>
+                            <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                                <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-info-bg); color: var(--ex-info); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Editar" data-bs-toggle="modal" data-bs-target="#editModal-@produto.Id.ToString().Replace("-","")">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                <button style="width: 30px; height: 30px; border-radius: 8px; border: none; background: var(--ex-danger-bg); color: var(--ex-danger); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; cursor: pointer;" title="Excluir" data-bs-toggle="modal" data-bs-target="#deleteModal-@produto.Id.ToString().Replace("-","")">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div style="font-size: 0.8rem; color: var(--ex-text-secondary); line-height: 1.35;">@(avaliacao.Comentario ?? "Sem comentário")</div>
+                    }
                     </div>
                 }
-                <div class="text-center mt-2">
-                    <a asp-controller="AvaliacaoFornecedor" asp-action="Avaliacoes" asp-route-fornecedorId="@Model.Id" style="color: var(--ex-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none;">
-                        Ver todas <i class="fas fa-arrow-right ms-1"></i>
-                    </a>
+                else
+                {
+                    <div class="dashboard-events-empty">
+                        <i class="fas fa-box-open d-block"></i>
+                        <div>Nenhum produto cadastrado</div>
+                        <button class="btn btn-saas-primary btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="fas fa-plus me-1"></i>Cadastrar Produto
+                        </button>
+                    </div>
+                }
+            </div>
+            </div>
+            <div class="dashboard-side-area">
+                <div class="dashboard-quick-actions-card mb-4">
+                    <div class="dashboard-quick-actions-header"><i class="fas fa-bolt"></i>Ações Rápidas</div>
+                    <div class="dashboard-quick-actions-list">
+                        <div class="dashboard-quick-action" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                            <i class="fas fa-plus-circle"></i><span>Novo Produto</span>
+                        </div>
+                        <a asp-controller="Pedido" asp-action="Index" class="dashboard-quick-action">
+                            <i class="fas fa-shopping-bag"></i><span>Pedidos</span>
+                        </a>
+                        <a asp-controller="Fornecedor" asp-action="Performance" class="dashboard-quick-action">
+                            <i class="fas fa-chart-line"></i><span>Performance</span>
+                        </a>
+                        <a asp-controller="RankingFornecedor" asp-action="Index" class="dashboard-quick-action">
+                            <i class="fas fa-trophy"></i><span>Ranking</span>
+                        </a>
+                    </div>
                 </div>
-            }
+                <div class="dashboard-events-card mb-4">
+                    <div class="dashboard-events-header"><i class="fas fa-shopping-bag"></i>Pedidos Recentes</div>
+                    @{
+                        var pedidosRecentes = ViewBag.PedidosRecentes as List<ProjetoEventX.Models.Pedido>;
+                    }
+                    @if (pedidosRecentes != null && pedidosRecentes.Any())
+                    {
+                        <div class="dashboard-events-list">
+                        @foreach (var pedido in pedidosRecentes)
+                        {
+                            <div class="dashboard-event-item">
+                                <div class="dashboard-event-date">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <div class="dashboard-event-info">
+                                    <div class="dashboard-event-title">@(pedido.Produto?.Nome ?? "Produto") — @(pedido.Evento?.NomeEvento ?? "")</div>
+                                    <div class="dashboard-event-meta">
+                                        @pedido.DataPedido.ToString("dd/MM/yyyy") ·
+                                        <span class="badge-saas @(pedido.StatusPedido == "Pendente" ? "badge-warning" : pedido.StatusPedido == "Pago" ? "badge-info" : pedido.StatusPedido == "Entregue" ? "badge-success" : "badge-primary")" style="font-size: 0.65rem;">@pedido.StatusPedido</span>
+                                    </div>
+                                </div>
+                                <div style="font-weight: 700; color: var(--ex-primary); font-size: 0.85rem; white-space: nowrap; margin-left: 0.5rem;">R$ @pedido.PrecoTotal.ToString("N2")</div>
+                            </div>
+                        }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dashboard-events-empty">
+                            <i class="fas fa-inbox d-block" style="font-size: 2rem;"></i>
+                            <div style="font-size: 0.85rem; margin: 0;">Nenhum pedido recebido ainda.</div>
+                        </div>
+                    }
+                </div>
+                <div class="dashboard-notifications-card">
+                    <div class="dashboard-notifications-header"><i class="fas fa-star"></i>Avaliações Recentes</div>
+                    @{
+                        var avaliacoesRecentes = ViewBag.AvaliacoesRecentes as List<ProjetoEventX.Models.AvaliacaoFornecedor>;
+                    }
+                    @if (avaliacoesRecentes != null && avaliacoesRecentes.Any())
+                    {
+                        <div class="dashboard-notifications-list">
+                        @foreach (var avaliacao in avaliacoesRecentes)
+                        {
+                            <div class="dashboard-notification-item">
+                                <div class="dashboard-notification-icon"><i class="fas fa-star"></i></div>
+                                <div class="dashboard-notification-info">
+                                    <div class="dashboard-notification-message">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fa@(i <= avaliacao.Nota ? "s" : "r") fa-star" style="color: @(i <= avaliacao.Nota ? "#F59E0B" : "#E5E7EB"); font-size: 0.75rem;"></i>
+                                        }
+                                        <span style="font-size: 0.72rem; color: var(--ex-text-muted);">@avaliacao.Organizador?.Pessoa?.Nome</span>
+                                    </div>
+                                    <div class="dashboard-notification-date">@(avaliacao.Comentario ?? "Sem comentário")</div>
+                                </div>
+                            </div>
+                        }
+                        <div class="dashboard-notifications-empty mt-2">
+                            <a asp-controller="AvaliacaoFornecedor" asp-action="Avaliacoes" asp-route-fornecedorId="@Model.Id" style="color: var(--ex-primary); font-weight: 600; font-size: 0.85rem; text-decoration: none;">
+                                Ver todas <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="dashboard-notifications-empty">
+                            <i class="fas fa-star d-block" style="font-size: 2rem;"></i>
+                            <div style="font-size: 0.85rem; margin: 0;">Nenhuma avaliação recebida.</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
             else
             {
                 <div class="empty-state" style="padding: 1.5rem;">
