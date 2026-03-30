@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProjetoEventX.Data;
 using ProjetoEventX.Models;
-using ProjetoEventX.Services; // Certifique-se que GeminiEventService está aqui
 using ProjetoEventX.Security;
+using ProjetoEventX.Services; // Certifique-se que GeminiEventService está aqui
 using Stripe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,11 +25,16 @@ catch (Exception ex)
 // ================================
 // 🔹 Obter string de conexão
 // ================================
-var dbConnection = Environment.GetEnvironmentVariable("DB_CONNECTION")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection");
+var dbConnection = Env.GetString("DB_CONNECTION");
 
-Console.WriteLine("🔍 Conexão usada:");
+if (string.IsNullOrEmpty(dbConnection))
+{
+    dbConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+}
+Console.WriteLine("🔍 Conexão FINAL:");
 Console.WriteLine(dbConnection);
+
+
 
 // ================================
 // 🔹 Configurar o DbContext
