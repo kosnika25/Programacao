@@ -1580,7 +1580,6 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("FotoPerfilUrl")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Nome")

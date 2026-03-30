@@ -41,6 +41,6 @@ namespace ProjetoEventX.Models
         public ICollection<Notificacao> Notificacoes { get; set; } = new List<Notificacao>();
 
         // Propriedade adicionada
-        public string FotoPerfilUrl { get; set; }
+        public string? FotoPerfilUrl { get; set; }
     }
 }

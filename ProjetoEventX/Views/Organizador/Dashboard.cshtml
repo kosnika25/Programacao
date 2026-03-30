@@ -1,614 +1,145 @@
 @model ProjetoEventX.Models.OrganizadorDashboardViewModel
+
 @{
     ViewBag.Title = "Dashboard do Organizador";
 }
+
+@if (Model == null)
+{
+    <div class="alert alert-danger">Erro ao carregar dashboard.</div>
+    return;
+}
+
 <div class="d-flex min-vh-100">
-    <!-- Sidebar -->
-    <nav class="sidebar bg-dark text-white p-4 d-flex flex-column" style="width: 240px; border-radius:0 2rem 2rem 0;">
-        <div class="mb-4">
-            <h3 class="fw-bold">EventX</h3>
-        </div>
-        <ul class="nav flex-column mb-auto">
-            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="bi bi-house"></i> Início</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="bi bi-calendar-event"></i> Meus Eventos</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="bi bi-people"></i> Convidados</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="bi bi-image"></i> Galeria</a></li>
-            <li class="nav-item mb-2"><a href="#" class="nav-link text-white"><i class="bi bi-gear"></i> Configurações</a></li>
+
+    <!-- SIDEBAR -->
+    <nav class="bg-dark text-white p-4" style="width:240px;">
+        <h3>EventX</h3>
+
+        <ul class="nav flex-column">
+            <li><a class="nav-link text-white" asp-action="Dashboard">Dashboard</a></li>
+            <li><a class="nav-link text-white" asp-action="MeusEventos">Eventos</a></li>
+            <li><a class="nav-link text-white" asp-action="Orcamento">Financeiro</a></li>
+            <li><a class="nav-link text-white" asp-action="Profile">Perfil</a></li>
         </ul>
-        <div class="mt-auto">
-            <a href="#" class="nav-link text-white"><i class="bi bi-box-arrow-right"></i> Sair</a>
-        </div>
     </nav>
-    <!-- Main Content -->
-    <div class="flex-grow-1 bg-light" style="min-height:100vh;">
-        <!-- Topbar -->
-        <div class="d-flex align-items-center justify-content-between px-4 py-3 bg-white shadow-sm" style="border-radius:0 0 2rem 2rem;">
-            <div class="input-group w-50">
-                <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control border-0 bg-light" placeholder="Buscar..." />
-            </div>
-            <div class="d-flex align-items-center gap-3">
-                <a href="#" class="text-dark position-relative"><i class="bi bi-bell fs-4"></i><span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span></a>
-                <img src="@Model.FotoPerfilUrl" class="rounded-circle" style="width:40px;height:40px;object-fit:cover;" />
-            </div>
-        </div>
-        <!-- Welcome Card Moderno -->
-        <div class="dashboard-welcome-card mb-4 animate-in">
-            <div class="d-flex align-items-center gap-3">
-                <div class="dashboard-welcome-avatar" style="background: var(--ex-primary-bg); color: var(--ex-primary);">
-                    <i class="fas fa-hand-wave"></i>
-                </div>
-                <div>
-                    <h2 class="dashboard-welcome-title">Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h2>
-                    <p class="dashboard-welcome-desc">Bem-vindo de volta. Aqui está o resumo dos seus eventos.</p>
-                </div>
-            </div>
-        </div>
-        <!-- Cards de Métricas Modernos -->
-        <div class="dashboard-metrics-grid mb-4">
-            <div class="dashboard-metric-card dashboard-metric-eventos">
-                <div class="dashboard-metric-icon dashboard-metric-eventos"><i class="fas fa-calendar-alt"></i></div>
-                <div class="dashboard-metric-info">
-                    <div class="dashboard-metric-label">Eventos</div>
-                    <div class="dashboard-metric-value">@ViewBag.TotalEventos</div>
-                </div>
-            </div>
-            <div class="dashboard-metric-card dashboard-metric-convidados">
-                <div class="dashboard-metric-icon dashboard-metric-convidados"><i class="fas fa-users"></i></div>
-                <div class="dashboard-metric-info">
-                    <div class="dashboard-metric-label">Convidados</div>
-                    <div class="dashboard-metric-value">@ViewBag.TotalConvidados</div>
-                    <div class="dashboard-metric-change"><i class="fas fa-check-circle"></i> @ViewBag.ConvidadosConfirmados confirmados</div>
-                </div>
-            </div>
-            <div class="dashboard-metric-card dashboard-metric-despesas">
-                <div class="dashboard-metric-icon dashboard-metric-despesas"><i class="fas fa-wallet"></i></div>
-                <div class="dashboard-metric-info">
-                    <div class="dashboard-metric-label">Despesas</div>
-                    <div class="dashboard-metric-value">R$ @(((decimal)ViewBag.TotalDespesas).ToString("N0"))</div>
-                </div>
-            </div>
-            <div class="dashboard-metric-card dashboard-metric-concluidos">
-                <div class="dashboard-metric-icon dashboard-metric-concluidos"><i class="fas fa-check-circle"></i></div>
-                <div class="dashboard-metric-info">
-                    <div class="dashboard-metric-label">Concluídos</div>
-                    <div class="dashboard-metric-value">@ViewBag.EventosConcluidos</div>
-                </div>
-            </div>
-        </div>
-        <!-- Grid de Gráficos Modernos -->
-        <div class="dashboard-charts-grid mb-4">
-            <div class="dashboard-chart-card">
-                <h6 class="fw-bold mb-2">Gráfico Financeiro</h6>
-                <div class="chart-placeholder" style="height:180px;background:var(--ex-bg);border-radius:1rem;display:flex;align-items:center;justify-content:center;color:var(--ex-primary);font-size:1.2rem;">[Gráfico financeiro aqui]</div>
-            </div>
-        </div>
-        <!-- Bloco do próximo evento -->
-        <div class="card mb-4 shadow rounded-4">
-            <div class="card-body d-flex align-items-center">
-                <img src="@Model.ProximoEvento.ImagemCapaUrl" class="rounded-4 me-3" style="width:80px;height:80px;object-fit:cover;" />
-                <div>
-                    <h5 class="mb-1">@Model.ProximoEvento.Nome</h5>
-                    <div class="text-muted small">@Model.ProximoEvento.DataEvento.ToString("dd/MM/yyyy") às @Model.ProximoEvento.HoraInicio</div>
-                    <div class="text-muted small">@Model.ProximoEvento.Local</div>
-                </div>
-                <a href="#" class="btn btn-primary ms-auto rounded-pill">Ver detalhes</a>
-            </div>
-        </div>
-        <!-- Lista de eventos -->
-        <div class="saas-card mb-4">
-            <h6 class="fw-bold mb-3">Meus Eventos</h6>
-            <table class="saas-table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Data</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach(var evento in Model.Eventos)
-                    {
-                        <tr>
-                            <td>@evento.NomeEvento</td>
-                            <td>@evento.DataEvento.ToString("dd/MM/yyyy")</td>
-                            <td><span class="badge badge-saas badge-info">@evento.StatusEvento</span></td>
-                            <td><a href="#" class="btn btn-saas-outline btn-sm">Ver</a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-        <!-- Cards de atualizações -->
-        <div class="row g-3 mb-4">
-            @foreach(var card in Model.CardsAtualizacoes)
-            {
-                <div class="col-md-6">
-                    <div class="card shadow-sm rounded-4 p-3">
-                        <div class="fw-bold mb-1">@card.Titulo</div>
-                        <div class="text-muted small">@card.Descricao</div>
-                    </div>
-                </div>
-            }
-        </div>
-        <!-- Coluna lateral -->
-        <div class="row">
-            <div class="col-lg-5">
-                <div class="sticky-top" style="top:90px;">
-                    <div class="card mb-3 shadow-sm rounded-4 p-3">
-                        <h6 class="fw-bold mb-2">Checklist</h6>
-                        <ul class="list-group list-group-flush">
-                            @foreach(var item in Model.Checklist)
-                            {
-                                <li class="list-group-item bg-transparent">@item</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="card mb-3 shadow-sm rounded-4 p-3">
-                        <h6 class="fw-bold mb-2">Ações rápidas</h6>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach(var acao in Model.AcoesRapidas)
-                            {
-                                <a href="@acao.Link" class="btn btn-outline-primary rounded-pill">@acao.Titulo</a>
-                            }
-                        </div>
-                    </div>
-                    <div class="card mb-3 shadow-sm rounded-4 p-3">
-                        <h6 class="fw-bold mb-2">Notificações</h6>
-                        <ul class="list-group list-group-flush">
-                            @foreach(var notif in Model.Notificacoes)
-                            {
-                                <li class="list-group-item bg-transparent">@notif</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="card shadow-sm rounded-4 p-3">
-                        <h6 class="fw-bold mb-2">Resumo do evento</h6>
-                        <div>@Model.ResumoEvento</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<style>
-.sidebar {
-    min-height: 100vh;
-    border-radius: 0 2rem 2rem 0;
-}
-.story-card {
-    min-width: 100px;
-    border-radius: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-}
-.card {
-    border-radius: 1.5rem;
-}
-</style>
 
-<!-- Welcome Card Moderno -->
-<div class="dashboard-welcome-card mb-4 animate-in">
-    <div class="d-flex align-items-center gap-3">
-        <div class="dashboard-welcome-avatar" style="background: var(--ex-primary-bg); color: var(--ex-primary);">
-            <i class="fas fa-hand-wave"></i>
-        </div>
-        <div>
-            <h2 class="dashboard-welcome-title">Olá, @(Model.Pessoa?.Nome ?? Model.UserName)!</h2>
-            <p class="dashboard-welcome-desc">Bem-vindo de volta. Aqui está o resumo dos seus eventos.</p>
-        </div>
-    </div>
-</div>
+    <!-- CONTENT -->
+    <div class="flex-grow-1 p-4 bg-light">
 
-<!-- Stat Cards -->
-<!-- Cards de Métricas Modernos -->
-<div class="dashboard-metrics-grid mb-4">
-    <div class="dashboard-metric-card dashboard-metric-eventos">
-        <div class="dashboard-metric-icon dashboard-metric-eventos"><i class="fas fa-calendar-alt"></i></div>
-        <div class="dashboard-metric-info">
-            <div class="dashboard-metric-label">Eventos</div>
-            <div class="dashboard-metric-value">@ViewBag.TotalEventos</div>
-        </div>
-    </div>
-    <div class="dashboard-metric-card dashboard-metric-convidados">
-        <div class="dashboard-metric-icon dashboard-metric-convidados"><i class="fas fa-users"></i></div>
-        <div class="dashboard-metric-info">
-            <div class="dashboard-metric-label">Convidados</div>
-            <div class="dashboard-metric-value">@ViewBag.TotalConvidados</div>
-            <div class="dashboard-metric-change"><i class="fas fa-check-circle"></i> @ViewBag.ConvidadosConfirmados confirmados</div>
-        </div>
-    </div>
-    <div class="dashboard-metric-card dashboard-metric-despesas">
-        <div class="dashboard-metric-icon dashboard-metric-despesas"><i class="fas fa-wallet"></i></div>
-        <div class="dashboard-metric-info">
-            <div class="dashboard-metric-label">Despesas</div>
-            <div class="dashboard-metric-value">R$ @(((decimal)ViewBag.TotalDespesas).ToString("N0"))</div>
-        </div>
-    </div>
-    <div class="dashboard-metric-card dashboard-metric-concluidos">
-        <div class="dashboard-metric-icon dashboard-metric-concluidos"><i class="fas fa-check-circle"></i></div>
-        <div class="dashboard-metric-info">
-            <div class="dashboard-metric-label">Concluídos</div>
-            <div class="dashboard-metric-value">@ViewBag.EventosConcluidos</div>
-        </div>
-    </div>
-</div>
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Olá, @(Model.Pessoa?.Nome ?? Model.UserName)</h2>
 
-<!-- Charts Row 1 -->
-<!-- Grid de Gráficos Modernos -->
-<div class="dashboard-charts-grid mb-4">
-    <div class="dashboard-chart-card">
-        <div class="dashboard-chart-title"><i class="fas fa-chart-bar me-2"></i>Gastos por Evento</div>
-        <div class="dashboard-chart-canvas"><canvas id="gastosEventoChart"></canvas></div>
-    </div>
-    <div class="dashboard-chart-card">
-        <div class="dashboard-chart-title"><i class="fas fa-user-check me-2"></i>Status dos Convidados</div>
-        <div class="dashboard-chart-canvas"><canvas id="convidadosChart"></canvas></div>
-    </div>
-</div>
+            <img src="@(string.IsNullOrEmpty(Model.FotoPerfilUrl) ? "/img/user.png" : Model.FotoPerfilUrl)"
+                 style="width:40px;height:40px;border-radius:50%;" />
+        </div>
 
-<!-- Charts Row 2 -->
-<!-- Grid de Gráficos Secundários -->
-<div class="dashboard-charts-secondary-grid mb-4">
-    <div class="dashboard-chart-card">
-        <div class="dashboard-chart-title"><i class="fas fa-chart-line me-2"></i>Despesas Mensais</div>
-        <div class="dashboard-chart-canvas"><canvas id="despesasMensaisChart"></canvas></div>
-    </div>
-    <div class="dashboard-chart-card">
-        <div class="dashboard-chart-title"><i class="fas fa-tasks me-2"></i>Tarefas</div>
-        @{
-            var totalTarefas = (int)ViewBag.TotalTarefas;
-            var tarefasConcluidas = (int)ViewBag.TarefasConcluidas;
-            var percentTarefas = totalTarefas > 0 ? (int)Math.Round((double)tarefasConcluidas / totalTarefas * 100) : 0;
-        }
-        <div class="dashboard-chart-canvas">
-            <canvas id="tarefasRing" width="140" height="140"></canvas>
-            <span class="dashboard-chart-percentage">@percentTarefas%</span>
-        </div>
-        <div class="dashboard-chart-desc">
-            <strong>@tarefasConcluidas</strong> de <strong>@totalTarefas</strong> concluídas
-        </div>
-    </div>
-    <div class="dashboard-chart-card">
-        <div class="dashboard-chart-title"><i class="fas fa-shopping-cart me-2"></i>Pedidos</div>
-        <div class="dashboard-chart-canvas"><canvas id="pedidosChart"></canvas></div>
-        <div class="dashboard-chart-desc">
-            <strong>@ViewBag.TotalPedidos</strong> pedidos no total
-        </div>
-    </div>
-</div>
-
-<!-- Financial Summary -->
-@{
-    var totalOrc = (decimal)ViewBag.TotalOrcamento;
-    var totalGasto = (decimal)ViewBag.TotalDespesas;
-    var saldo = totalOrc - totalGasto;
-    var percentOrc = totalOrc > 0 ? (double)(totalGasto / totalOrc) * 100 : 0;
-    var barColor = percentOrc > 100 ? "var(--ex-danger)" : percentOrc > 80 ? "var(--ex-warning)" : "var(--ex-success)";
-}
-<!-- Card Resumo Financeiro Moderno -->
-<div class="dashboard-finance-card mb-4">
-    <div class="dashboard-finance-header">
-        <h5 class="dashboard-finance-title"><i class="fas fa-coins me-2"></i>Resumo Financeiro</h5>
-        <a asp-action="Orcamento" class="btn btn-saas-outline btn-sm">Ver detalhes <i class="fas fa-arrow-right ms-1"></i></a>
-    </div>
-    <div class="dashboard-finance-content">
-        <div class="dashboard-finance-info">
-            <div class="dashboard-finance-row">
-                <span>Orçamento Estimado</span>
-                <strong>R$ @totalOrc.ToString("N2")</strong>
+        <!-- MÉTRICAS -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 text-center">
+                    <h6>Eventos</h6>
+                    <h3>@(ViewBag.TotalEventos ?? 0)</h3>
+                </div>
             </div>
-            <div class="dashboard-finance-row">
-                <span>Total Gasto</span>
-                <strong style="color: var(--ex-danger);">R$ @totalGasto.ToString("N2")</strong>
+
+            <div class="col-md-3">
+                <div class="card p-3 text-center">
+                    <h6>Convidados</h6>
+                    <h3>@(ViewBag.TotalConvidados ?? 0)</h3>
+                    <small>@(ViewBag.ConvidadosConfirmados ?? 0) confirmados</small>
+                </div>
             </div>
-            <div class="dashboard-finance-row">
-                <span>Saldo</span>
-                <strong style="color: @(saldo >= 0 ? "var(--ex-success)" : "var(--ex-danger)");">R$ @saldo.ToString("N2")</strong>
+
+            <div class="col-md-3">
+                <div class="card p-3 text-center">
+                    <h6>Despesas</h6>
+                    <h3>R$ @((ViewBag.TotalDespesas ?? 0m).ToString("N2"))</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card p-3 text-center">
+                    <h6>Concluídos</h6>
+                    <h3>@(ViewBag.EventosConcluidos ?? 0)</h3>
+                </div>
             </div>
         </div>
-        <div class="dashboard-finance-bar">
-            <div class="dashboard-finance-bar-labels">
-                <span>@percentOrc.ToString("N0")% utilizado</span>
-                <span>R$ @totalGasto.ToString("N2") / R$ @totalOrc.ToString("N2")</span>
-            </div>
-            <div class="dashboard-finance-progress">
-                <div class="dashboard-finance-progress-bar" style="width: @Math.Min(percentOrc, 100).ToString("N0")%; background: @barColor !important;"></div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Main Content Row -->
-<!-- Grid Principal do Dashboard Moderno -->
-<div class="dashboard-main-grid">
-    <div class="dashboard-main-area">
+        <!-- PRÓXIMO EVENTO -->
         @if (Model.ProximoEvento != null)
         {
-            <div class="dashboard-next-event-card mb-4 animate-in">
-                <div class="dashboard-next-event-header">
-                    <i class="fas fa-star"></i>
-                    <span>Próximo Evento</span>
-                </div>
-                <div class="dashboard-next-event-title">@Model.ProximoEvento.NomeEvento</div>
-                <div class="dashboard-next-event-details">
-                    <span><i class="fas fa-calendar"></i> @Model.ProximoEvento.DataEvento.ToString("dd/MM/yyyy")</span>
-                    <span><i class="fas fa-clock"></i> @Model.ProximoEvento.HoraInicio - @Model.ProximoEvento.HoraFim</span>
-                    <span><i class="fas fa-tag"></i> @Model.ProximoEvento.TipoEvento</span>
-                    <!-- PublicoEstimado removido: propriedade não existe -->
-                </div>
+            <div class="card mb-4 p-3">
+                <h5>Próximo Evento</h5>
+
+                <strong>@Model.ProximoEvento.NomeEvento</strong><br />
+
+                <span>
+                    @Model.ProximoEvento.DataEvento.ToString("dd/MM/yyyy")
+                </span><br />
+
+                <span>@Model.ProximoEvento.TipoEvento</span>
             </div>
         }
-        <!-- Lista de Eventos Modernos -->
-        <div class="dashboard-events-card">
-            <div class="dashboard-events-header">
-                <span><i class="fas fa-list"></i> Meus Eventos</span>
-                <a asp-action="CriarEvento" class="btn btn-saas-primary btn-sm dashboard-events-new-btn"><i class="fas fa-plus"></i> Novo evento</a>
-            </div>
-            <div class="dashboard-events-list">
-                @if (Model.Eventos != null && Model.Eventos.Any())
-                {
-                    @foreach (var evento in Model.Eventos.OrderByDescending(e => e.DataEvento).Take(5))
-                    {
-                        var statusClass = evento.StatusEvento?.ToLower() switch {
-                            "planejado" => "badge-warning",
-                            "em andamento" => "badge-info",
-                            "concluído" or "finalizado" => "badge-success",
-                            "cancelado" => "badge-danger",
-                            _ => "badge-warning"
-                        };
-                        <a asp-action="DetalhesEvento" asp-route-id="@evento.Id" class="dashboard-event-item">
-                            <div class="dashboard-event-date">
-                                <span class="dashboard-event-day">@evento.DataEvento.Day</span>
-                                <span class="dashboard-event-month">@evento.DataEvento.ToString("MMM")</span>
-                            </div>
-                            <div class="dashboard-event-info">
-                                <div class="dashboard-event-title">@evento.NomeEvento</div>
-                                <div class="dashboard-event-meta">@evento.TipoEvento · @evento.HoraInicio - @evento.HoraFim</div>
-                            </div>
-                            <span class="badge-saas @statusClass dashboard-event-status">@evento.StatusEvento</span>
-                        </a>
-                    }
-                    @if (Model.Eventos.Count > 5)
-                    {
-                        <div class="dashboard-events-view-all">
-                            <a asp-action="MeusEventos" class="btn btn-saas-outline btn-sm">Ver todos os eventos</a>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="dashboard-events-empty">
-                        <i class="fas fa-calendar-plus"></i>
-                        <h5>Nenhum evento criado</h5>
-                        <p>Comece criando seu primeiro evento e organize tudo em um só lugar.</p>
-                        <a asp-action="CriarEvento" class="btn btn-saas-primary btn-sm"><i class="fas fa-plus me-1"></i>Criar Evento</a>
-                    </div>
-                }
-            </div>
+
+        <!-- LISTA DE EVENTOS -->
+        <div class="card p-3 mb-4">
+            <h5>Meus Eventos</h5>
+
+            @if (Model.Eventos != null && Model.Eventos.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Data</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var evento in Model.Eventos)
+                        {
+                            <tr>
+                                <td>@evento.NomeEvento</td>
+                                <td>@evento.DataEvento.ToString("dd/MM/yyyy")</td>
+                                <td>@evento.TipoEvento</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <p>Nenhum evento encontrado.</p>
+            }
         </div>
-    </div>
-    <div class="dashboard-side-area">
-        <!-- Notificações Modernas -->
-        <div class="dashboard-notifications-card mb-4">
-            <div class="dashboard-notifications-header">
-                <span><i class="fas fa-bell"></i> Notificações</span>
-                @if ((int)ViewBag.NotificacoesNaoLidas > 0)
-                {
-                    <span class="dashboard-notifications-badge">@ViewBag.NotificacoesNaoLidas</span>
-                }
-            </div>
-            <div class="dashboard-notifications-list">
-                @if (Model.Notificacoes != null && Model.Notificacoes.Any())
-                {
-                    @foreach (var notif in Model.Notificacoes)
-                    {
-                        var iconBg = notif.Tipo?.ToLower() switch {
-                            "presenca" or "confirmacao" => "var(--ex-success)",
-                            "lembrete" => "var(--ex-warning)",
-                            "mudanca" or "alteracao" => "var(--ex-info)",
-                            _ => "var(--ex-text-muted)"
-                        };
-                        var iconFa = notif.Tipo?.ToLower() switch {
-                            "presenca" or "confirmacao" => "fa-user-check",
-                            "lembrete" => "fa-clock",
-                            "mudanca" or "alteracao" => "fa-edit",
-                            _ => "fa-bell"
-                        };
-                        <div class="dashboard-notification-item">
-                            <div class="dashboard-notification-icon" style="background: @iconBg;">
-                                <i class="fas @iconFa"></i>
-                            </div>
-                            <div class="dashboard-notification-info">
-                                <div class="dashboard-notification-message">@notif.Mensagem</div>
-                                <div class="dashboard-notification-date">@notif.Data.ToString("dd/MM HH:mm")</div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="dashboard-notifications-empty">
-                        <i class="fas fa-bell-slash"></i>
-                        Nenhuma notificação
-                    </div>
-                }
-            </div>
+
+        <!-- RESUMO FINANCEIRO -->
+        @{
+            var totalOrc = (decimal?)(ViewBag.TotalOrcamento) ?? 0m;
+            var totalGasto = (decimal?)(ViewBag.TotalDespesas) ?? 0m;
+            var saldo = totalOrc - totalGasto;
+        }
+
+        <div class="card p-3 mb-4">
+            <h5>Resumo Financeiro</h5>
+
+            <p><strong>Orçamento:</strong> R$ @totalOrc.ToString("N2")</p>
+            <p><strong>Gasto:</strong> R$ @totalGasto.ToString("N2")</p>
+            <p><strong>Saldo:</strong> R$ @saldo.ToString("N2")</p>
         </div>
-        <!-- Checklist Moderno -->
-        <div id="eventx-checklist-card" class="dashboard-checklist-card mb-4"></div>
-        <!-- Ações Rápidas Modernas -->
-        <div class="dashboard-quick-actions-card mb-4">
-            <div class="dashboard-quick-actions-header">
-                <span><i class="fas fa-bolt"></i> Ações Rápidas</span>
-            </div>
-            <div class="dashboard-quick-actions-list">
-                <a asp-action="CriarEvento" class="dashboard-quick-action"><i class="fas fa-calendar-plus"></i><span>Criar Evento</span></a>
-                <a asp-controller="Marketplace" asp-action="Index" class="dashboard-quick-action"><i class="fas fa-store"></i><span>Marketplace</span></a>
-                <a asp-controller="Organizador" asp-action="Orcamento" class="dashboard-quick-action"><i class="fas fa-wallet"></i><span>Financeiro</span></a>
-                <a asp-controller="IA" asp-action="Index" class="dashboard-quick-action"><i class="fas fa-robot"></i><span>Assistente IA</span></a>
-                <a asp-controller="TemplateConvite" asp-action="Index" class="dashboard-quick-action"><i class="fas fa-palette"></i><span>Convites</span></a>
-                <a asp-controller="RankingFornecedor" asp-action="Index" class="dashboard-quick-action"><i class="fas fa-ranking-star"></i><span>Ranking</span></a>
-            </div>
+
+        <!-- PERFIL -->
+        <div class="card p-3">
+            <h5>Perfil</h5>
+
+            <p><strong>Nome:</strong> @(Model.Pessoa?.Nome ?? "-")</p>
+            <p><strong>Email:</strong> @(Model.Email ?? "-")</p>
+            <p><strong>Telefone:</strong> @(Model.Pessoa?.Telefone ?? "-")</p>
+            <p><strong>Cidade:</strong> @(Model.Pessoa?.Cidade ?? "-")</p>
         </div>
-        <!-- Perfil Moderno -->
-        <div class="dashboard-profile-card">
-            <div class="saas-card-header">
-                <h5 class="saas-card-title"><i class="fas fa-user-circle me-2"></i>Meu Perfil</h5>
-            </div>
-            <div class="d-flex flex-column gap-2" style="font-size: 0.85rem;">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-user me-2" style="width: 18px; color: var(--ex-text-muted);"></i>
-                    <span style="color: var(--ex-text-secondary); min-width: 70px;">Nome</span>
-                    <strong class="ms-auto">@(Model.Pessoa?.Nome ?? "—")</strong>
-                </div>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-envelope me-2" style="width: 18px; color: var(--ex-text-muted);"></i>
-                    <span style="color: var(--ex-text-secondary); min-width: 70px;">Email</span>
-                    <strong class="ms-auto" style="font-size: 0.8rem;">@(Model.Email ?? "—")</strong>
-                </div>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-phone me-2" style="width: 18px; color: var(--ex-text-muted);"></i>
-                    <span style="color: var(--ex-text-secondary); min-width: 70px;">Telefone</span>
-                    <strong class="ms-auto">@(Model.Pessoa?.Telefone ?? "—")</strong>
-                </div>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-map-marker-alt me-2" style="width: 18px; color: var(--ex-text-muted);"></i>
-                    <span style="color: var(--ex-text-secondary); min-width: 70px;">Cidade</span>
-                    <strong class="ms-auto">@(Model.Pessoa?.Cidade ?? "—")/@(Model.Pessoa?.UF ?? "—")</strong>
-                </div>
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-calendar-check me-2" style="width: 18px; color: var(--ex-text-muted);"></i>
-                    <span style="color: var(--ex-text-secondary); min-width: 70px;">Desde</span>
-                    <strong class="ms-auto">@Model.DataCadastro.ToString("MMM/yyyy")</strong>
-                </div>
-            </div>
-        </div>
+
     </div>
 </div>
-
-<!-- Floating Chat IA -->
-<a href="@Url.Action("Index", "IA")" class="floating-chat-btn">
-    <i class="fas fa-robot"></i>
-</a>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script>
-        const cores = {
-            primary: '#C0392B', primaryLight: '#E74C3C',
-            success: '#10B981', warning: '#F59E0B',
-            danger: '#EF4444', info: '#3B82F6',
-            muted: '#9CA3AF'
-        };
-
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#6B7280';
-
-        // Gastos por Evento
-        const gastosNomes = @Html.Raw(ViewBag.GastosEventoNomes ?? "[]");
-        const gastosValores = @Html.Raw(ViewBag.GastosEventoValores ?? "[]");
-        if (gastosNomes.length > 0) {
-            new Chart(document.getElementById('gastosEventoChart'), {
-                type: 'bar',
-                data: {
-                    labels: gastosNomes,
-                    datasets: [{
-                        label: 'Gastos (R$)', data: gastosValores,
-                        backgroundColor: [cores.primary, cores.primaryLight, cores.info, cores.warning, cores.success],
-                        borderRadius: 8, borderSkipped: false, barPercentage: 0.6
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#F3F4F6' }, ticks: { callback: v => 'R$ ' + v.toLocaleString('pt-BR') } },
-                        x: { grid: { display: false }, ticks: { maxRotation: 45 } }
-                    }
-                }
-            });
-        } else {
-            document.getElementById('gastosEventoChart').parentElement.innerHTML = '<div class="empty-state"><i class="fas fa-chart-bar d-block"></i><p>Sem dados de gastos</p></div>';
-        }
-
-        // Status dos Convidados
-        const convLabels = @Html.Raw(ViewBag.ConvidadosStatusLabels ?? "[]");
-        const convValores = @Html.Raw(ViewBag.ConvidadosStatusValores ?? "[]");
-        if (convValores.some(v => v > 0)) {
-            new Chart(document.getElementById('convidadosChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: convLabels,
-                    datasets: [{ data: convValores, backgroundColor: [cores.success, cores.warning, cores.danger], borderWidth: 0, spacing: 3 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '68%',
-                    plugins: { legend: { position: 'bottom', labels: { padding: 15, usePointStyle: true, pointStyleWidth: 10, font: { weight: '500' } } } }
-                }
-            });
-        } else {
-            document.getElementById('convidadosChart').parentElement.innerHTML = '<div class="empty-state"><i class="fas fa-users d-block"></i><p>Sem convidados</p></div>';
-        }
-
-        // Despesas Mensais
-        const despMesLabels = @Html.Raw(ViewBag.DespesasMensaisLabels ?? "[]");
-        const despMesValores = @Html.Raw(ViewBag.DespesasMensaisValores ?? "[]");
-        if (despMesLabels.length > 0) {
-            new Chart(document.getElementById('despesasMensaisChart'), {
-                type: 'line',
-                data: {
-                    labels: despMesLabels,
-                    datasets: [{
-                        label: 'Despesas (R$)', data: despMesValores,
-                        borderColor: cores.warning, backgroundColor: 'rgba(245, 158, 11, 0.08)',
-                        fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: cores.warning,
-                        pointBorderColor: '#fff', pointBorderWidth: 2, borderWidth: 2.5
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { color: '#F3F4F6' }, ticks: { callback: v => 'R$ ' + v.toLocaleString('pt-BR') } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        } else {
-            document.getElementById('despesasMensaisChart').parentElement.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line d-block"></i><p>Sem despesas</p></div>';
-        }
-
-        // Tarefas Ring
-        const tarefasCanvas = document.getElementById('tarefasRing');
-        if (tarefasCanvas) {
-            const ctx = tarefasCanvas.getContext('2d');
-            const pct = @percentTarefas / 100;
-            const cx = 70, cy = 70, r = 55, lw = 12;
-            ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI);
-            ctx.strokeStyle = '#F3F4F6'; ctx.lineWidth = lw; ctx.stroke();
-            ctx.beginPath(); ctx.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + (2 * Math.PI * pct));
-            ctx.strokeStyle = cores.info; ctx.lineWidth = lw; ctx.lineCap = 'round'; ctx.stroke();
-        }
-
-        // Pedidos
-        const pedPend = @ViewBag.PedidosPendentes;
-        const pedPago = @ViewBag.PedidosPagos;
-        const pedEntr = @ViewBag.PedidosEntregues;
-        if (pedPend + pedPago + pedEntr > 0) {
-            new Chart(document.getElementById('pedidosChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Pendentes', 'Pagos', 'Entregues'],
-                    datasets: [{ data: [pedPend, pedPago, pedEntr], backgroundColor: [cores.warning, cores.success, cores.info], borderWidth: 0, spacing: 2 }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '62%',
-                    plugins: { legend: { position: 'bottom', labels: { padding: 8, usePointStyle: true, pointStyleWidth: 8, font: { size: 11, weight: '500' } } } }
-                }
-            });
-        } else {
-            document.getElementById('pedidosChart').parentElement.innerHTML = '<div class="empty-state"><i class="fas fa-shopping-cart d-block"></i><p>Sem pedidos</p></div>';
-        }
-    </script>
-}
