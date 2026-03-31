@@ -40,37 +40,7 @@
     @if (isPublicPage)
     {
         <!-- ======================== PUBLIC NAVBAR (não-logado) ======================== -->
-        <nav class="navbar navbar-expand-lg public-navbar">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 36px;">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="publicNav">
-                    <ul class="navbar-nav ms-auto align-items-center gap-2">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Eventos" asp-action="Index">Eventos</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Entrar</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginOrganizador"><i class="fas fa-user-tie me-2"></i>Organizador</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginFornecedor"><i class="fas fa-store me-2"></i>Fornecedor</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginConvidado"><i class="fas fa-users me-2"></i>Convidado</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="btn btn-saas-primary btn-sm px-3" href="#" data-bs-toggle="dropdown">Cadastrar</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegistroOrganizador"><i class="fas fa-user-tie me-2"></i>Organizador</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegistroFornecedor"><i class="fas fa-store me-2"></i>Fornecedor</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        
 
         <!-- Alerts -->
         <div class="container mt-3">
