@@ -1,16 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ProjetoEventX.Data;
 using ProjetoEventX.Models;
 using ProjetoEventX.Security;
 using ProjetoEventX.Services;
-using System;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ProjetoEventX.Controllers
 {
@@ -124,7 +119,7 @@ namespace ProjetoEventX.Controllers
                     await _context.SaveChangesAsync();
 
                     // Registrar auditoria
-                    await _auditoriaService.RegistrarAcaoAsync("ApplicationUser", user.Id, "CREATE", 
+                    await _auditoriaService.RegistrarAcaoAsync("ApplicationUser", user.Id, "CREATE",
                         $"Novo organizador criado: {pessoa.Nome}", null, new { user.Id, pessoa.Nome, pessoa.Email });
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -217,6 +212,7 @@ namespace ProjetoEventX.Controllers
                     {
                         PessoaId = pessoa.Id,
                         Pessoa = pessoa,
+                        NomeNegocio = SecurityValidator.SanitizeInput(model.NomeLoja),
                         Cnpj = SecurityValidator.SanitizeInput(cnpjLimpo),
                         TipoServico = SecurityValidator.SanitizeInput(model.TipoServico),
                         Cidade = SecurityValidator.SanitizeInput(model.Cidade),
@@ -225,7 +221,10 @@ namespace ProjetoEventX.Controllers
                         Email = user.Email,
                         EmailConfirmed = true,
                         CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
+                        UpdatedAt = DateTime.UtcNow,
+                        ServicosOferecidos = new List<string>(),
+                        Galeria = new List<string>()
+
                     };
 
                     _context.Fornecedores.Add(fornecedor);

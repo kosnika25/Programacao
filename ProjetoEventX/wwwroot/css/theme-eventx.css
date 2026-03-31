@@ -22,11 +22,184 @@
     --ex-danger: var(--eventx-danger);
 }
 
+body {
     font-family: 'Inter', 'Poppins', 'Segoe UI', sans-serif;
     color: var(--eventx-text);
     background: var(--eventx-background);
 }
+    /*Nav fornecedor*/
+/* ==========================
+   SIDEBAR EVENTX FORNECEDOR
+========================== */
+/* ==========================
+   SIDEBAR FIXA PROFISSIONAL
+========================== */
 
+.eventx-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background: #0f172a; /* FUNDO ESCURO FORTE */
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 9999;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.4);
+}
+
+/* EVITA CONTEÚDO ATRÁS */
+
+
+/* ==========================
+   TOPO
+========================== */
+.layout-com-sidebar {
+    margin-left: 260px;
+}
+.sidebar-top {
+    padding: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.logo {
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.4rem;
+}
+
+.subtitle {
+    color: #9ca3af;
+    font-size: 0.8rem;
+}
+
+/* ==========================
+   MENU
+========================== */
+
+.sidebar-menu {
+    flex: 1;
+    padding: 10px;
+}
+
+.sidebar-section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin: 15px 10px 5px;
+}
+
+/* LINKS */
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 6px;
+    border-radius: 10px;
+    color: #e5e7eb; /* TEXTO CLARO */
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+    /* Ícones mais visíveis */
+    .sidebar-link i {
+        font-size: 16px;
+        color: #f87171;
+    }
+
+    /* HOVER */
+    .sidebar-link:hover {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+        transform: translateX(5px);
+    }
+
+    /* ATIVO */
+    .sidebar-link.active {
+        background: linear-gradient(135deg, #992008, #E74C3C);
+        color: #fff;
+        font-weight: 600;
+    }
+
+/* ==========================
+   FOOTER (PERFIL)
+========================== */
+
+.sidebar-footer {
+    padding: 15px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* USER */
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #992008, #E74C3C);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+}
+
+.user-text strong {
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.user-text small {
+    color: #9ca3af;
+    font-size: 0.75rem;
+}
+
+/* BOTÕES */
+
+.user-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-profile,
+.btn-logout {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    border-radius: 8px;
+    color: #fff;
+}
+
+/* CONFIG */
+.btn-profile {
+    background: #1f2937;
+}
+
+    .btn-profile:hover {
+        background: #374151;
+    }
+
+/* SAIR */
+.btn-logout {
+    background: #dc2626;
+}
+
+    .btn-logout:hover {
+        background: #b91c1c;
+    }
+ /*--------------------------*/
 /* Hero moderno */
 .hero-modern {
     min-height: 520px;

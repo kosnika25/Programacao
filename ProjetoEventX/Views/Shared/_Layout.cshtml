@@ -14,6 +14,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css" />
+
     
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -162,25 +163,72 @@
                         <i class="fas fa-robot"></i><span>Assistente IA</span>
                     </a>
                 }
-                else if (tipoUsuario == "Fornecedor")
+                @if (tipoUsuario == "Fornecedor")
                 {
-                    <a class="sidebar-link" asp-controller="Fornecedor" asp-action="Dashboard">
-                        <i class="fas fa-gauge-high"></i><span>Dashboard</span>
-                    </a>
-                    <a class="sidebar-link" asp-controller="Marketplace" asp-action="SolicitacoesRecebidas">
-                        <i class="fas fa-inbox"></i><span>Solicitações</span>
-                    </a>
-                    <a class="sidebar-link" asp-controller="Orcamento" asp-action="Index">
-                        <i class="fas fa-file-invoice-dollar"></i><span>Orçamentos</span>
-                    </a>
+                    <aside class="eventx-sidebar">
 
-                    <div class="sidebar-section-label">Performance</div>
-                    <a class="sidebar-link" asp-controller="Fornecedor" asp-action="Performance">
-                        <i class="fas fa-chart-line"></i><span>Performance</span>
-                    </a>
-                    <a class="sidebar-link" asp-controller="RankingFornecedor" asp-action="Index">
-                        <i class="fas fa-ranking-star"></i><span>Ranking</span>
-                    </a>
+                        <!-- LOGO -->
+                        <div class="sidebar-top">
+                            <h4 class="logo">EventX</h4>
+                            <span class="subtitle">Fornecedor</span>
+                        </div>
+
+                        <!-- MENU -->
+                        <nav class="sidebar-menu">
+
+                            <div class="sidebar-section-label">Principal</div>
+
+                            <a class="sidebar-link" asp-controller="Fornecedor" asp-action="Dashboard">
+                                <i class="fas fa-gauge-high"></i><span>Dashboard</span>
+                            </a>
+
+                            <a class="sidebar-link" asp-controller="Marketplace" asp-action="SolicitacoesRecebidas">
+                                <i class="fas fa-inbox"></i><span>Solicitações</span>
+                            </a>
+
+                            <a class="sidebar-link" asp-controller="Orcamento" asp-action="Index">
+                                <i class="fas fa-file-invoice-dollar"></i><span>Orçamentos</span>
+                            </a>
+
+                            <div class="sidebar-section-label">Performance</div>
+
+                            <a class="sidebar-link" asp-controller="Fornecedor" asp-action="Performance">
+                                <i class="fas fa-chart-line"></i><span>Performance</span>
+                            </a>
+
+                            <a class="sidebar-link" asp-controller="RankingFornecedor" asp-action="Index">
+                                <i class="fas fa-ranking-star"></i><span>Ranking</span>
+                            </a>
+
+                        </nav>
+
+                        <!-- PERFIL -->
+                        <div class="sidebar-footer">
+
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    @User.Identity.Name?.Substring(0, 1)
+                                </div>
+
+                                <div class="user-text">
+                                    <strong>@User.Identity.Name</strong>
+                                    <small>Fornecedor</small>
+                                </div>
+                            </div>
+
+                            <div class="user-actions">
+                                <a asp-controller="Fornecedor" asp-action="Perfil" class="btn-profile">
+                                    <i class="fas fa-user-cog"></i>
+                                </a>
+
+                                <a asp-controller="Conta" asp-action="Logout" class="btn-logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                </a>
+                            </div>
+
+                        </div>
+
+                    </aside>
                 }
             </nav>
 
