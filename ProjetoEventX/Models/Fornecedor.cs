@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
 
 namespace ProjetoEventX.Models
 {
@@ -11,16 +11,15 @@ namespace ProjetoEventX.Models
         public string NomeNegocio { get; set; }
 
         [StringLength(1000)]
-        public string Descricao { get; set; }
+        public string? Descricao { get; set; }
+        [StringLength(100)]
+        public string? Categoria { get; set; }
 
         [StringLength(100)]
-        public string Categoria { get; set; }
-
-        [StringLength(100)]
-        public string FaixaPreco { get; set; }
+        public string? FaixaPreco { get; set; }
 
         [StringLength(255)]
-        public string ContatoComercial { get; set; }
+        public string? ContatoComercial { get; set; }
 
         // Galeria/Portfólio
         public ICollection<FotoPortfolio> Portfolio { get; set; } = new List<FotoPortfolio>();
@@ -30,7 +29,7 @@ namespace ProjetoEventX.Models
 
         // Disponibilidade (ex: string json, ou model separado)
         [StringLength(500)]
-        public string Disponibilidade { get; set; }
+        public string? Disponibilidade { get; set; }
         [Required]
         public int PessoaId { get; set; }
 
@@ -49,7 +48,7 @@ namespace ProjetoEventX.Models
         public required string Cidade { get; set; }
 
         [Required]
-        [StringLength(2)] 
+        [StringLength(2)]
         public required string UF { get; set; }
         // ------------------------------------
 
@@ -68,11 +67,11 @@ namespace ProjetoEventX.Models
         public ICollection<SolicitacaoOrcamento> SolicitacoesRecebidas { get; set; } = new List<SolicitacaoOrcamento>();
 
         // Propriedades adicionadas
-        public string FotoPerfilUrl { get; set; }
-        public string Regiao { get; set; }
-        public string Telefone { get; set; }
-        public List<string> ServicosOferecidos { get; set; }
-        public List<string> Galeria { get; set; }
+        public string? FotoPerfilUrl { get; set; }
+        public string? Regiao { get; set; }
+        public string? Telefone { get; set; }
+        public List<string> ServicosOferecidos { get; set; } = new List<string>();
+        public List<string> Galeria { get; set; } = new List<string>();
         public int TotalAvaliacoes { get; set; }
     }
 }

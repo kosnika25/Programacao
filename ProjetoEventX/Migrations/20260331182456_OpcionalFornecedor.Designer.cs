@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ProjetoEventX.Data;
@@ -12,9 +13,11 @@ using ProjetoEventX.Data;
 namespace ProjetoEventX.Migrations
 {
     [DbContext(typeof(EventXContext))]
-    partial class EventXContextModelSnapshot : ModelSnapshot
+    [Migration("20260331182456_OpcionalFornecedor")]
+    partial class OpcionalFornecedor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -815,6 +818,7 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("character varying(1000)");
 
                     b.Property<string>("Disponibilidade")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
@@ -829,6 +833,7 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("FotoPerfilUrl")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.PrimitiveCollection<List<string>>("Galeria")
@@ -865,6 +870,7 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Regiao")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("SecurityStamp")
@@ -875,6 +881,7 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("text[]");
 
                     b.Property<string>("Telefone")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("TipoServico")
