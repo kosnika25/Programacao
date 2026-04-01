@@ -8,7 +8,6 @@ using ProjetoEventX.Security;
 using ProjetoEventX.Services;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Security.Claims;
 
@@ -25,7 +24,13 @@ namespace ProjetoEventX.Controllers
         private readonly NotificationService _notificationService;
         private readonly EventLogService _eventLogService;
 
-        public ConviteController(EventXContext context, UserManager<ApplicationUser> userManager, AuditoriaService auditoriaService, EmailService emailService, NotificationService notificationService, EventLogService eventLogService)
+        public ConviteController(
+            EventXContext context,
+            UserManager<ApplicationUser> userManager,
+            AuditoriaService auditoriaService,
+            EmailService emailService,
+            NotificationService notificationService,
+            EventLogService eventLogService)
         {
             _context = context;
             _userManager = userManager;
@@ -50,15 +55,25 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("LoginOrganizador", "Auth");
             }
 
-            // Verificar se o usuário é dono do evento
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
             {
-                await _auditoriaService.RegistrarAcaoAsync("Evento", eventoId, "VIEW", 
-                    $"Tentativa não autorizada de criar convite por: {user.UserName}", null, null, false, "Acesso negado");
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "Evento",
+                    eventoId,
+                    "VIEW",
+                    $"Tentativa não autorizada de criar convite por: {user.UserName}",
+                    null,
+                    null,
+                    false,
+                    "Acesso negado");
+
                 return RedirectToAction("AccessDenied", "Auth");
             }
 
-            var evento = await _context.Eventos.Include(e => e.Local).FirstOrDefaultAsync(e => e.Id == eventoId);
+            var evento = await _context.Eventos
+                .Include(e => e.Local)
+                .FirstOrDefaultAsync(e => e.Id == eventoId);
+
             if (evento == null)
             {
                 TempData["ErrorMessage"] = "❌ Evento não encontrado.";
@@ -75,12 +90,11 @@ namespace ProjetoEventX.Controllers
             ViewBag.NomeLocal = evento.Local?.NomeLocal ?? "Local não informado";
             ViewBag.EnderecoLocal = evento.Local?.EnderecoLocal ?? "Local não informado";
 
-            // Buscar templates do organizador para este evento
             var templates = await _context.TemplatesConvites
-                .Where(t => t.OrganizadorId == user.Id && t.EventoId == eventoId && t.Ativo)
-                .OrderByDescending(t => t.PadraoSistema)
-                .ThenByDescending(t => t.CreatedAt)
+                .Where(t => t.EventoId == eventoId && t.Ativo)
+                .OrderByDescending(t => t.Id)
                 .ToListAsync();
+
             ViewBag.Templates = templates;
 
             var listaConvidado = new ListaConvidado
@@ -100,8 +114,12 @@ namespace ProjetoEventX.Controllers
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     },
-                    HoraInicio = !string.IsNullOrEmpty(evento.HoraInicio) ? evento.HoraInicio : DateTime.UtcNow.ToString("HH:mm"),
-                    HoraFim = !string.IsNullOrEmpty(evento.HoraFim) ? evento.HoraFim : DateTime.UtcNow.AddHours(1).ToString("HH:mm"),
+                    HoraInicio = !string.IsNullOrEmpty(evento.HoraInicio)
+                        ? evento.HoraInicio
+                        : DateTime.UtcNow.ToString("HH:mm"),
+                    HoraFim = !string.IsNullOrEmpty(evento.HoraFim)
+                        ? evento.HoraFim
+                        : DateTime.UtcNow.AddHours(1).ToString("HH:mm"),
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 },
@@ -134,7 +152,6 @@ namespace ProjetoEventX.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Criar(int eventoId, ListaConvidado convite)
         {
-            // Limpar erros de validação de propriedades de navegação (preenchidas pelo controller, não pelo form)
             ModelState.Remove("Evento");
             ModelState.Remove("Evento.NomeEvento");
             ModelState.Remove("Evento.DescricaoEvento");
@@ -151,9 +168,9 @@ namespace ProjetoEventX.Controllers
             ModelState.Remove("Convidado.UserName");
             ModelState.Remove("Convidado.Email");
 
-            // Validar apenas os campos do form
             var nomeForm = Request.Form["Convidado.Pessoa.Nome"].ToString();
             var emailForm = Request.Form["Convidado.Pessoa.Email"].ToString();
+
             if (string.IsNullOrWhiteSpace(nomeForm) || string.IsNullOrWhiteSpace(emailForm))
             {
                 TempData["ErrorMessage"] = "❌ Nome e email do convidado são obrigatórios.";
@@ -167,7 +184,6 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("LoginOrganizador", "Auth");
             }
 
-            // Verificar permissão
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
             {
                 return RedirectToAction("AccessDenied", "Auth");
@@ -175,14 +191,16 @@ namespace ProjetoEventX.Controllers
 
             try
             {
-                var evento = await _context.Eventos.Include(e => e.Local).FirstOrDefaultAsync(e => e.Id == eventoId);
+                var evento = await _context.Eventos
+                    .Include(e => e.Local)
+                    .FirstOrDefaultAsync(e => e.Id == eventoId);
+
                 if (evento == null)
                 {
                     TempData["ErrorMessage"] = "❌ Evento não encontrado.";
                     return RedirectToAction("Index", "Eventos");
                 }
 
-                // Helper local para repopular ViewBag ao retornar à view
                 void PrepararViewBag()
                 {
                     ViewBag.EventoId = eventoId;
@@ -190,11 +208,9 @@ namespace ProjetoEventX.Controllers
                     ViewBag.EnderecoLocal = evento.Local?.EnderecoLocal ?? "Local não informado";
                 }
 
-                // Obter e validar dados do formulário
                 var nomeConvidado = Request.Form["Convidado.Pessoa.Nome"].ToString();
                 var emailConvidado = Request.Form["Convidado.Pessoa.Email"].ToString();
 
-                // Validações de segurança
                 if (!SecurityValidator.IsValidInput(nomeConvidado))
                 {
                     ModelState.AddModelError("", "❌ Nome do convidado contém caracteres inválidos.");
@@ -209,13 +225,11 @@ namespace ProjetoEventX.Controllers
                     return View(convite);
                 }
 
-                // Sanitizar dados
                 nomeConvidado = SecurityValidator.SanitizeInput(nomeConvidado);
                 emailConvidado = SecurityValidator.SanitizeInput(emailConvidado);
 
-                // Verificar se o convidado já existe
                 var pessoa = await _context.Pessoas.FirstOrDefaultAsync(p => p.Email == emailConvidado);
-                Convidado convidado = null;
+                Convidado? convidado = null;
 
                 if (pessoa != null)
                 {
@@ -223,7 +237,6 @@ namespace ProjetoEventX.Controllers
 
                     if (convidado == null)
                     {
-                        // Criar convidado para pessoa existente
                         var userConvidado = new ApplicationUser
                         {
                             UserName = emailConvidado,
@@ -247,12 +260,17 @@ namespace ProjetoEventX.Controllers
                                 CreatedAt = DateTime.UtcNow,
                                 UpdatedAt = DateTime.UtcNow
                             };
+
                             _context.Convidados.Add(convidado);
                             await _context.SaveChangesAsync();
 
-                            // Registrar criação de convidado
-                            await _auditoriaService.RegistrarAcaoAsync("Convidado", convidado.Id, "CREATE", 
-                                $"Convidado criado: {pessoa.Nome}", null, new { convidado.Id, pessoa.Nome, pessoa.Email });
+                            await _auditoriaService.RegistrarAcaoAsync(
+                                "Convidado",
+                                convidado.Id,
+                                "CREATE",
+                                $"Convidado criado: {pessoa.Nome}",
+                                null,
+                                new { convidado.Id, pessoa.Nome, pessoa.Email });
                         }
                         else
                         {
@@ -264,7 +282,6 @@ namespace ProjetoEventX.Controllers
                 }
                 else
                 {
-                    // Criar nova pessoa e convidado
                     pessoa = new Pessoa
                     {
                         Nome = nomeConvidado,
@@ -274,6 +291,7 @@ namespace ProjetoEventX.Controllers
                         Cpf = "00000000000",
                         Endereco = "Endereço não informado"
                     };
+
                     _context.Pessoas.Add(pessoa);
                     await _context.SaveChangesAsync();
 
@@ -300,11 +318,17 @@ namespace ProjetoEventX.Controllers
                             CreatedAt = DateTime.UtcNow,
                             UpdatedAt = DateTime.UtcNow
                         };
+
                         _context.Convidados.Add(convidado);
                         await _context.SaveChangesAsync();
 
-                        await _auditoriaService.RegistrarAcaoAsync("Convidado", convidado.Id, "CREATE", 
-                            $"Convidado criado: {pessoa.Nome}", null, new { convidado.Id, pessoa.Nome, pessoa.Email });
+                        await _auditoriaService.RegistrarAcaoAsync(
+                            "Convidado",
+                            convidado.Id,
+                            "CREATE",
+                            $"Convidado criado: {pessoa.Nome}",
+                            null,
+                            new { convidado.Id, pessoa.Nome, pessoa.Email });
                     }
                     else
                     {
@@ -314,13 +338,12 @@ namespace ProjetoEventX.Controllers
                     }
                 }
 
-                // Criar lista de convidado
                 var listaConvidado = new ListaConvidado
                 {
-                    ConvidadoId = convidado.Id,
+                    ConvidadoId = convidado!.Id,
                     Convidado = convidado,
                     EventoId = eventoId,
-                    Evento = evento!,
+                    Evento = evento,
                     DataInclusao = DateTime.UtcNow,
                     ConfirmaPresenca = "Pendente",
                     CodigoQR = $"EVTX-{eventoId}-{convidado.Id}-{Guid.NewGuid().ToString("N")[..8]}",
@@ -328,7 +351,6 @@ namespace ProjetoEventX.Controllers
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                // Verificar se já não está convidado
                 var jaConvidado = await _context.ListasConvidados
                     .AnyAsync(l => l.ConvidadoId == convidado.Id && l.EventoId == eventoId);
 
@@ -341,22 +363,35 @@ namespace ProjetoEventX.Controllers
                 _context.ListasConvidados.Add(listaConvidado);
                 await _context.SaveChangesAsync();
 
-                // Registrar convite
-                await _auditoriaService.RegistrarAcaoAsync("ListaConvidado", listaConvidado.Id, "CREATE", 
-                    $"Convidado adicionado ao evento: {pessoa.Nome} -> {evento.NomeEvento}", null, 
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "ListaConvidado",
+                    listaConvidado.Id,
+                    "CREATE",
+                    $"Convidado adicionado ao evento: {pessoa.Nome} -> {evento.NomeEvento}",
+                    null,
                     new { listaConvidado.Id, Convidado = pessoa.Nome, Evento = evento.NomeEvento });
 
                 TempData["SuccessMessage"] = $"✅ Convidado '{pessoa.Nome}' adicionado com sucesso!";
 
-                await _eventLogService.LogAsync(eventoId, user.Id, "ConviteEnviado",
+                await _eventLogService.LogAsync(
+                    eventoId,
+                    user.Id,
+                    "ConviteEnviado",
                     $"Convidado '{pessoa.Nome}' adicionado à lista do evento.");
 
                 return RedirectToAction("Detalhes", "Eventos", new { id = eventoId });
             }
             catch (Exception ex)
             {
-                await _auditoriaService.RegistrarAcaoAsync("Convidado", 0, "CREATE", 
-                    $"Erro ao adicionar convidado: {ex.Message}", null, null, false, ex.Message);
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "Convidado",
+                    0,
+                    "CREATE",
+                    $"Erro ao adicionar convidado: {ex.Message}",
+                    null,
+                    null,
+                    false,
+                    ex.Message);
 
                 TempData["ErrorMessage"] = "❌ Erro ao adicionar convidado.";
                 ViewBag.EventoId = eventoId;
@@ -379,7 +414,6 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("LoginOrganizador", "Auth");
             }
 
-            // Verificar permissão
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
             {
                 return RedirectToAction("AccessDenied", "Auth");
@@ -393,8 +427,9 @@ namespace ProjetoEventX.Controllers
 
             ViewBag.EventoId = eventoId;
 
-            // Registrar visualização
-            await _auditoriaService.RegistrarVisualizacaoAsync("ListaConvidado", eventoId, 
+            await _auditoriaService.RegistrarVisualizacaoAsync(
+                "ListaConvidado",
+                eventoId,
                 $"Listagem de convidados do evento ID: {eventoId}");
 
             return View(convidados);
@@ -410,7 +445,6 @@ namespace ProjetoEventX.Controllers
                 return RedirectToAction("LoginOrganizador", "Auth");
             }
 
-            // Verificar permissão
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
             {
                 return RedirectToAction("AccessDenied", "Auth");
@@ -432,16 +466,18 @@ namespace ProjetoEventX.Controllers
                     return RedirectToAction("Listar", new { eventoId });
                 }
 
-                var linkConfirmacao = Url.Action("ConfirmarPresenca", "Convite", 
-                    new { eventoId = eventoId, convidadoId = convidadoId }, 
+                var linkConfirmacao = Url.Action(
+                    "ConfirmarPresenca",
+                    "Convite",
+                    new { eventoId, convidadoId },
                     protocol: Request.Scheme) ?? "";
 
                 var templateConvite = await _context.TemplatesConvites
-                    .FirstOrDefaultAsync(t => t.OrganizadorId == user.Id && t.Ativo);
+                    .FirstOrDefaultAsync(t => t.EventoId == eventoId && t.Ativo);
 
-                var htmlConvite = templateConvite != null 
-                    ? templateConvite.GerarHTMLConvite(convidado.Pessoa.Nome, linkConfirmacao)
-                    : $"<h1>Convite para {evento.NomeEvento}</h1><p>Olá {convidado.Pessoa.Nome}, você está convidado!</p>";
+                var htmlConvite = templateConvite != null
+                    ? templateConvite.GerarHTMLConvite(convidado.Pessoa!.Nome, linkConfirmacao)
+                    : $"<h1>Convite para {evento.NomeEvento}</h1><p>Olá {convidado.Pessoa!.Nome}, você está convidado!</p>";
 
                 var htmlCompleto = $@"
                     <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;'>
@@ -456,35 +492,54 @@ namespace ProjetoEventX.Controllers
                         </p>
                     </div>";
 
-                // Registrar envio do convite
-                await _auditoriaService.RegistrarAcaoAsync("Convite", 0, "SEND", 
-                    $"Convite enviado para {convidado.Pessoa.Nome} no evento {evento.NomeEvento}", null, 
-                    new { Convidado = convidado.Pessoa.Nome, Evento = evento.NomeEvento, TemplateUsado = templateConvite != null });
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "Convite",
+                    0,
+                    "SEND",
+                    $"Convite enviado para {convidado.Pessoa!.Nome} no evento {evento.NomeEvento}",
+                    null,
+                    new
+                    {
+                        Convidado = convidado.Pessoa!.Nome,
+                        Evento = evento.NomeEvento,
+                        TemplateUsado = templateConvite != null
+                    });
 
-                // Enviar email via SMTP
                 var emailEnviado = await _emailService.EnviarEmailAsync(
-                    convidado.Pessoa.Email,
+                    convidado.Pessoa!.Email!,
                     $"Convite: {evento.NomeEvento}",
                     htmlCompleto);
 
                 if (emailEnviado)
                 {
-                    TempData["SuccessMessage"] = $"✅ Convite enviado com sucesso para {convidado.Pessoa.Nome} ({convidado.Pessoa.Email})!";
+                    TempData["SuccessMessage"] =
+                        $"✅ Convite enviado com sucesso para {convidado.Pessoa!.Nome} ({convidado.Pessoa!.Email})!";
                 }
                 else
                 {
-                    TempData["SuccessMessage"] = $"✅ Convite registrado para {convidado.Pessoa.Nome}! (Email SMTP não configurado - configure SMTP_USER e SMTP_PASS)";
+                    TempData["SuccessMessage"] =
+                        $"✅ Convite registrado para {convidado.Pessoa!.Nome}! (Email SMTP não configurado - configure SMTP_USER e SMTP_PASS)";
                 }
 
-                await _eventLogService.LogAsync(eventoId, user.Id, "ConviteEnviado",
-                    $"Convite enviado para {convidado.Pessoa.Nome} ({convidado.Pessoa.Email}).");
+                await _eventLogService.LogAsync(
+                    eventoId,
+                    user.Id,
+                    "ConviteEnviado",
+                    $"Convite enviado para {convidado.Pessoa!.Nome} ({convidado.Pessoa!.Email}).");
 
                 return RedirectToAction("Listar", new { eventoId });
             }
             catch (Exception ex)
             {
-                await _auditoriaService.RegistrarAcaoAsync("Convite", 0, "SEND", 
-                    $"Erro ao enviar convite: {ex.Message}", null, null, false, ex.Message);
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "Convite",
+                    0,
+                    "SEND",
+                    $"Erro ao enviar convite: {ex.Message}",
+                    null,
+                    null,
+                    false,
+                    ex.Message);
 
                 TempData["ErrorMessage"] = "❌ Erro ao enviar convite.";
                 return RedirectToAction("Listar", new { eventoId });
@@ -521,8 +576,15 @@ namespace ProjetoEventX.Controllers
             }
             catch (Exception ex)
             {
-                await _auditoriaService.RegistrarAcaoAsync("ListaConvidado", 0, "VIEW", 
-                    $"Erro ao exibir RSVP: {ex.Message}", null, null, false, ex.Message);
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "ListaConvidado",
+                    0,
+                    "VIEW",
+                    $"Erro ao exibir RSVP: {ex.Message}",
+                    null,
+                    null,
+                    false,
+                    ex.Message);
 
                 TempData["ErrorMessage"] = "❌ Erro ao carregar convite.";
                 return RedirectToAction("Index", "Home");
@@ -550,6 +612,7 @@ namespace ProjetoEventX.Controllers
 
                 var statusAnterior = listaConvidado.ConfirmaPresenca;
                 string novoStatus;
+
                 if (resposta == "Confirmado")
                     novoStatus = "Confirmado";
                 else if (resposta == "NaoIra")
@@ -563,15 +626,18 @@ namespace ProjetoEventX.Controllers
                 _context.Update(listaConvidado);
                 await _context.SaveChangesAsync();
 
-                await _auditoriaService.RegistrarAcaoAsync("ListaConvidado", listaConvidado.Id, "UPDATE",
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "ListaConvidado",
+                    listaConvidado.Id,
+                    "UPDATE",
                     $"RSVP: {listaConvidado.Convidado?.Pessoa?.Nome} respondeu '{novoStatus}' no evento {listaConvidado.Evento?.NomeEvento}",
                     new { listaConvidado.Id, ConfirmaPresenca = statusAnterior },
                     new { listaConvidado.Id, ConfirmaPresenca = novoStatus });
 
-                // Notificar organizador sobre confirmação de presença
                 if (listaConvidado.Evento != null && novoStatus == "Confirmado")
                 {
                     var nomeConvidado = listaConvidado.Convidado?.Pessoa?.Nome ?? "Um convidado";
+
                     await _notificationService.CreateAsync(
                         listaConvidado.Evento.OrganizadorId,
                         "Presença confirmada",
@@ -579,7 +645,10 @@ namespace ProjetoEventX.Controllers
                         "ConfirmacaoPresenca",
                         $"/Convite/Gerenciar?eventoId={listaConvidado.EventoId}");
 
-                    await _eventLogService.LogAsync(listaConvidado.EventoId, null, "ConfirmacaoPresenca",
+                    await _eventLogService.LogAsync(
+                        listaConvidado.EventoId,
+                        null,
+                        "ConfirmacaoPresenca",
                         $"{nomeConvidado} confirmou presença no evento.");
                 }
 
@@ -592,15 +661,21 @@ namespace ProjetoEventX.Controllers
             }
             catch (Exception ex)
             {
-                await _auditoriaService.RegistrarAcaoAsync("ListaConvidado", 0, "UPDATE",
-                    $"Erro no RSVP: {ex.Message}", null, null, false, ex.Message);
+                await _auditoriaService.RegistrarAcaoAsync(
+                    "ListaConvidado",
+                    0,
+                    "UPDATE",
+                    $"Erro no RSVP: {ex.Message}",
+                    null,
+                    null,
+                    false,
+                    ex.Message);
 
                 TempData["ErrorMessage"] = "❌ Erro ao registrar resposta.";
                 return RedirectToAction("Index", "Home");
             }
         }
 
-        // GET: Convite/Editor - Editor visual estilo Canva com Fabric.js
         [HttpGet]
         public async Task<IActionResult> Editor(int eventoId)
         {
@@ -614,7 +689,10 @@ namespace ProjetoEventX.Controllers
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
                 return RedirectToAction("AccessDenied", "Auth");
 
-            var evento = await _context.Eventos.Include(e => e.Local).FirstOrDefaultAsync(e => e.Id == eventoId);
+            var evento = await _context.Eventos
+                .Include(e => e.Local)
+                .FirstOrDefaultAsync(e => e.Id == eventoId);
+
             if (evento == null)
                 return RedirectToAction("Index", "Eventos");
 
@@ -631,7 +709,6 @@ namespace ProjetoEventX.Controllers
             return View();
         }
 
-        // POST: Convite/SalvarDesignCanvas - Salva JSON do Fabric.js canvas
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SalvarDesignCanvas(int eventoId, string canvasJson, string nomeTemplate)
@@ -646,16 +723,18 @@ namespace ProjetoEventX.Controllers
             var template = new TemplateConvite
             {
                 EventoId = eventoId,
-                OrganizadorId = user.Id,
-                NomeTemplate = nomeTemplate ?? "Convite personalizado",
-                TituloConvite = "Convite",
-                MensagemPrincipal = "Convite criado no editor visual",
-                CSSPersonalizado = canvasJson, // Armazena o JSON do canvas no campo CSS
-                EstiloLayout = "Canvas",
+                Nome = nomeTemplate ?? "Convite personalizado",
+                Titulo = "Convite",
+                Mensagem = "Convite criado no editor visual",
+                LayoutJson = canvasJson,
+                Estilo = "Canvas",
                 Ativo = true,
-                PadraoSistema = false,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                CorFundo = "#ffffff",
+                CorTexto = "#333333",
+                CorPrimaria = "#992008",
+                Fonte = "'Inter', sans-serif",
+                Saudacao = "Olá Nome do Convidado,",
+                TextoBotao = "Confirmar Presença"
             };
 
             _context.TemplatesConvites.Add(template);
@@ -664,7 +743,6 @@ namespace ProjetoEventX.Controllers
             return Json(new { success = true, templateId = template.Id });
         }
 
-        // GET: Convite/Publico/{codigo} - Página pública do convite compartilhável
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Publico(string codigo)
@@ -692,20 +770,16 @@ namespace ProjetoEventX.Controllers
             ViewBag.EventoId = lista.EventoId;
             ViewBag.ConvidadoId = lista.ConvidadoId;
 
-            // Buscar template do convite
             var template = await _context.TemplatesConvites
-                .FirstOrDefaultAsync(t => t.EventoId == lista.EventoId && t.Ativo && t.PadraoSistema);
-
-            if (template == null)
-                template = await _context.TemplatesConvites
-                    .FirstOrDefaultAsync(t => t.EventoId == lista.EventoId && t.Ativo);
+                .Where(t => t.EventoId == lista.EventoId && t.Ativo)
+                .OrderByDescending(t => t.Id)
+                .FirstOrDefaultAsync();
 
             ViewBag.Template = template;
 
             return View();
         }
 
-        // GET: Convite/GaleriaTemplates - Galeria de templates profissionais
         [HttpGet]
         public async Task<IActionResult> GaleriaTemplates(int eventoId)
         {
@@ -716,7 +790,10 @@ namespace ProjetoEventX.Controllers
             if (!await User.IsOwnerOfEventoAsync(_userManager, eventoId, _context))
                 return RedirectToAction("AccessDenied", "Auth");
 
-            var evento = await _context.Eventos.Include(e => e.Local).FirstOrDefaultAsync(e => e.Id == eventoId);
+            var evento = await _context.Eventos
+                .Include(e => e.Local)
+                .FirstOrDefaultAsync(e => e.Id == eventoId);
+
             if (evento == null)
                 return RedirectToAction("Index", "Eventos");
 
@@ -724,11 +801,11 @@ namespace ProjetoEventX.Controllers
             ViewBag.NomeEvento = evento.NomeEvento;
             ViewBag.TipoEvento = evento.TipoEvento;
 
-            // Buscar templates salvos do organizador
             var templatesSalvos = await _context.TemplatesConvites
-                .Where(t => t.OrganizadorId == user.Id && t.Ativo)
-                .OrderByDescending(t => t.CreatedAt)
+                .Where(t => t.EventoId == eventoId && t.Ativo)
+                .OrderByDescending(t => t.Id)
                 .ToListAsync();
+
             ViewBag.TemplatesSalvos = templatesSalvos;
 
             return View();

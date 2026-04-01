@@ -8,11 +8,12 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/forms.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/onboarding.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ProjetoEventX.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/theme-eventx.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/onboarding.css" asp-append-version="true" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css" />
 
     
@@ -25,6 +26,7 @@
     string tipoUsuario = "";
     string nomeUsuario = "";
     string emailUsuario = "";
+
     if (User.Identity?.IsAuthenticated == true)
     {
         var appUser = await UserManager.GetUserAsync(User);
@@ -32,6 +34,7 @@
         nomeUsuario = appUser?.UserName ?? "";
         emailUsuario = appUser?.Email ?? "";
     }
+
     bool isAuth = User.Identity?.IsAuthenticated == true;
     bool isPublicPage = !isAuth;
 }
@@ -40,40 +43,6 @@
 
     @if (isPublicPage)
     {
-        <!-- ======================== PUBLIC NAVBAR (não-logado) ======================== -->
-        <nav class="navbar navbar-expand-lg public-navbar">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
-                    <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 36px;">
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#publicNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="publicNav">
-                    <ul class="navbar-nav ms-auto align-items-center gap-2">
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Eventos" asp-action="Index">Eventos</a></li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Entrar</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginOrganizador"><i class="fas fa-user-tie me-2"></i>Organizador</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginFornecedor"><i class="fas fa-store me-2"></i>Fornecedor</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="LoginConvidado"><i class="fas fa-users me-2"></i>Convidado</a></li>
-                            </ul>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="btn btn-saas-primary btn-sm px-3" href="#" data-bs-toggle="dropdown">Cadastrar</a>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegistroOrganizador"><i class="fas fa-user-tie me-2"></i>Organizador</a></li>
-                                <li><a class="dropdown-item" asp-controller="Auth" asp-action="RegistroFornecedor"><i class="fas fa-store me-2"></i>Fornecedor</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Alerts -->
         <div class="container mt-3">
             @if (TempData["SuccessMessage"] != null)
             {
@@ -82,6 +51,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
+
             @if (TempData["ErrorMessage"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show saas-alert" role="alert">
@@ -89,6 +59,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
+
             @if (TempData["InfoMessage"] != null)
             {
                 <div class="alert alert-info alert-dismissible fade show saas-alert" role="alert">
@@ -102,23 +73,25 @@
 
         <footer class="public-footer">
             <div class="container text-center py-4">
-                <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 32px; opacity: 0.7;" class="mb-2">
+                <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 32px; opacity: 0.7;" class="mb-2" />
                 <p class="mb-1 small text-muted">&copy; 2025 EventX — Onde organizar eventos é só o começo.</p>
-                <p class="mb-0 small"><a href="#" class="text-muted">Suporte</a> · <a href="#" class="text-muted">Privacidade</a></p>
+                <p class="mb-0 small">
+                    <a href="#" class="text-muted">Suporte</a> ·
+                    <a href="#" class="text-muted">Privacidade</a>
+                </p>
             </div>
         </footer>
     }
     else
     {
-        <!-- ======================== SaaS APP LAYOUT (logado) ======================== -->
-
-        <!-- SIDEBAR -->
         <aside class="saas-sidebar" id="saasSidebar">
             <div class="sidebar-brand">
                 <a asp-controller="Home" asp-action="Index">
-                    <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 30px;">
+                    <img src="~/Images/Logo_com_nome.png" alt="EventX" style="height: 30px;" />
                 </a>
-                <button class="sidebar-close d-lg-none" id="sidebarClose"><i class="fas fa-times"></i></button>
+                <button type="button" class="sidebar-close d-lg-none" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <nav class="sidebar-nav">
@@ -137,6 +110,7 @@
                     </a>
 
                     <div class="sidebar-section-label">Gestão</div>
+
                     <a class="sidebar-link" asp-controller="Organizador" asp-action="Orcamento">
                         <i class="fas fa-coins"></i><span>Financeiro</span>
                     </a>
@@ -148,6 +122,7 @@
                     </a>
 
                     <div class="sidebar-section-label">Fornecedores</div>
+
                     <a class="sidebar-link" asp-controller="Marketplace" asp-action="Index">
                         <i class="fas fa-store"></i><span>Marketplace</span>
                     </a>
@@ -159,6 +134,7 @@
                     </a>
 
                     <div class="sidebar-section-label">Ferramentas</div>
+
                     <a class="sidebar-link" asp-controller="IA" asp-action="Index">
                         <i class="fas fa-robot"></i><span>Assistente IA</span>
                     </a>
@@ -229,16 +205,26 @@
                         </div>
 
                     </aside>
+                    <div class="sidebar-section-label">Performance</div>
+
+                    <a class="sidebar-link" asp-controller="Fornecedor" asp-action="Performance">
+                        <i class="fas fa-chart-line"></i><span>Performance</span>
+                    </a>
+                    <a class="sidebar-link" asp-controller="RankingFornecedor" asp-action="Index">
+                        <i class="fas fa-ranking-star"></i><span>Ranking</span>
+                    </a>
                 }
             </nav>
 
             <div class="sidebar-footer">
-                <button class="sidebar-tour-btn" onclick="EventXOnboarding.resetOnboarding()" title="Ver tour novamente">
+                <button type="button" class="sidebar-tour-btn" onclick="EventXOnboarding.resetOnboarding()" title="Ver tour novamente">
                     <i class="fas fa-route"></i><span>Ver tour novamente</span>
                 </button>
+
                 <a class="sidebar-link" asp-controller="Notificacao" asp-action="Index">
                     <i class="fas fa-bell"></i><span>Notificações</span>
                 </a>
+
                 <div class="sidebar-user">
                     <div class="sidebar-user-avatar">
                         <i class="fas fa-user"></i>
@@ -251,66 +237,83 @@
             </div>
         </aside>
 
-        <!-- Overlay mobile -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-        <!-- MAIN AREA -->
         <div class="saas-main">
-            <!-- TOP HEADER -->
             <header class="saas-header">
                 <div class="header-left">
-                    <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
+                    <button type="button" class="sidebar-toggle d-lg-none" id="sidebarToggle">
                         <i class="fas fa-bars"></i>
                     </button>
+
                     <div class="header-search">
                         <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Buscar eventos, fornecedores..." id="globalSearch" autocomplete="off">
+                        <input type="text" placeholder="Buscar eventos, fornecedores..." id="globalSearch" autocomplete="off" />
                     </div>
                 </div>
+
                 <div class="header-right">
-                    <!-- Notificações (sino) -->
                     <div class="header-notification dropdown" id="notificationBell">
-                        <button class="header-icon-btn" data-bs-toggle="dropdown" id="notificationDropdownToggle">
+                        <button type="button" class="header-icon-btn" data-bs-toggle="dropdown" id="notificationDropdownToggle" aria-expanded="false">
                             <i class="fas fa-bell"></i>
                             <span class="notification-dot d-none" id="notificationBadge"></span>
                         </button>
+
                         <div class="dropdown-menu dropdown-menu-end notification-dropdown" id="notificationDropdown">
                             <div class="notification-header">
                                 <strong>Notificações</strong>
-                                <button class="btn btn-sm btn-link p-0 text-decoration-none" id="markAllReadBtn">
+                                <button type="button" class="btn btn-sm btn-link p-0 text-decoration-none" id="markAllReadBtn">
                                     Marcar lidas
                                 </button>
                             </div>
+
                             <div class="notification-body" id="notificationList">
                                 <div class="notification-empty">Nenhuma notificação</div>
                             </div>
+
                             <div class="notification-footer">
                                 <a href="/Notificacao">Ver todas</a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Perfil -->
                     <div class="dropdown">
-                        <button class="header-profile-btn" data-bs-toggle="dropdown">
+                        <button type="button" class="header-profile-btn" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="header-avatar"><i class="fas fa-user"></i></div>
                             <span class="d-none d-md-inline">@nomeUsuario</span>
                             <i class="fas fa-chevron-down ms-1" style="font-size: 0.65rem;"></i>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end">
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-4">
                             @if (tipoUsuario == "Organizador")
                             {
-                                <li><a class="dropdown-item" asp-controller="Organizador" asp-action="Profile"><i class="fas fa-user me-2"></i>Perfil</a></li>
-                                <li><a class="dropdown-item" asp-controller="Eventos" asp-action="Index"><i class="fas fa-calendar me-2"></i>Meus Eventos</a></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Organizador" asp-action="Profile">
+                                        <i class="fas fa-user me-2"></i>Perfil
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Eventos" asp-action="Index">
+                                        <i class="fas fa-calendar me-2"></i>Meus Eventos
+                                    </a>
+                                </li>
                             }
                             else if (tipoUsuario == "Fornecedor")
                             {
-                                <li><a class="dropdown-item" asp-controller="Fornecedor" asp-action="Dashboard"><i class="fas fa-store me-2"></i>Minha Loja</a></li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="Fornecedor" asp-action="Dashboard">
+                                        <i class="fas fa-store me-2"></i>Minha Loja
+                                    </a>
+                                </li>
                             }
+
                             <li><hr class="dropdown-divider"></li>
+
                             <li>
                                 <form asp-controller="Auth" asp-action="Logout" method="post">
-                                    <button type="submit" class="dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Sair</button>
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Sair
+                                    </button>
                                 </form>
                             </li>
                         </ul>
@@ -318,7 +321,6 @@
                 </div>
             </header>
 
-            <!-- ALERTS -->
             <div class="saas-alerts">
                 @if (TempData["SuccessMessage"] != null)
                 {
@@ -327,6 +329,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
+
                 @if (TempData["ErrorMessage"] != null)
                 {
                     <div class="alert alert-danger alert-dismissible fade show saas-alert" role="alert">
@@ -334,6 +337,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
+
                 @if (TempData["InfoMessage"] != null)
                 {
                     <div class="alert alert-info alert-dismissible fade show saas-alert" role="alert">
@@ -343,115 +347,154 @@
                 }
             </div>
 
-            <!-- CONTENT -->
             <main class="saas-content">
                 @RenderBody()
             </main>
         </div>
     }
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/formatacao.js" asp-append-version="true"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
-    
+
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Auto-dismiss alerts
-        setTimeout(() => {
-            document.querySelectorAll('.alert-success').forEach(a => new bootstrap.Alert(a).close());
-        }, 5000);
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(() => {
+                document.querySelectorAll('.alert-success').forEach(a => new bootstrap.Alert(a).close());
+            }, 5000);
 
-        // Sidebar toggle (mobile)
-        const sidebar = document.getElementById('saasSidebar');
-        const overlay = document.getElementById('sidebarOverlay');
-        const toggle = document.getElementById('sidebarToggle');
-        const close = document.getElementById('sidebarClose');
-        
-        if (toggle) toggle.addEventListener('click', () => {
-            sidebar?.classList.add('open');
-            overlay?.classList.add('active');
-        });
-        [close, overlay].forEach(el => el?.addEventListener('click', () => {
-            sidebar?.classList.remove('open');
-            overlay?.classList.remove('active');
-        }));
+            const sidebar = document.getElementById('saasSidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const toggle = document.getElementById('sidebarToggle');
+            const close = document.getElementById('sidebarClose');
 
-        // Active sidebar link
-        const path = window.location.pathname.toLowerCase();
-        document.querySelectorAll('.sidebar-link').forEach(link => {
-            const href = link.getAttribute('href')?.toLowerCase();
-            if (href && path.startsWith(href) && href !== '/') {
-                link.classList.add('active');
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    sidebar?.classList.add('open');
+                    overlay?.classList.add('active');
+                });
             }
+
+            [close, overlay].forEach(el => {
+                el?.addEventListener('click', () => {
+                    sidebar?.classList.remove('open');
+                    overlay?.classList.remove('active');
+                });
+            });
+
+            const currentPath = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                const href = (link.getAttribute('href') || '').toLowerCase().replace(/\/+$/, '');
+                if (!href || href === '/') return;
+
+                if (currentPath === href || currentPath.startsWith(href + '/')) {
+                    link.classList.add('active');
+                }
+            });
         });
-    });
     </script>
 
     @if (isAuth)
     {
-    <script>
-    (function() {
-        const typeIcons = {
-            'RespostaOrcamento': 'fas fa-file-invoice-dollar text-primary',
-            'NovaMensagem': 'fas fa-comment-dots text-info',
-            'PropostaAceita': 'fas fa-check-circle text-success',
-            'PropostaRecusada': 'fas fa-times-circle text-danger',
-            'NovoPedido': 'fas fa-shopping-cart text-warning',
-            'PagamentoConfirmado': 'fas fa-credit-card text-success',
-            'ConfirmacaoPresenca': 'fas fa-user-check text-primary'
-        };
-        function getIcon(type) { return typeIcons[type] || 'fas fa-bell text-secondary'; }
-        function escapeHtml(t) { var d = document.createElement('div'); d.appendChild(document.createTextNode(t)); return d.innerHTML; }
+        <script>
+            (function () {
+                const typeIcons = {
+                    'RespostaOrcamento': 'fas fa-file-invoice-dollar text-primary',
+                    'NovaMensagem': 'fas fa-comment-dots text-info',
+                    'PropostaAceita': 'fas fa-check-circle text-success',
+                    'PropostaRecusada': 'fas fa-times-circle text-danger',
+                    'NovoPedido': 'fas fa-shopping-cart text-warning',
+                    'PagamentoConfirmado': 'fas fa-credit-card text-success',
+                    'ConfirmacaoPresenca': 'fas fa-user-check text-primary'
+                };
 
-        function loadNotifications() {
-            $.getJSON('/Notificacao/GetUnread', function(data) {
-                var badge = $('#notificationBadge');
-                if (data.unreadCount > 0) {
-                    badge.text(data.unreadCount > 99 ? '99+' : data.unreadCount).removeClass('d-none');
-                } else {
-                    badge.addClass('d-none');
+                function getIcon(type) {
+                    return typeIcons[type] || 'fas fa-bell text-secondary';
                 }
-                var list = $('#notificationList');
-                if (data.notifications.length === 0) {
-                    list.html('<div class="notification-empty">Nenhuma notificação</div>');
-                    return;
+
+                function escapeHtml(t) {
+                    var d = document.createElement('div');
+                    d.appendChild(document.createTextNode(t));
+                    return d.innerHTML;
                 }
-                var html = '';
-                data.notifications.forEach(function(n) {
-                    var bgClass = n.isRead ? '' : 'unread';
-                    html += '<a class="notification-item ' + bgClass + '" href="javascript:void(0)" data-id="' + n.id + '" data-link="' + (n.link || '/Notificacao') + '">' +
-                        '<div class="notification-item-icon"><i class="' + getIcon(n.type) + '"></i></div>' +
-                        '<div class="notification-item-content">' +
-                            '<div class="notification-item-title">' + escapeHtml(n.title) + '</div>' +
-                            '<div class="notification-item-text">' + escapeHtml(n.message) + '</div>' +
-                            '<div class="notification-item-time">' + n.timeAgo + '</div>' +
-                        '</div>' +
-                    '</a>';
+
+                function loadNotifications() {
+                    $.getJSON('/Notificacao/GetUnread', function (data) {
+                        var badge = $('#notificationBadge');
+
+                        if (data.unreadCount > 0) {
+                            badge.text(data.unreadCount > 99 ? '99+' : data.unreadCount).removeClass('d-none');
+                        } else {
+                            badge.addClass('d-none');
+                        }
+
+                        var list = $('#notificationList');
+
+                        if (data.notifications.length === 0) {
+                            list.html('<div class="notification-empty">Nenhuma notificação</div>');
+                            return;
+                        }
+
+                        var html = '';
+                        data.notifications.forEach(function (n) {
+                            var bgClass = n.isRead ? '' : 'unread';
+
+                            html += '<a class="notification-item ' + bgClass + '" href="javascript:void(0)" data-id="' + n.id + '" data-link="' + (n.link || '/Notificacao') + '">' +
+                                '<div class="notification-item-icon"><i class="' + getIcon(n.type) + '"></i></div>' +
+                                '<div class="notification-item-content">' +
+                                '<div class="notification-item-title">' + escapeHtml(n.title) + '</div>' +
+                                '<div class="notification-item-text">' + escapeHtml(n.message) + '</div>' +
+                                '<div class="notification-item-time">' + n.timeAgo + '</div>' +
+                                '</div>' +
+                                '</a>';
+                        });
+
+                        list.html(html);
+                    });
+                }
+
+                $(document).on('click', '.notification-item', function (e) {
+                    e.preventDefault();
+                    var id = $(this).data('id');
+                    var link = $(this).data('link');
+
+                    $.post('/Notificacao/MarkAsRead/' + id, function () {
+                        window.location.href = link;
+                    });
                 });
-                list.html(html);
-            });
-        }
-        $(document).on('click', '.notification-item', function(e) {
-            e.preventDefault();
-            var id = $(this).data('id'), link = $(this).data('link');
-            $.post('/Notificacao/MarkAsRead/' + id, function() { window.location.href = link; });
-        });
-        $('#markAllReadBtn').on('click', function(e) { e.preventDefault(); e.stopPropagation(); $.post('/Notificacao/MarkAllAsRead', function() { loadNotifications(); }); });
-        $('#notificationDropdownToggle').on('click', function() { loadNotifications(); });
-        setInterval(function() {
-            $.getJSON('/Notificacao/UnreadCount', function(data) {
-                var badge = $('#notificationBadge');
-                if (data.count > 0) { badge.text(data.count > 99 ? '99+' : data.count).removeClass('d-none'); } else { badge.addClass('d-none'); }
-            });
-        }, 30000);
-        $.getJSON('/Notificacao/UnreadCount', function(data) {
-            if (data.count > 0) { $('#notificationBadge').text(data.count > 99 ? '99+' : data.count).removeClass('d-none'); }
-        });
-    })();
-    </script>
+
+                $('#markAllReadBtn').on('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    $.post('/Notificacao/MarkAllAsRead', function () {
+                        loadNotifications();
+                    });
+                });
+
+                $('#notificationDropdownToggle').on('click', function () {
+                    loadNotifications();
+                });
+
+                setInterval(function () {
+                    $.getJSON('/Notificacao/UnreadCount', function (data) {
+                        var badge = $('#notificationBadge');
+                        if (data.count > 0) {
+                            badge.text(data.count > 99 ? '99+' : data.count).removeClass('d-none');
+                        } else {
+                            badge.addClass('d-none');
+                        }
+                    });
+                }, 30000);
+
+                $.getJSON('/Notificacao/UnreadCount', function (data) {
+                    if (data.count > 0) {
+                        $('#notificationBadge').text(data.count > 99 ? '99+' : data.count).removeClass('d-none');
+                    }
+                });
+            })();
+        </script>
     }
 
     <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
