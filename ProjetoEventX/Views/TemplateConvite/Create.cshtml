@@ -142,10 +142,10 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            <label asp-for="TamanhoFonteTitulo" class="control-label">Tamanho Fonte Título</label>
-                                            <input asp-for="TamanhoFonteTitulo" type="range" min="16" max="48" class="form-control" />
-                                            <small class="form-text text-muted">@Model.TamanhoFonteTitulo px</small>
-                                            <span asp-validation-for="TamanhoFonteTitulo" class="text-danger"></span>
+                                            <label asp-for="TamanhoFonte" class="control-label">Tamanho Fonte Título</label>
+                                            <input asp-for="TamanhoFonte" type="range" min="16" max="48" class="form-control" />
+                                            <small class="form-text text-muted">@Model.TamanhoFonte px</small>
+                                            <span asp-validation-for="TamanhoFonte" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -168,8 +168,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label asp-for="FonteTexto" class="control-label">Fonte do Texto</label>
-                                            <select asp-for="FonteTexto" class="form-control">
+                                            <label asp-for="Fonte" class="control-label">Fonte do Texto</label>
+                                            <select asp-for="Fonte" class="form-control">
                                                 <option value="Arial, sans-serif">Arial</option>
                                                 <option value="'Times New Roman', serif">Times New Roman</option>
                                                 <option value="'Helvetica Neue', sans-serif">Helvetica</option>
@@ -179,7 +179,7 @@
                                                 <option value="'Lato', sans-serif">Lato</option>
                                                 <option value="'Source Sans Pro', sans-serif">Source Sans Pro</option>
                                             </select>
-                                            <span asp-validation-for="FonteTexto" class="text-danger"></span>
+                                            <span asp-validation-for="Fonte" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>

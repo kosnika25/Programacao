@@ -1970,54 +1970,40 @@ namespace ProjetoEventX.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("CorFundo")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("CorPrimaria")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<string>("CorTexto")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("EstiloLayout")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
-                    b.Property<int>("EventoId")
+                    b.Property<int?>("EventoId")
                         .HasColumnType("integer");
 
-                    b.Property<string>("FonteTexto")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<string>("Fonte")
+                        .HasColumnType("text");
 
                     b.Property<string>("FonteTitulo")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
-                    b.Property<string>("ImagemCabecalho")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                    b.Property<string>("LayoutJson")
+                        .HasColumnType("text");
 
-                    b.Property<string>("ImagemRodape")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                    b.Property<string>("Mensagem")
+                        .HasColumnType("text");
 
                     b.Property<string>("MensagemPrincipal")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("MensagemSecundaria")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<bool>("MostrarFotoEvento")
                         .HasColumnType("boolean");
@@ -2033,34 +2019,29 @@ namespace ProjetoEventX.Migrations
 
                     b.Property<string>("NomeTemplate")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("OrganizadorId")
-                        .HasColumnType("integer");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PadraoSistema")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("TamanhoFonteTexto")
-                        .HasColumnType("integer");
+                    b.Property<string>("Saudacao")
+                        .HasColumnType("text");
 
-                    b.Property<int>("TamanhoFonteTitulo")
-                        .HasColumnType("integer");
+                    b.Property<string>("TamanhoFonte")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TextoBotao")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Titulo")
+                        .HasColumnType("text");
 
                     b.Property<string>("TituloConvite")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.HasIndex("EventoId");
-
-                    b.HasIndex("OrganizadorId");
 
                     b.ToTable("TemplatesConvites");
                 });
@@ -2649,19 +2630,9 @@ namespace ProjetoEventX.Migrations
                 {
                     b.HasOne("ProjetoEventX.Models.Evento", "Evento")
                         .WithMany()
-                        .HasForeignKey("EventoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProjetoEventX.Models.Organizador", "Organizador")
-                        .WithMany()
-                        .HasForeignKey("OrganizadorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EventoId");
 
                     b.Navigation("Evento");
-
-                    b.Navigation("Organizador");
                 });
 
             modelBuilder.Entity("ProjetoEventX.Models.TimelineEvento", b =>

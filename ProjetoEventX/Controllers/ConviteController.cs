@@ -6,10 +6,6 @@ using ProjetoEventX.Data;
 using ProjetoEventX.Models;
 using ProjetoEventX.Security;
 using ProjetoEventX.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Security.Claims;
 
 namespace ProjetoEventX.Controllers
 {
@@ -723,11 +719,11 @@ namespace ProjetoEventX.Controllers
             var template = new TemplateConvite
             {
                 EventoId = eventoId,
-                Nome = nomeTemplate ?? "Convite personalizado",
+                NomeTemplate = nomeTemplate ?? "Convite personalizado",
                 Titulo = "Convite",
                 Mensagem = "Convite criado no editor visual",
                 LayoutJson = canvasJson,
-                Estilo = "Canvas",
+                EstiloLayout = "Canvas",
                 Ativo = true,
                 CorFundo = "#ffffff",
                 CorTexto = "#333333",

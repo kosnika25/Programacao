@@ -6,16 +6,12 @@ using ProjetoEventX.Data;
 using ProjetoEventX.Models;
 using ProjetoEventX.Security;
 using ProjetoEventX.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Security.Claims;
 
 namespace ProjetoEventX.Controllers
 {
     [Authorize]
     [ServiceFilter(typeof(SecurityActionFilter))]
-    public class ConviteController : Controller
+    public class TemplateConviteController : Controller
     {
         private readonly EventXContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -24,7 +20,8 @@ namespace ProjetoEventX.Controllers
         private readonly NotificationService _notificationService;
         private readonly EventLogService _eventLogService;
 
-        public ConviteController(
+
+        public TemplateConviteController(
             EventXContext context,
             UserManager<ApplicationUser> userManager,
             AuditoriaService auditoriaService,
@@ -723,11 +720,11 @@ namespace ProjetoEventX.Controllers
             var template = new TemplateConvite
             {
                 EventoId = eventoId,
-                Nome = nomeTemplate ?? "Convite personalizado",
+                NomeTemplate = nomeTemplate ?? "Convite personalizado",
                 Titulo = "Convite",
                 Mensagem = "Convite criado no editor visual",
                 LayoutJson = canvasJson,
-                Estilo = "Canvas",
+                EstiloLayout = "Canvas",
                 Ativo = true,
                 CorFundo = "#ffffff",
                 CorTexto = "#333333",
@@ -801,7 +798,7 @@ namespace ProjetoEventX.Controllers
             ViewBag.NomeEvento = evento.NomeEvento;
             ViewBag.TipoEvento = evento.TipoEvento;
 
-            var templatesSalvos = await  _context.TemplatesConvites
+            var templatesSalvos = await _context.TemplatesConvites
                 .Where(t => t.EventoId == eventoId && t.Ativo)
                 .OrderByDescending(t => t.Id)
                 .ToListAsync();
