@@ -15,7 +15,7 @@ namespace ProjetoEventX.Controllers
 {
     [Authorize]
     [ServiceFilter(typeof(SecurityActionFilter))]
-    public class ConviteController : Controller
+    public class TemplateConviteController : Controller
     {
         private readonly EventXContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -24,7 +24,7 @@ namespace ProjetoEventX.Controllers
         private readonly NotificationService _notificationService;
         private readonly EventLogService _eventLogService;
 
-        public ConviteController(
+        public TemplateConviteController(
             EventXContext context,
             UserManager<ApplicationUser> userManager,
             AuditoriaService auditoriaService,
